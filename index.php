@@ -17,14 +17,56 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        /* Hero Section */
         .hero-section {
             background: #fff;
             padding: 60px 0;
         }
 
         .hero-text {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
+        }
+
+        .nama-toko {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .hero-section .container {
+            min-height: 460px;
+        }
+
+        .shape-main {
+            position: absolute;
+            right: 40px;
+            top: 12%;
+            width: 50%;
+            z-index: 1;
+        }
+
+        .image-catdog {
+            position: absolute;
+            right: 40px;
+            top: 12%;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .shape-leftup {
+            position: absolute;
+            left: 15%;
+            top: -12%;
+            width: 13%;
+            z-index: 1;
+        }
+
+        .shape-leftdown {
+            position: absolute;
+            left: 25%;
+            bottom: 5%;
+            width: 11%;
+            z-index: 1;
         }
 
         .btn-black {
@@ -32,7 +74,14 @@
             color: #fff;
             border: none;
             padding: 10px 20px;
+            font-weight: 600;
+            transition: 0.2s;
         }
+        .btn-black:hover {
+            background: #333;
+            color: #fff;
+        }
+
 
         .layanan-icon img,
         .produk-icon img {
@@ -120,17 +169,22 @@
 
 
     <!-- Hero Section -->
-    <section class="hero-section text-center text-lg-start">
-        <div class="container d-flex flex-wrap align-items-center justify-content-between">
-            <div class="col-lg-6 mb-4">
-                <h6 class="text-warning">Ling-Ling Pet Shop</h6>
-                <h1 class="hero-text">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
+    <section class="hero-section position-relative overflow-hidden">
+        <!-- SHAPE BESAR KANAN -->
+        <img src="Asset/Shape2.png" class="shape-main" alt="Shape">
+        <!-- SHAPE KECIL KIRI ATAS -->
+        <img src="Asset/Shape.png" class="shape-leftup" alt="Shape2">
+        <!-- SHAPE KECIL KIRI BAWAH -->
+        <img src="Asset/Shape1.png" class="shape-leftdown" alt="Shape1">
+        <div class="container d-flex flex-wrap align-items-center justify-content-between position-relative"
+            style="z-index:2;">
+            <div class="col-lg-6 mb-4 text-lg-start text-center">
+                <h6 class="nama-toko text-warning">Ling-Ling Pet Shop</h6>
+                <h1 class="hero-text mb-4">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
                 <a href="#" class="btn btn-black mt-3">Mulai Belanja</a>
             </div>
-            <div class="col-lg-5">
-                <img src="aset/hro.png" class="img-fluid" alt="Hewan Peliharaan">
-            </div>
         </div>
+        <img src="Asset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
     </section>
     <!-- hero rampung -->
 
