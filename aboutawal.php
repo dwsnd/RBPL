@@ -18,11 +18,6 @@
             color: #000 !important;
             transition: all 0.3s ease;
         }
-
-        .nav-link.active {
-            color: #ffc107 !important;
-        }
-
         .nav-link::after {
             content: '';
             position: absolute;
@@ -35,7 +30,14 @@
             transition: transform 0.3s ease;
         }
 
+        .nav-link.active {
+            color: #ffc107 !important;
+        }
         .nav-link.active::after {
+            transform: scaleX(1);
+        }
+
+        .nav-link:hover::after {
             transform: scaleX(1);
         }
 
