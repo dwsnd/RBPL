@@ -13,6 +13,32 @@
             z-index: 1000;
         }
 
+        .nav-link {
+            position: relative;
+            color: #000 !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            color: #ffc107 !important;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #ffc107;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link.active::after {
+            transform: scaleX(1);
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
         }
@@ -140,26 +166,27 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <?php $current = basename($_SERVER['PHP_SELF']); ?>
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link fw-semibold mx-2 active" href="#">Home</a>
+                        <a class="nav-link fw-semibold mx-2 <?php echo $current == 'index.php' ? 'active' : ''; ?>" href="index.php">Home</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link fw-semibold mx-2 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link fw-semibold mx-2 dropdown-toggle <?php echo in_array($current, ['shop.php', 'perawatan.php', 'penitipan.php', 'konsultasi.php']) ? 'active' : ''; ?>" href="#" role="button" data-bs-toggle="dropdown">
                             Layanan
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Shop</a></li>
-                            <li><a class="dropdown-item" href="#">Perawatan</a></li>
-                            <li><a class="dropdown-item" href="#">Penitipan</a></li>
-                            <li><a class="dropdown-item" href="#">Konsultasi</a></li>
+                            <li><a class="dropdown-item" href="shopawal.php">Shop</a></li>
+                            <li><a class="dropdown-item" href="perawatan.php">Perawatan</a></li>
+                            <li><a class="dropdown-item" href="penitipan.php">Penitipan</a></li>
+                            <li><a class="dropdown-item" href="konsultasi.php">Konsultasi</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-semibold mx-2" href="shopawal.php">Shop</a>
+                        <a class="nav-link fw-semibold mx-2 <?php echo $current == 'shopawal.php' ? 'active' : ''; ?>" href="shopawal.php">Shop</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-semibold mx-2" href="aboutawal.php">About Us</a>
+                        <a class="nav-link fw-semibold mx-2 <?php echo $current == 'aboutawal.php' ? 'active' : ''; ?>" href="aboutawal.php">About Us</a>
                     </li>
                 </ul>
 
