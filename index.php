@@ -31,10 +31,13 @@
         .nama-toko {
             font-size: 1rem;
             font-weight: 600;
+            margin-bottom: 1rem;
         }
 
         .hero-section .container {
             min-height: 460px;
+            position: relative;
+            z-index: 2;
         }
 
         .shape-main {
@@ -51,6 +54,10 @@
             top: 12%;
             width: 50%;
             z-index: 2;
+            transition: transform 0.3s ease;
+        }
+        .image-catdog:hover {
+            transform: scale(1.02);
         }
 
         .shape-leftup {
@@ -82,7 +89,6 @@
             color: #fff;
         }
 
-
         .layanan-icon img,
         .produk-icon img {
             max-height: 80px;
@@ -92,18 +98,6 @@
             font-weight: 600;
             font-size: 1.5rem;
             margin: 40px 0 20px;
-        }
-
-        footer {
-            padding: 40px 0;
-            background-color: #f8f9fa;
-        }
-
-        .cat-img {
-            width: 100%;
-            max-width: 1000px;
-            display: block;
-            margin: auto;
         }
 
         .produk-card {
@@ -116,6 +110,18 @@
         .produk-card img {
             max-height: 120px;
             object-fit: contain;
+        }
+        
+        footer {
+            padding: 40px 0;
+            background-color: #f8f9fa;
+        }
+
+        .cat-img {
+            width: 100%;
+            max-width: 1000px;
+            display: block;
+            margin: auto;
         }
     </style>
 </head>
