@@ -171,11 +171,11 @@
     <!-- Hero Section -->
     <section class="hero-section position-relative overflow-hidden">
         <!-- SHAPE BESAR KANAN -->
-        <img src="Asset/Shape2.png" class="shape-main" alt="Shape">
+        <img src="aset/Shape2.png" class="shape-main" alt="Shape">
         <!-- SHAPE KECIL KIRI ATAS -->
-        <img src="Asset/Shape.png" class="shape-leftup" alt="Shape2">
+        <img src="aset/Shape.png" class="shape-leftup" alt="Shape2">
         <!-- SHAPE KECIL KIRI BAWAH -->
-        <img src="Asset/Shape1.png" class="shape-leftdown" alt="Shape1">
+        <img src="aset/Shape1.png" class="shape-leftdown" alt="Shape1">
         <div class="container d-flex flex-wrap align-items-center justify-content-between position-relative"
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
@@ -184,7 +184,7 @@
                 <a href="#" class="btn btn-black mt-3">Mulai Belanja</a>
             </div>
         </div>
-        <img src="Asset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
+        <img src="aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
     </section>
     <!-- hero rampung -->
 
