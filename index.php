@@ -111,7 +111,7 @@
             max-height: 120px;
             object-fit: contain;
         }
-        
+
         footer {
             padding: 40px 0;
             background-color: #f8f9fa;
@@ -128,7 +128,6 @@
 
 <body>
 
-    <!-- Navbar -->
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top py-3 navbar-shadow">
         <div class="container">
@@ -172,6 +171,7 @@
             </div>
         </div>
     </nav>
+    <!-- Navbar -->
 
 
     <!-- Hero Section -->
