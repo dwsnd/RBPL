@@ -43,16 +43,6 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        .hero-section {
-            background: #fff;
-            padding: 60px 0;
-        }
-
-        .hero-text {
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
         .btn-black {
             background: #000;
             color: #fff;
@@ -151,18 +141,7 @@
 
 
     <!-- Hero Section -->
-    <section class="hero-section text-center text-lg-start">
-        <div class="container d-flex flex-wrap align-items-center justify-content-between">
-            <div class="col-lg-6 mb-4">
-                <h6 class="text-warning">Ling-Ling Pet Shop</h6>
-                <h1 class="hero-text">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
-                <a href="#" class="btn btn-black mt-3">Mulai Belanja</a>
-            </div>
-            <div class="col-lg-5">
-                <img src="aset/hro.png" class="img-fluid" alt="Hewan Peliharaan">
-            </div>
-        </div>
-    </section>
+    <?php include 'hero.php'; ?>
     <!-- hero rampung -->
 
     <!-- Layanan Kami -->
