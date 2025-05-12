@@ -5,13 +5,13 @@ require '../includes/db.php';
 
 // checking
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
+    $email_or_phone = $_POST['email'];
     $password = $_POST['password'];
     $remember = isset($_POST['remember']) ? true : false;
 
-    if ($email && $password) {
-        // mencari pelanggan berdasarkan email
-        $query = "SELECT * FROM pelanggan WHERE email = '$email'";
+    if ($email_or_phone && $password) {
+        // mencari pelanggan berdasarkan email atau nomor telepon
+        $query = "SELECT * FROM pelanggan WHERE email = '$email_or_phone' OR nomor_telepon = '$email_or_phone'";
         $result = $conn->query($query);
 
         if ($result->num_rows === 1) {
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['email'] = $user['email'];
 
                 if ($remember) {
-                    setcookie('email', $email, time() + (86400), "/"); // 1 day
+                    setcookie('email', $user['email'], time() + (86400), "/"); // 1 day
                 }
 
                 header("Location: ../dashboard/index.php");
@@ -34,10 +34,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $error_message = "Password yang Anda masukkan salah!";
             }
         } else {
-            $error_message = "Email tidak ditemukan!";
+            $error_message = "Email atau nomor telepon tidak ditemukan!";
         }
     } else {
-        $error_message = "Email dan password harus diisi!";
+        $error_message = "Email/nomor telepon dan password harus diisi!";
     }
 }
 ?>
