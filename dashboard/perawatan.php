@@ -1,3 +1,22 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once '../includes/db.php';
+
+// Fetch user data if logged in
+$user_data = [];
+if (isset($_SESSION['id_pelanggan'])) {
+    $id_pelanggan = $_SESSION['id_pelanggan'];
+    $query = "SELECT nama_lengkap, nomor_telepon FROM pelanggan WHERE id_pelanggan = '$id_pelanggan'";
+    $result = mysqli_query($conn, $query);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $user_data = mysqli_fetch_assoc($result);
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -13,15 +32,15 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* hero section */
+        /* Hero Section */
         .hero-section {
             background: #fff;
-            padding: 60px 0;
+            padding: 65px 0;
         }
 
         .hero-text {
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: 750;
         }
 
         .nama-toko {
@@ -39,7 +58,7 @@
         .shape-main {
             position: absolute;
             right: 40px;
-            top: 12%;
+            top: 13%;
             width: 50%;
             z-index: 1;
         }
@@ -47,7 +66,7 @@
         .image-catdog {
             position: absolute;
             right: 40px;
-            top: 12%;
+            top: 14%;
             width: 50%;
             z-index: 2;
             transition: transform 0.3s ease;
@@ -96,6 +115,18 @@
             font-weight: 600;
             font-size: 1.5rem;
             margin: 40px 0 20px;
+        }
+
+        .produk-card {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+
+        .produk-card img {
+            max-height: 120px;
+            object-fit: contain;
         }
 
         footer {
@@ -160,8 +191,8 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="nama-toko text-warning">Ling-Ling Pet Shop</h6>
-                <h1 class="hero-text mb-4">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
-                <a href="#" class="btn btn-black mt-3">Mulai Belanja</a>
+                <h1 class="hero-text mb-3">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
+                <a href="#" class="btn btn-black mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -316,7 +347,17 @@
                 </div>
 
                 <div class="p-8">
-                    <form action="../auth/login.php" method="post" class="space-y-6" id="bookingForm">
+                    <?php
+                    if (isset($_SESSION['success'])) {
+                        echo '<div class="alert alert-success mb-4">' . $_SESSION['success'] . '</div>';
+                        unset($_SESSION['success']);
+                    }
+                    if (isset($_SESSION['error'])) {
+                        echo '<div class="alert alert-danger mb-4">' . $_SESSION['error'] . '</div>';
+                        unset($_SESSION['error']);
+                    }
+                    ?>
+                    <form action="process_booking.php" method="post" class="space-y-6" id="bookingForm">
                         <div class="container mx-auto">
                             <?php
                             $formFields = [
@@ -324,12 +365,16 @@
                                     'label' => 'Nama Pelanggan',
                                     'type' => 'text',
                                     'placeholder' => 'Masukkan nama lengkap Anda',
+                                    'value' => isset($_SESSION['id_pelanggan']) ? htmlspecialchars($user_data['nama_lengkap'] ?? '') : (htmlspecialchars($_POST['nama_lengkap'] ?? '')),
+                                    'readonly' => isset($_SESSION['id_pelanggan']),
                                     'required' => true
                                 ],
                                 'nomor_telepon' => [
                                     'label' => 'Nomor Telepon',
                                     'type' => 'tel',
                                     'placeholder' => 'Masukkan nomor telepon Anda',
+                                    'value' => isset($_SESSION['id_pelanggan']) ? htmlspecialchars($user_data['nomor_telepon'] ?? '') : (htmlspecialchars($_POST['nomor_telepon'] ?? '')),
+                                    'readonly' => isset($_SESSION['id_pelanggan']),
                                     'required' => true
                                 ],
                                 'pet_name' => [
@@ -419,6 +464,7 @@
                                     echo '<input type="' . $field['type'] . '" name="' . $name . '" 
                                       class="' . $class . '" 
                                       placeholder="' . $field['placeholder'] . '" 
+                                      value="' . (isset($field['value']) ? $field['value'] : '') . '"
                                       ' . (isset($field['readonly']) ? 'readonly' : '') . '
                                       ' . (isset($field['required']) ? 'required' : '') . '>';
                                 }

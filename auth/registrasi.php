@@ -54,9 +54,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!-- bagian kiri -->
         <div class="hidden md:flex md:w-1/2 bg-orange-400 flex-col items-center justify-center">
             <h1 class="text-white text-3xl font-bold mt-12 z-10">Selamat Datang di Ling-Ling Pet Shop</h1>
-            <div class="relative z-10 mt-5">
-                <img src="../aset/iconloginregis.png" alt="Person holding a cat" class="max-w-md">
-            </div>
+            <a href="../public/index.php">
+                <div class="relative z-10 mt-5">
+                    <img src="../aset/iconloginregis.png" alt="Person holding a cat" class="max-w-md">
+                </div>
+            </a>
         </div>
 
         <!-- bagian kanan -->
