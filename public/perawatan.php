@@ -13,15 +13,15 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* hero section */
+        /* Hero Section */
         .hero-section {
             background: #fff;
-            padding: 60px 0;
+            padding: 65px 0;
         }
 
         .hero-text {
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: 750;
         }
 
         .nama-toko {
@@ -39,7 +39,7 @@
         .shape-main {
             position: absolute;
             right: 40px;
-            top: 12%;
+            top: 13%;
             width: 50%;
             z-index: 1;
         }
@@ -47,7 +47,7 @@
         .image-catdog {
             position: absolute;
             right: 40px;
-            top: 12%;
+            top: 14%;
             width: 50%;
             z-index: 2;
             transition: transform 0.3s ease;
@@ -160,8 +160,8 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="nama-toko text-warning">Ling-Ling Pet Shop</h6>
-                <h1 class="hero-text mb-4">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
-                <a href="#" class="btn btn-black mt-3">Mulai Belanja</a>
+                <h1 class="hero-text mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan Berbicara<br> Tentang Kita!</h1>
+                <a href="#" class="btn btn-black mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -257,7 +257,7 @@
         </div>
     </section>
 
-    <!-- Grooming Services Section -->
+    <!-- bagian perawatan -->
     <section class="py-12">
         <div class="container mx-auto px-4 py-8 bg-orange-50 rounded-4xl">
             <h2 class="text-center font-bold text-2xl mb-12">Ada Perawatan Apa Aja Kalau Kamu Grooming di Ling-Ling
@@ -306,7 +306,7 @@
         </div>
     </section>
 
-    <!-- Booking Form Section -->
+    <!-- bagian form booking -->
     <section id="booking-form" class="py-12">
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto bg-white rounded-lg overflow-hidden shadow-lg">
@@ -443,7 +443,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- footer -->
     <?php require '../includes/footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

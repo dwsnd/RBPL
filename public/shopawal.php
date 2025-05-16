@@ -13,15 +13,15 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* hero section */
+        /* Hero Section */
         .hero-section {
             background: #fff;
-            padding: 60px 0;
+            padding: 65px 0;
         }
 
         .hero-text {
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: 750;
         }
 
         .nama-toko {
@@ -39,7 +39,7 @@
         .shape-main {
             position: absolute;
             right: 40px;
-            top: 12%;
+            top: 13%;
             width: 50%;
             z-index: 1;
         }
@@ -47,11 +47,12 @@
         .image-catdog {
             position: absolute;
             right: 40px;
-            top: 12%;
+            top: 14%;
             width: 50%;
             z-index: 2;
             transition: transform 0.3s ease;
         }
+
         .image-catdog:hover {
             transform: scale(1.02);
         }
@@ -80,6 +81,7 @@
             font-weight: 600;
             transition: 0.2s;
         }
+
         .btn-black:hover {
             background: #333;
             color: #fff;
@@ -138,8 +140,8 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="nama-toko text-warning">Ling-Ling Pet Shop</h6>
-                <h1 class="hero-text mb-4">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
-                <a href="#" class="btn btn-black mt-3">Mulai Belanja</a>
+                <h1 class="hero-text mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan Berbicara<br> Tentang Kita!</h1>
+                <a href="#" class="btn btn-black mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">

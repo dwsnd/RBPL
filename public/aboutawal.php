@@ -13,15 +13,15 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* hero section */
+        /* Hero Section */
         .hero-section {
             background: #fff;
-            padding: 60px 0;
+            padding: 65px 0;
         }
 
         .hero-text {
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: 750;
         }
 
         .nama-toko {
@@ -39,7 +39,7 @@
         .shape-main {
             position: absolute;
             right: 40px;
-            top: 12%;
+            top: 13%;
             width: 50%;
             z-index: 1;
         }
@@ -47,11 +47,12 @@
         .image-catdog {
             position: absolute;
             right: 40px;
-            top: 12%;
+            top: 14%;
             width: 50%;
             z-index: 2;
             transition: transform 0.3s ease;
         }
+
         .image-catdog:hover {
             transform: scale(1.02);
         }
@@ -80,6 +81,7 @@
             font-weight: 600;
             transition: 0.2s;
         }
+
         .btn-black:hover {
             background: #333;
             color: #fff;
@@ -125,7 +127,7 @@
 <body>
     <!-- Navbar -->
     <?php require '../includes/header.php'; ?>
-    
+
     <!-- Hero Section -->
     <section class="hero-section position-relative overflow-hidden">
         <!-- SHAPE BESAR KANAN -->
@@ -138,8 +140,8 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="nama-toko text-warning">Ling-Ling Pet Shop</h6>
-                <h1 class="hero-text mb-4">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
-                <a href="#" class="btn btn-black mt-3">Mulai Belanja</a>
+                <h1 class="hero-text mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan Berbicara<br> Tentang Kita!</h1>
+                <a href="#" class="btn btn-black mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -155,7 +157,8 @@
                     <h5 class="fw-bold">Tentang Kami</h5>
                     <p class="text-muted">
                         Kami hadir sebagai solusi lengkap untuk kebutuhan hewan peliharaan Anda di Kabupaten Bantul.
-                        Dari pakan, aksesoris, hingga perlengkapan grooming dan kesehatan, semua tersedia dengan harga terjangkau dan kualitas terjamin.
+                        Dari pakan, aksesoris, hingga perlengkapan grooming dan kesehatan, semua tersedia dengan harga
+                        terjangkau dan kualitas terjamin.
                     </p>
 
                     <form class="bg-light p-4 rounded">
@@ -210,12 +213,12 @@
         </div>
     </section>
 
- 
+
     <!-- testi -->
     <section class="py-5 bg-light">
         <div class="container">
             <div class="row align-items-center">
-            
+
                 <div class="col-md-6">
                     <p class="text-warning fw-bold mb-1">Testimoni</p>
                     <h5 class="fw-bold">Apa kata mereka tentang kami</h5>
@@ -224,7 +227,8 @@
                     </div>
                     <p class="text-muted">
                         pet shop & ada dokter nya juga <br>
-                        super duper lengkap, harganya lebih murah daripada pet shop lainnya! dan yang bikin senang pelayanannya sangat ramah
+                        super duper lengkap, harganya lebih murah daripada pet shop lainnya! dan yang bikin senang
+                        pelayanannya sangat ramah
                         <br>
                         pernah grooming juga disini dan beneran worth it karena kucing aku kutunya langsung hilang 😻
                     </p>
@@ -235,11 +239,13 @@
                 <!-- gmbr -->
                 <div class="col-md-6 text-center">
                     <div class="position-relative d-inline-block">
-                        <img src="aset/rate.png" alt="Pelanggan" style="width: 400px; height: 350px; object-fit: cover;">
+                        <img src="aset/rate.png" alt="Pelanggan"
+                            style="width: 400px; height: 350px; object-fit: cover;">
                     </div>
                     <!-- Navigasi -->
                     <div class="mt-3">
-                        <button class="btn btn-dark rounded-circle me-2"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="btn btn-dark rounded-circle me-2"><i
+                                class="fa-solid fa-chevron-left"></i></button>
                         <button class="btn btn-dark rounded-circle"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                 </div>
