@@ -222,7 +222,7 @@
         <div class="container mx-auto px-4">
             <div class="flex flex-wrap items-center">
                 <div class="w-full lg:w-5/12 mb-6 lg:mb-0">
-                    <img src="../aset/anjingperawatan.png" alt="Grooming Illustration" class="w-full">
+                    <img src="../aset/anjingpenitipan1.png" alt="Grooming Illustration" class="w-full">
                 </div>
                 <div class="w-full lg:w-7/12 lg:pl-8">
                     <h2 class="text-orange-500 font-bold text-2xl mb-4 text-center">Syarat Penitipan Hewan
@@ -280,7 +280,7 @@
                     ?>
                 </div>
                 <div class="w-full lg:w-5/12 mb-6 lg:mb-0">
-                    <img src="../aset/anjingperawatan.png" alt="Grooming Illustration" class="w-full">
+                    <img src="../aset/anjingpenitipan2.png" alt="Grooming Illustration" class="w-full">
                 </div>
             </div>
         </div>
@@ -288,45 +288,11 @@
 
     <!-- bagian fasilitas & benefit -->
     <section class="py-12">
-        <div class="container mx-auto px-4 py-8 bg-orange-50 rounded-4xl">
-            <h2 class="text-center font-bold text-2xl mb-12">Ada Perawatan Apa Aja Kalau Kamu Grooming di Ling-Ling
-                Petshop</h2>
+        <div class="container mx-auto px-4 py-8 bg-orange-100 rounded-4xl">
+            <h2 class="text-center font-bold text-2xl mb-4">Dapatkan Harga Spesial Dari Kami!</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
-                <?php
-                $services = [
-                    [
-                        'icon' => 'database',
-                        'title' => 'Basic',
-                        'description' => 'Layanan grooming anti kutu, grooming anti jamur, pemeriksaan kesehatan, dan pemberian obat cacing untuk hewan peliharaan Anda'
-                    ],
-                    [
-                        'icon' => 'band-aid',
-                        'title' => 'Mix',
-                        'description' => 'Grooming basic + suntik vitamin untuk kesehatan optimal hewan peliharaan Anda'
-                    ],
-                    [
-                        'icon' => 'trophy',
-                        'title' => 'Complete',
-                        'description' => 'Perawatan menyeluruh yang terdiri dari grooming mix + tes Revolution untuk pemeriksaan parasit pada hewan kesayangan Anda'
-                    ]
-                ];
-
-                foreach ($services as $service) {
-                    echo '<div class="text-center px-4">
-                            <div class="text-4xl text-orange-500 mb-4">
-                                <i class="fas fa-' . $service['icon'] . '"></i>
-                            </div>
-                            <h3 class="font-bold text-xl mb-4">' . $service['title'] . '</h3>
-                            <p class="mb-0">' . $service['description'] . '</p>
-                          </div>';
-                }
-                ?>
-            </div>
-
-            <div class="text-center mt-8 mb-8 rounded-4xl">
-                <p class="font-bold mb-6">Benefit: Semua jenis grooming sudah termasuk gunting kuku, pembersihan
-                    telinga, rapihkan bulu paw, dan bagian bokong</p>
+            <div class="text-center mb-8 rounded-4xl">
+                <p class="font-bold mb-6">Cuma Mulai Dari <strong>35 Ribu Rupiah</strong> Per Malam</p>
                 <a href="#booking-form"
                     class="inline-flex items-center justify-center bg-orange-500 text-white px-6 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
                     <i class="fab fa-whatsapp text-xl mr-2"></i>Saya Mau Booking Sekarang
@@ -340,8 +306,8 @@
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto bg-white rounded-lg overflow-hidden shadow-lg">
                 <div class="bg-orange-500 text-white p-6 text-center">
-                    <h3 class="text-xl font-semibold mb-2">Form Layanan Grooming</h3>
-                    <p>Layanan perawatan untuk hewan kesayangan Anda</p>
+                    <h3 class="text-xl font-semibold mb-2">Form Layanan Penitipan}</h3>
+                    <p>Layanan penitipan untuk hewan kesayangan Anda</p>
                 </div>
 
                 <div class="p-8">
@@ -361,10 +327,16 @@
                                     'placeholder' => 'Masukkan nomor telepon Anda',
                                     'required' => true
                                 ],
+                                'kontak_darurat' => [
+                                    'label' => 'Kontak Darurat',
+                                    'type' => 'tel',
+                                    'placeholder' => 'Masukkan nomor darurat Anda',
+                                    'required' => true
+                                ],
                                 'pet_name' => [
                                     'label' => 'Nama Hewan Peliharaan',
                                     'type' => 'text',
-                                    'placeholder' => 'Masukkan nama hewan peliharaan',
+                                    'placeholder' => 'Masukkan nama hewan peliharaan Anda',
                                     'required' => true
                                 ],
                                 'pet_category' => [
@@ -375,8 +347,7 @@
                                         'kucing' => 'Kucing',
                                         'anjing' => 'Anjing',
                                         'kelinci' => 'Kelinci',
-                                        'hamster' => 'Hamster',
-                                        'lainnya' => 'Lainnya'
+                                        'hamster' => 'Hamster'
                                     ]
                                 ],
                                 'pet_special' => ['label' => 'Ciri-Ciri Khusus Hewan (Opsional)', 'type' => 'text', 'placeholder' => 'Contoh: Warna bulu, ukuran, atau kondisi khusus'],
@@ -390,33 +361,35 @@
                                         'complete' => 'Complete (Rp 250.000)'
                                     ]
                                 ],
-                                'service_date' => [
+                                'service_datein' => [
                                     'label' => 'Tanggal Perawatan',
                                     'type' => 'date',
-                                    'placeholder' => 'Pilih tanggal perawatan',
+                                    'placeholder' => 'Pilih tanggal masuk',
                                     'min' => date('Y-m-d')
                                 ],
-                                'service_time' => [
-                                    'label' => 'Waktu Perawatan',
-                                    'type' => 'select',
-                                    'options' => [
-                                        '' => 'Pilih waktu grooming',
-                                        'pagi' => '08:00 - 10:00',
-                                        'siang' => '10:00 - 12:00',
-                                        'sore' => '13:00 - 15:00',
-                                        'sore-akhir' => '15:00 - 17:00'
-                                    ]
+                                'service_dateout' => [
+                                    'label' => 'Tanggal Perawatan',
+                                    'type' => 'date',
+                                    'placeholder' => 'Pilih tanggal keluar',
+                                    'min' => date('Y-m-d')
                                 ],
-                                'groomer' => [
-                                    'label' => 'Groomer',
-                                    'type' => 'select',
-                                    'options' => [
-                                        '' => 'Pilih groomer',
-                                        'andi' => 'Andi (Rp 50.000)',
-                                        'budi' => 'Budi (Rp 45.000)',
-                                        'cindy' => 'Cindy (Rp 55.000)',
-                                        'dina' => 'Dina (Rp 50.000)'
-                                    ]
+                                'pet_foods' => [
+                                    'label' => 'Pola Makan',
+                                    'type' => 'text',
+                                    'placeholder' => 'Masukkan pola makan hewan peliharaan (opsional)',
+                                    'required' => true
+                                ],
+                                'pet_medicines' => [
+                                    'label' => 'Obat-Obatan',
+                                    'type' => 'text',
+                                    'placeholder' => 'Masukkan nama obat-obatan untuk hewan peliharaan (opsional)',
+                                    'required' => true
+                                ],
+                                'pet_habits' => [
+                                    'label' => 'Kebiasaan Penting',
+                                    'type' => 'text',
+                                    'placeholder' => 'Masukkan kebiasaan penting hewan peliharaan (opsional)',
+                                    'required' => true
                                 ],
                                 'total_price' => ['label' => 'Total Harga', 'type' => 'text', 'placeholder' => 'Rp0', 'readonly' => true],
                                 'payment_method' => [

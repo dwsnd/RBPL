@@ -259,7 +259,7 @@
 
     <!-- bagian perawatan -->
     <section class="py-12">
-        <div class="container mx-auto px-4 py-8 bg-orange-50 rounded-4xl">
+        <div class="container mx-auto px-4 py-8 bg-orange-100 rounded-4xl">
             <h2 class="text-center font-bold text-2xl mb-12">Ada Perawatan Apa Aja Kalau Kamu Grooming di Ling-Ling
                 Petshop</h2>
 
@@ -346,8 +346,7 @@
                                         'kucing' => 'Kucing',
                                         'anjing' => 'Anjing',
                                         'kelinci' => 'Kelinci',
-                                        'hamster' => 'Hamster',
-                                        'lainnya' => 'Lainnya'
+                                        'hamster' => 'Hamster'
                                     ]
                                 ],
                                 'pet_special' => ['label' => 'Ciri-Ciri Khusus Hewan (Opsional)', 'type' => 'text', 'placeholder' => 'Contoh: Warna bulu, ukuran, atau kondisi khusus'],
