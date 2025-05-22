@@ -157,25 +157,25 @@
             <div class="row g-3 justify-content-center">
                 <div class="col-6 col-md-3">
                     <div class="rounded-4 p-4 shadow-sm" style="background-color: #e0e0e0;">
-                        <img src="aset/shop.png" alt="Shop" class="img-fluid mb-2" style="width: 80px;">
+                        <img src="../aset/shop_index.png" alt="Shop" class="img-fluid mb-2" style="width: 130px;">
                         <p class="fw-semibold mb-0">Shop</p>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="rounded-4 p-4 shadow-sm" style="background-color: #e0e0e0;">
-                        <img src="aset/perawatan.png" alt="Perawatan" class="img-fluid mb-2" style="width: 80px;">
+                        <img src="../aset/perawatan_index.png" alt="Perawatan" class="img-fluid mb-2" style="width: 130px;">
                         <p class="fw-semibold mb-0">Perawatan</p>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="rounded-4 p-4 shadow-sm" style="background-color: #e0e0e0;">
-                        <img src="aset/penitipan.png" alt="Penitipan" class="img-fluid mb-2" style="width: 80px;">
+                        <img src="../aset/penitipan_index.png" alt="Penitipan" class="img-fluid mb-2" style="width: 130px;">
                         <p class="fw-semibold mb-0">Penitipan</p>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
                     <div class="rounded-4 p-4 shadow-sm" style="background-color: #e0e0e0;">
-                        <img src="aset/konsultasi.png" alt="Konsultasi" class="img-fluid mb-2" style="width: 80px;">
+                        <img src="../aset/konsultasi_index.png" alt="Konsultasi" class="img-fluid mb-2" style="width: 130px;">
                         <p class="fw-semibold mb-0">Konsultasi</p>
                     </div>
                 </div>
