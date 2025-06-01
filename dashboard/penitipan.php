@@ -1,3 +1,20 @@
+<?php
+session_start();
+require_once '../includes/db.php';
+
+// Fetch user data if logged in
+$user_data = [];
+if (isset($_SESSION['id_pelanggan'])) {
+    $id_pelanggan = $_SESSION['id_pelanggan'];
+    $query = "SELECT nama_lengkap, nomor_telepon FROM pelanggan WHERE id_pelanggan = '$id_pelanggan'";
+    $result = mysqli_query($conn, $query);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $user_data = mysqli_fetch_assoc($result);
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -98,6 +115,18 @@
             margin: 40px 0 20px;
         }
 
+        .produk-card {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+
+        .produk-card img {
+            max-height: 120px;
+            object-fit: contain;
+        }
+
         footer {
             padding: 40px 0;
             background-color: #f8f9fa;
@@ -117,7 +146,6 @@
             box-shadow: 0 0 0 0.2rem rgba(253, 126, 20, 0.25) !important;
         }
 
-
         select.form-control {
             color: #888;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23000' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
@@ -128,18 +156,6 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             padding-right: 2.5rem !important;
-        }
-
-        select.form-control option {
-            color: #888 !important;
-        }
-
-        select.form-control option:checked {
-            color: #000 !important;
-        }
-
-        select.form-control option:first-child {
-            color: #888 !important;
         }
     </style>
 </head>
@@ -160,7 +176,7 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="nama-toko text-warning">Ling-Ling Pet Shop</h6>
-                <h1 class="hero-text mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan Berbicara<br> Tentang Kita!</h1>
+                <h1 class="hero-text mb-3">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
                 <a href="#" class="btn btn-black mt-2">Mulai Belanja</a>
             </div>
         </div>
@@ -168,37 +184,37 @@
     </section>
     <!-- hero rampung -->
 
-    <!-- masalah pelanggan -->
+    <!-- masalah anabul -->
     <section class="py-12">
         <div class="container mx-auto px-4">
-            <h2 class="text-center font-bold text-2xl mb-8">Apakah Kamu Mengalami Masalah Ini?</h2>
+            <h2 class="text-center font-bold text-2xl mb-8">Apakah Anabul Kesayanganmu Mengalami Masalah Ini?</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <?php
                 $masalah = [
                     [
                         'icon' => 'exclamation-circle',
-                        'text' => 'Anabulmu mengalami stres saat harus ikut mudik/lebaran'
+                        'text' => 'Kulitnya bermasalah dengan bakteri dan jamur yang bikin tidak nyaman?'
                     ],
                     [
                         'icon' => 'exclamation-circle',
-                        'text' => 'Merasa tidak tega meninggalkan anabulmu sendirian di rumah tanpa pengawasan'
+                        'text' => 'Kutu nakal muncul dan membuatnya terus menggaruk dengan gelisah?'
                     ],
                     [
                         'icon' => 'exclamation-circle',
-                        'text' => 'Sulit mencari orang yang bisa merawat anabulmu selama kamu pergi liburan'
+                        'text' => 'Bulu rontok, kusut, atau terlihat tidak terawat seperti kehilangan kilaunya?'
                     ],
                     [
                         'icon' => 'exclamation-circle',
-                        'text' => 'Khawatir jika dititipkan ke orang lain, perawatannya tidak sesuai dengan yang kamu inginkan'
+                        'text' => 'Ada kotoran membandel di area mata dan telinga yang sulit dibersihkan?'
                     ],
                     [
                         'icon' => 'exclamation-circle',
-                        'text' => 'Tidak memiliki kerabat atau teman yang bisa dititipi untuk menjaga anabulmu'
+                        'text' => 'Bau kurang sedap yang mulai mengganggu pelukan hangatmu dengannya?'
                     ],
                     [
                         'icon' => 'exclamation-circle',
-                        'text' => 'Terbatasnya waktu mengurus kebutuhan anabulmu dengan baik'
+                        'text' => 'Takut salah memberikan perawatan yang tepat untuk kesehatan si kecil?'
                     ]
                 ];
 
@@ -217,82 +233,87 @@
         </div>
     </section>
 
-    <!-- syarat penitipan -->
+    <!-- info perawatan -->
     <section class="py-12">
         <div class="container mx-auto px-4">
             <div class="flex flex-wrap items-center">
-                <div class="w-full lg:w-5/12 mb-6 lg:mb-0">
-                    <img src="../aset/anjingpenitipan1.png" alt="Grooming Illustration" class="w-full">
+                <div class="w-full lg:w-5/12 mb-8 lg:mb-0">
+                    <img src="../aset/anjingperawatan.png" alt="Grooming Illustration" class="w-full">
                 </div>
                 <div class="w-full lg:w-7/12 lg:pl-8">
-                    <h2 class="text-orange-500 font-bold text-2xl mb-4 text-center">Syarat Penitipan Hewan
+                    <h2 class="text-orange-500 font-bold text-2xl mb-4">Segera Lakukan Grooming Pada Anabul Kesayangan!
                     </h2>
+                    <p class="mb-6">Grooming rutin sangat penting untuk menjaga kesehatan dan kenyamanan si kecil
+                        kesayangan Anda. Namun, kami memahami beberapa kendala yang mungkin Anda hadapi:</p>
+
                     <?php
-                    $syarat = [
-                        ['text' => 'Hewan dalam kondisi sehat & tidak berkutu. Kami akan melakukan pemeriksaan kondisi anjing & kucing Anda saat tiba. Hal ini bertujuan untuk menjaga keamanan & kesehatan semua hewan yang dititipkan.'],
-                        ['text' => 'Jika setelah pemeriksaan ditemukan kutu atau masalah kulit, akan dilakukan pengobatan khusus segera saat kedatangan. Hewan tetap bisa dititipkan dalam ruang perawatan khusus yang terpisah dari hewan yang sehat.'],
-                        ['text' => 'Selama penitipan, hewan kesayangan Anda memiliki waktu bermain bebas bersama pengunjung/hewan lain tanpa diikat atau dikandangkan, kecuali atas permintaan khusus atau dalam situasi tertentu.'],
-                        ['text' => 'Anda dapat membawa perlengkapan khusus sesuai kebutuhan seperti makanan, cemilan, vitamin, mainan, dan sebagainya.']
+                    $kendala = [
+                        ['icon' => 'exclamation-triangle', 'text' => 'Tidak memahami teknik grooming yang tepat dan aman untuk Anabul Anda'],
+                        ['icon' => 'clock', 'text' => 'Kesibukan yang membuat Anda tidak punya waktu cukup untuk melakukan grooming sendiri'],
+                        ['icon' => 'question-circle', 'text' => 'Bingung memilih produk perawatan yang aman dan sesuai untuk kondisi Anabul Anda']
                     ];
 
-                    foreach ($syarat as $index => $item) {
-                        $number = $index + 1;
-                        echo '<div class="flex items-start">
-                                <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
+                    foreach ($kendala as $item) {
+                        echo '<div class="flex items-center mb-4">
+                                <div class="mr-3">
+                                    <i class="fas fa-' . $item['icon'] . '"></i>
                                 </div>
-                                <p class="text-gray-700 leading-relaxed text-justify flex-1">' . $item['text'] . '</p>
+                                <p class="mb-0">' . $item['text'] . '</p>
                               </div>';
                     }
                     ?>
+
+                    <a href="#"
+                        class="inline-flex items-center justify-center bg-orange-500 text-white px-6 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
+                        <i class="fab fa-whatsapp text-xl mr-2"></i>Hubungi Kami
+                    </a>
+                    <span class="ml-4 fw-semibold">Konsultasi permasalahan anabulmu sekarang!</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- bagian fasilitas & benefit -->
+    <!-- Grooming Services Section -->
     <section class="py-12">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-wrap items-center">
-                <div class="w-full lg:w-7/12 lg:pl-8">
-                    <h2 class="text-orange-500 font-bold text-2xl mb-4 text-center">Syarat Penitipan Hewan
-                    </h2>
-                    <?php
-                    $fasilitas = [
-                        ['text' => 'Jasa Antar-Jemput khusus area DIY (biaya tambahan sesuai jarak)'],
-                        ['text' => 'Free grooming untuk minimal 1 minggu penitipan'],
-                        ['text' => 'Full AC (Indoor Cage)'],
-                        ['text' => 'Kandang Bersih dan Luas dengan satu kandang untuk satu ekor anjing/kucing, tidak dicampur dengan hewan lain'],
-                        ['text' => 'Update Foto & Video harian'],
-                        ['text' => 'Pembersihan Alat Makan & Minum 2x Sehari'],
-                        ['text' => 'Pembersihan Toilet Setiap Hari'],
-                        ['text' => 'Paramedis yang siaga untuk memantau kondisi anabul'],
-                        ['text' => 'Penyediaan berbagai mainan untuk Anjing & Kucing']
-                    ];
+        <div class="container mx-auto px-4 py-8 bg-orange-50 rounded-4xl">
+            <h2 class="text-center font-bold text-2xl mb-12">Ada Perawatan Apa Aja Kalau Kamu Grooming di Ling-Ling
+                Petshop</h2>
 
-                    foreach ($fasilitas as $index => $item) {
-                        $number = $index + 1;
-                        echo '<div class="flex items-start">
-                                <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
-                                </div>
-                                <p class="text-gray-700 leading-relaxed text-justify flex-1">' . $item['text'] . '</p>
-                              </div>';
-                    }
-                    ?>
-                </div>
-                <div class="w-full lg:w-5/12 mb-6 lg:mb-0">
-                    <img src="../aset/anjingpenitipan2.png" alt="Grooming Illustration" class="w-full">
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-10">
+                <?php
+                $services = [
+                    [
+                        'icon' => 'database',
+                        'title' => 'Basic',
+                        'description' => 'Layanan grooming anti kutu, grooming anti jamur, pemeriksaan kesehatan, dan pemberian obat cacing untuk hewan peliharaan Anda'
+                    ],
+                    [
+                        'icon' => 'band-aid',
+                        'title' => 'Mix',
+                        'description' => 'Grooming basic + suntik vitamin untuk kesehatan optimal hewan peliharaan Anda'
+                    ],
+                    [
+                        'icon' => 'trophy',
+                        'title' => 'Complete',
+                        'description' => 'Perawatan menyeluruh yang terdiri dari grooming mix + tes Revolution untuk pemeriksaan parasit pada hewan kesayangan Anda'
+                    ]
+                ];
+
+                foreach ($services as $service) {
+                    echo '<div class="text-center">
+                            <div class="text-4xl text-orange-500 mb-4">
+                                <i class="fas fa-' . $service['icon'] . '"></i>
+                            </div>
+                            <h3 class="font-bold text-xl mb-4">' . $service['title'] . '</h3>
+                            <p class="mb-0">' . $service['description'] . '</p>
+                          </div>';
+                }
+                ?>
             </div>
-        </div>
-    </section>
 
-    <!-- bagian fasilitas & benefit -->
-    <section class="py-12">
-        <div class="container mx-auto px-4 py-8 bg-orange-100 rounded-4xl">
-            <h2 class="text-center font-bold text-2xl mb-4">Dapatkan Harga Spesial Dari Kami!</h2>
-
-            <div class="text-center mb-8 rounded-4xl">
-                <p class="font-bold mb-6">Cuma Mulai Dari <strong>35 Ribu Rupiah</strong> Per Malam</p>
+            <div class="text-center mt-8 mb-8 rounded-4xl">
+                <p class="font-bold mb-6">Benefit: Semua jenis grooming sudah termasuk gunting kuku, pembersihan
+                    telinga, rapihkan bulu paw, dan bagian bokong</p>
                 <a href="#booking-form"
                     class="inline-flex items-center justify-center bg-orange-500 text-white px-6 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
                     <i class="fab fa-whatsapp text-xl mr-2"></i>Saya Mau Booking Sekarang
@@ -306,12 +327,22 @@
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto bg-white rounded-lg overflow-hidden shadow-lg">
                 <div class="bg-orange-500 text-white p-6 text-center">
-                    <h3 class="text-xl font-semibold mb-2">Form Layanan Penitipan}</h3>
-                    <p>Layanan penitipan untuk hewan kesayangan Anda</p>
+                    <h3 class="text-xl font-semibold mb-2">Form Layanan Grooming</h3>
+                    <p>Layanan perawatan untuk hewan kesayangan Anda</p>
                 </div>
 
                 <div class="p-8">
-                    <form action="../auth/login.php" method="post" class="space-y-6" id="bookingForm">
+                    <?php
+                    if (isset($_SESSION['success'])) {
+                        echo '<div class="alert alert-success mb-4">' . $_SESSION['success'] . '</div>';
+                        unset($_SESSION['success']);
+                    }
+                    if (isset($_SESSION['error'])) {
+                        echo '<div class="alert alert-danger mb-4">' . $_SESSION['error'] . '</div>';
+                        unset($_SESSION['error']);
+                    }
+                    ?>
+                    <form action="process_booking.php" method="post" class="space-y-6" id="bookingForm">
                         <div class="container mx-auto">
                             <?php
                             $formFields = [
@@ -319,24 +350,22 @@
                                     'label' => 'Nama Pelanggan',
                                     'type' => 'text',
                                     'placeholder' => 'Masukkan nama lengkap Anda',
+                                    'value' => isset($_SESSION['id_pelanggan']) ? htmlspecialchars($user_data['nama_lengkap'] ?? '') : (htmlspecialchars($_POST['nama_lengkap'] ?? '')),
+                                    'readonly' => isset($_SESSION['id_pelanggan']),
                                     'required' => true
                                 ],
                                 'nomor_telepon' => [
                                     'label' => 'Nomor Telepon',
                                     'type' => 'tel',
                                     'placeholder' => 'Masukkan nomor telepon Anda',
-                                    'required' => true
-                                ],
-                                'kontak_darurat' => [
-                                    'label' => 'Kontak Darurat',
-                                    'type' => 'tel',
-                                    'placeholder' => 'Masukkan nomor darurat Anda',
+                                    'value' => isset($_SESSION['id_pelanggan']) ? htmlspecialchars($user_data['nomor_telepon'] ?? '') : (htmlspecialchars($_POST['nomor_telepon'] ?? '')),
+                                    'readonly' => isset($_SESSION['id_pelanggan']),
                                     'required' => true
                                 ],
                                 'pet_name' => [
                                     'label' => 'Nama Hewan Peliharaan',
                                     'type' => 'text',
-                                    'placeholder' => 'Masukkan nama hewan peliharaan Anda',
+                                    'placeholder' => 'Masukkan nama hewan peliharaan',
                                     'required' => true
                                 ],
                                 'pet_category' => [
@@ -347,7 +376,8 @@
                                         'kucing' => 'Kucing',
                                         'anjing' => 'Anjing',
                                         'kelinci' => 'Kelinci',
-                                        'hamster' => 'Hamster'
+                                        'hamster' => 'Hamster',
+                                        'lainnya' => 'Lainnya'
                                     ]
                                 ],
                                 'pet_special' => ['label' => 'Ciri-Ciri Khusus Hewan (Opsional)', 'type' => 'text', 'placeholder' => 'Contoh: Warna bulu, ukuran, atau kondisi khusus'],
@@ -361,35 +391,33 @@
                                         'complete' => 'Complete (Rp 250.000)'
                                     ]
                                 ],
-                                'service_datein' => [
+                                'service_date' => [
                                     'label' => 'Tanggal Perawatan',
                                     'type' => 'date',
-                                    'placeholder' => 'Pilih tanggal masuk',
+                                    'placeholder' => 'Pilih tanggal perawatan',
                                     'min' => date('Y-m-d')
                                 ],
-                                'service_dateout' => [
-                                    'label' => 'Tanggal Perawatan',
-                                    'type' => 'date',
-                                    'placeholder' => 'Pilih tanggal keluar',
-                                    'min' => date('Y-m-d')
+                                'service_time' => [
+                                    'label' => 'Waktu Perawatan',
+                                    'type' => 'select',
+                                    'options' => [
+                                        '' => 'Pilih waktu grooming',
+                                        'pagi' => '08:00 - 10:00',
+                                        'siang' => '10:00 - 12:00',
+                                        'sore' => '13:00 - 15:00',
+                                        'sore-akhir' => '15:00 - 17:00'
+                                    ]
                                 ],
-                                'pet_foods' => [
-                                    'label' => 'Pola Makan',
-                                    'type' => 'text',
-                                    'placeholder' => 'Masukkan pola makan hewan peliharaan (opsional)',
-                                    'required' => true
-                                ],
-                                'pet_medicines' => [
-                                    'label' => 'Obat-Obatan',
-                                    'type' => 'text',
-                                    'placeholder' => 'Masukkan nama obat-obatan untuk hewan peliharaan (opsional)',
-                                    'required' => true
-                                ],
-                                'pet_habits' => [
-                                    'label' => 'Kebiasaan Penting',
-                                    'type' => 'text',
-                                    'placeholder' => 'Masukkan kebiasaan penting hewan peliharaan (opsional)',
-                                    'required' => true
+                                'groomer' => [
+                                    'label' => 'Groomer',
+                                    'type' => 'select',
+                                    'options' => [
+                                        '' => 'Pilih groomer',
+                                        'andi' => 'Andi (Rp 50.000)',
+                                        'budi' => 'Budi (Rp 45.000)',
+                                        'cindy' => 'Cindy (Rp 55.000)',
+                                        'dina' => 'Dina (Rp 50.000)'
+                                    ]
                                 ],
                                 'total_price' => ['label' => 'Total Harga', 'type' => 'text', 'placeholder' => 'Rp0', 'readonly' => true],
                                 'payment_method' => [
@@ -421,6 +449,7 @@
                                     echo '<input type="' . $field['type'] . '" name="' . $name . '" 
                                       class="' . $class . '" 
                                       placeholder="' . $field['placeholder'] . '" 
+                                      value="' . (isset($field['value']) ? $field['value'] : '') . '"
                                       ' . (isset($field['readonly']) ? 'readonly' : '') . '
                                       ' . (isset($field['required']) ? 'required' : '') . '>';
                                 }
@@ -431,11 +460,11 @@
 
                         <div class="flex justify-between mt-8">
                             <button type="reset"
-                                class="px-4 py-3 border !border-orange-400 text-orange-500 rounded-lg font-semibold hover:bg-orange-100 transition duration-200">
+                                class="px-6 py-3 border border-orange-500 text-orange-500 rounded-lg font-semibold hover:bg-orange-50 transition duration-200">
                                 Reset
                             </button>
                             <button type="submit"
-                                class="px-4 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition duration-200">
+                                class="px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition duration-200">
                                 Pesan Sekarang
                             </button>
                         </div>
@@ -455,23 +484,6 @@
             const serviceType = form.querySelector('select[name="service_type"]');
             const groomer = form.querySelector('select[name="groomer"]');
             const totalPrice = form.querySelector('input[name="total_price"]');
-            const petCategory = form.querySelector('select[name="pet_category"]');
-            const serviceTime = form.querySelector('select[name="service_time"]');
-            const paymentMethod = form.querySelector('select[name="payment_method"]');
-
-            // Function to handle select color changes
-            function handleSelectColor(select) {
-                select.style.color = select.value ? '#000' : '#888';
-            }
-
-            // Add event listeners for all select elements
-            [serviceType, groomer, petCategory, serviceTime, paymentMethod].forEach(select => {
-                select.addEventListener('change', function () {
-                    handleSelectColor(this);
-                });
-                // Set initial color
-                handleSelectColor(select);
-            });
 
             const hargaPerawatan = {
                 'basic': 150000,

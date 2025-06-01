@@ -1,4 +1,4 @@
-<footer class="overflow-hidden">
+<footer class="overflow-hidden bg-white">
     <!-- Konten footer -->
     <div class="container mb-0 px-4 py-8 relative">
         <div class="flex flex-wrap justify-between">

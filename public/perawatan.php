@@ -238,11 +238,11 @@
                     ];
 
                     foreach ($kendala as $item) {
-                        echo '<div class="flex items-center mb-4 mr-2">
-                                <div class="mr-3">
+                        echo '<div class="flex items-start">
+                                <div class="mr-4">
                                     <i class="fas fa-' . $item['icon'] . '"></i>
                                 </div>
-                                <p class="mb-0">' . $item['text'] . '</p>
+                                <p class="mb-4">' . $item['text'] . '</p>
                               </div>';
                     }
                     ?>

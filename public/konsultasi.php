@@ -237,22 +237,22 @@
                     </h2>
                     <?php
                     $layanan = [
-                        ['icon' => '1', 'text' => 'Konsultasi & Pemeriksaan Rutin'],
-                        ['icon' => '2', 'text' => 'Vaksinasi & Sterilisasi'],
-                        ['icon' => '3', 'text' => 'Rawat Inap & ICU'],
-                        ['icon' => '4', 'text' => 'Grooming & Perawatan Kesehatan'],
-                        ['icon' => '5', 'text' => 'Operasi bedah & Penanganan Darurat'],
-                        ['icon' => '6', 'text' => 'Laboratorium & Diagnotik'],
-                        ['icon' => '7', 'text' => 'USG'],
-                        ['icon' => '8', 'text' => 'Farmasi Lengkap']
+                        ['text' => 'Konsultasi & Pemeriksaan Rutin'],
+                        ['text' => 'Vaksinasi & Sterilisasi'],
+                        ['text' => 'Rawat Inap & ICU'],
+                        ['text' => 'Grooming & Perawatan Kesehatan'],
+                        ['text' => 'Operasi bedah & Penanganan Darurat'],
+                        ['text' => 'Laboratorium & Diagnotik'],
+                        ['text' => 'USG'],
+                        ['text' => 'Farmasi Lengkap']
                     ];
 
-                    foreach ($layanan as $item) {
-                        echo '<div class="flex items-start mb-4 mr-2">
-                                <div class="mr-3">
-                                    <i class="fas fa-' . $item['icon'] . ' text-lg font-semibold mt-1"></i>
+                    foreach ($layanan as $index => $item) {
+                        $number = $index + 1;
+                        echo '<div class="flex items-start">
+                                <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
                                 </div>
-                                <p class="mb-0 text-justify mr-2 ml-3">' . $item['text'] . '</p>
+                                <p class="text-gray-700 leading-relaxed text-justify flex-1">' . $item['text'] . '</p>
                               </div>';
                     }
                     ?>
@@ -269,24 +269,24 @@
                     <h2 class="text-orange-500 font-bold text-2xl mb-4 text-center">Syarat Penitipan Hewan
                     </h2>
                     <?php
-                    $fasilitas = [
-                        ['icon' => '1', 'text' => 'Jasa Antar-Jemput khusus area DIY (biaya tambahan sesuai jarak)'],
-                        ['icon' => '2', 'text' => 'Free grooming untuk minimal 1 minggu penitipan'],
-                        ['icon' => '3', 'text' => 'Full AC (Indoor Cage)'],
-                        ['icon' => '4', 'text' => 'Kandang Bersih dan Luas dengan satu kandang untuk satu ekor anjing/kucing, tidak dicampur dengan hewan lain'],
-                        ['icon' => '5', 'text' => 'Update Foto & Video harian'],
-                        ['icon' => '6', 'text' => 'Pembersihan Alat Makan & Minum 2x Sehari'],
-                        ['icon' => '7', 'text' => 'Pembersihan Toilet Setiap Hari'],
-                        ['icon' => '8', 'text' => 'Paramedis yang siaga untuk memantau kondisi anabul'],
-                        ['icon' => '9', 'text' => 'Penyediaan berbagai mainan untuk Anjing & Kucing']
+                    $syarat = [
+                        ['text' => 'Jasa Antar-Jemput khusus area DIY (biaya tambahan sesuai jarak)'],
+                        ['text' => 'Free grooming untuk minimal 1 minggu penitipan'],
+                        ['text' => 'Full AC (Indoor Cage)'],
+                        ['text' => 'Kandang Bersih dan Luas dengan satu kandang untuk satu ekor anjing/kucing, tidak dicampur dengan hewan lain'],
+                        ['text' => 'Update Foto & Video harian'],
+                        ['text' => 'Pembersihan Alat Makan & Minum 2x Sehari'],
+                        ['text' => 'Pembersihan Toilet Setiap Hari'],
+                        ['text' => 'Paramedis yang siaga untuk memantau kondisi anabul'],
+                        ['text' => 'Penyediaan berbagai mainan untuk Anjing & Kucing']
                     ];
 
-                    foreach ($fasilitas as $item) {
-                        echo '<div class="flex items-start mb-1 mr-2">
-                                <div class="mr-3">
-                                    <i class="fas fa-' . $item['icon'] . ' text-lg font-semibold mt-1"></i>
+                    foreach ($syarat as $index => $item) {
+                        $number = $index + 1;
+                        echo '<div class="flex items-start">
+                                <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
                                 </div>
-                                <p class="mb-0 text-justify mr-2 ml-3">' . $item['text'] . '</p>
+                                <p class="text-gray-700 leading-relaxed text-justify flex-1 mr-10">' . $item['text'] . '</p>
                               </div>';
                     }
                     ?>
