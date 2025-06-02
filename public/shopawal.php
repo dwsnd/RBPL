@@ -87,19 +87,11 @@
             color: #fff;
         }
 
-        .layanan-icon img,
-        .produk-icon img {
-            max-height: 80px;
-        }
-
-        .section-title {
-            font-weight: 600;
-            font-size: 1.5rem;
-            margin: 40px 0 20px;
-        }
-
         .product-card {
             transition: all 0.3s ease;
+            border: 1px solid #f97316;
+            border-radius: 0.5rem;
+            overflow: hidden;
         }
 
         .product-card:hover {
@@ -107,36 +99,75 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
+        .button-pagination {
+            border: 1px solid rgb(97, 87, 80);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        /*Pagination*/
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pagination .page-link {
+            background-color: white;
+            border: 1px solid grey;
+            color: grey;
+            font-weight: 600;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #f97316;
+            border: 1px solid #f97316;
+            color: white;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #f5f5f5;
+        }
+
         .service-card {
             transition: all 0.3s ease;
+            position: relative;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .service-card:hover {
             transform: scale(1.02);
         }
 
+        .service-card .pet-icon {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .service-card .pet-name {
+            position: relative;
+            z-index: 2;
+            color: #1a1a1a;
+        }
+
+        .service-card.active .pet-name {
+            color: #fff;
+        }
+
         footer {
             padding: 40px 0;
             background-color: #f8f9fa;
-        }
-
-        .cat-img {
-            width: 100%;
-            max-width: 1000px;
-            display: block;
-            margin: auto;
-        }
-
-        .produk-card {
-            text-align: center;
-            padding: 20px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-        }
-
-        .produk-card img {
-            max-height: 120px;
-            object-fit: contain;
         }
     </style>
 </head>
@@ -168,40 +199,44 @@
     <!-- Filter hewan -->
     <section class="text-center py-5">
         <div class="container">
-            <h2 class="text-center font-bold text-2xl mb-4">Pilih Produk Berdasarkan Hewan Peliharaan</h2>
+            <h2 class="text-center font-bold text-2xl mb-5">Pilih Produk Berdasarkan Hewan Peliharaan</h2>
             <div class="flex justify-center">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl">
-                    <div class="service-card bg-white rounded-lg p-4 shadow-sm border cursor-pointer text-center"
-                        onclick="filterByCategory('kucing')">
-                        <div
-                            class="w-16 h-16 mx-auto mb-2 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
-                            <img src="../aset/kucingtoko.png" alt="Kucing" class="w-12 h-12 object-contain">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-20">
+                    <div>
+                        <div class="service-card cursor-pointer mb-2" onclick="filterByCategory('kucing')"
+                            style="background-image: url('../aset/vectorfilterhewan.png')">
+                            <div class="pet-icon items-center justify-center overflow-hidden">
+                                <img src="../aset/kucingtoko.png" alt="Kucing" class="w-48 h-48 object-contain">
+                            </div>
                         </div>
-                        <p class="font-semibold text-sm text-gray-800">Kucing</p>
+                        <p class="pet-name font-semibold text-base">Kucing</p>
                     </div>
-                    <div class="service-card bg-white rounded-lg p-4 shadow-sm border cursor-pointer text-center"
-                        onclick="filterByCategory('hamster')">
-                        <div
-                            class="w-16 h-16 mx-auto mb-2 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
-                            <img src="../aset/hamstertoko.png" alt="Hamster" class="w-12 h-12 object-contain">
+                    <div>
+                        <div class="service-card cursor-pointer mb-2 w-48 h-48" onclick="filterByCategory('hamster')"
+                            style="background-image: url('../aset/vectorfilterhewan.png')">
+                            <div class="pet-icon item-center justify-center overflow-hidden">
+                                <img src="../aset/hamstertoko.png" alt="Hamster" class="w-38 h-38 object-contain">
+                            </div>
                         </div>
-                        <p class="font-semibold text-sm text-gray-800">Hamster</p>
+                        <p class="pet-name font-semibold text-base">Hamster</p>
                     </div>
-                    <div class="service-card bg-white rounded-lg p-4 shadow-sm border cursor-pointer text-center"
-                        onclick="filterByCategory('anjing')">
-                        <div
-                            class="w-16 h-16 mx-auto mb-2 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
-                            <img src="../aset/anjingtoko.png" alt="Anjing" class="w-12 h-12 object-contain">
+                    <div>
+                        <div class="service-card cursor-pointer mb-2" onclick="filterByCategory('anjing')"
+                            style="background-image: url('../aset/vectorfilterhewan.png')">
+                            <div class="pet-icon items-center justify-center overflow-hidden">
+                                <img src="../aset/anjingtoko.png" alt="Anjing" class="w-48 h-48 object-contain">
+                            </div>
                         </div>
-                        <p class="font-semibold text-sm text-gray-800">Anjing</p>
+                        <p class="pet-name font-semibold text-base">Anjing</p>
                     </div>
-                    <div class="service-card bg-white rounded-lg p-4 shadow-sm border cursor-pointer text-center"
-                        onclick="filterByCategory('kelinci')">
-                        <div
-                            class="w-16 h-16 mx-auto mb-2 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
-                            <img src="../aset/kelincitoko.png" alt="Kelinci" class="w-12 h-12 object-contain">
+                    <div>
+                        <div class="service-card cursor-pointer mb-2" onclick="filterByCategory('kelinci')"
+                            style="background-image: url('../aset/vectorfilterhewan.png')">
+                            <div class="pet-icon items-center justify-center overflow-hidden">
+                                <img src="../aset/kelincitoko.png" alt="Kelinci" class="w-48 h-48 object-contain">
+                            </div>
                         </div>
-                        <p class="font-semibold text-sm text-gray-800">Kelinci</p>
+                        <p class="pet-name font-semibold text-base">Kelinci</p>
                     </div>
                 </div>
             </div>
@@ -220,7 +255,7 @@
                 <div class="flex gap-2">
                     <div class="relative">
                         <input type="text" placeholder="Search"
-                            class="pl-8 pr-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-500 w-48"
+                            class="pl-8 pr-4 py-2 text-sm border border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-500 w-48"
                             id="searchInput">
                         <i
                             class="fas fa-search absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
@@ -234,12 +269,11 @@
 
             <!-- Products Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="productsContainer">
-                <!-- Products will be loaded here -->
+                <!-- Products-->
             </div>
 
             <!-- Pagination -->
             <div class="flex justify-center items-center mt-8 space-x-2" id="pagination">
-                <!-- Pagination will be loaded here -->
             </div>
         </div>
     </section>
@@ -255,7 +289,6 @@
 
     <!-- Footer -->
     <?php require '../includes/footer.php'; ?>
-
 
     <script>
         // Variabel DOM utama
@@ -293,6 +326,19 @@
         `;
         };
 
+        // Fungsi menampilkan pesan pilih kategori
+        const showSelectCategoryMessage = () => {
+            productsContainer.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-paw text-orange-400 text-4xl mb-3"></i>
+                <p class="text-gray-600 font-medium">Silakan pilih kategori hewan peliharaan untuk melihat produk</p>
+            </div>
+        `;
+            pagination.innerHTML = '';
+            currentCount.textContent = '0';
+            totalCount.textContent = '0';
+        };
+
         // Fungsi mengambil data produk dari server dan menerapkan filter
         const loadProducts = async () => {
             if (isLoading) return;
@@ -305,7 +351,11 @@
 
                 if (data.success) {
                     allProducts = data.products;
-                    applyFilters();
+                    if (!selectedCategory) {
+                        showSelectCategoryMessage();
+                    } else {
+                        applyFilters();
+                    }
                 } else {
                     showAlert('Gagal memuat produk');
                 }
@@ -319,6 +369,11 @@
 
         // Fungsi menampilkan produk ke dalam grid sesuai filter & halaman
         const renderProducts = () => {
+            if (!selectedCategory) {
+                showSelectCategoryMessage();
+                return;
+            }
+
             const start = (currentPage - 1) * productsPerPage;
             const end = start + productsPerPage;
             const productsToShow = filteredProducts.slice(start, end);
@@ -337,17 +392,19 @@
 
             // Render produk dengan map, lebih efisien
             productsContainer.innerHTML = productsToShow.map(product => `
-            <div class="product-card bg-white rounded-lg overflow-hidden border border-orange-200">
-                <div class="aspect-square bg-gray-100 relative p-2">
+            <div class="product-card rounded-lg cursor-pointer" onclick="window.location.href='../auth/login.php'">
+                <div class="aspect-square bg-gray-200 relative p-2">
                     <img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain">
-                    <button class="absolute top-2 right-2 w-6 h-6 bg-white rounded-full shadow-sm flex items-center justify-center hover:bg-gray-50 transition-colors">
-                        <i class="far fa-heart text-gray-400 text-xs"></i>
-                    </button>
                 </div>
                 <div class="p-3">
-                    <h3 class="font-medium text-xs text-gray-800 mb-1 line-clamp-2 leading-tight" title="${product.name}">
-                        ${product.name}
-                    </h3>
+                    <div class="flex items-start justify-between mb-1">
+                        <h3 class="font-medium text-sm text-gray-800 line-clamp-2 leading-tight pr-2" title="${product.name}">
+                            ${product.name}
+                        </h3>
+                        <button class="w-6 h-6 flex justify-center items-end" onclick="event.stopPropagation(); window.location.href='../auth/login.php'">
+                            <i class="far fa-heart text-orange-400 text-lg"></i>
+                        </button>
+                    </div>
                     <p class="text-orange-600 font-semibold text-sm">Rp${parseInt(product.price).toLocaleString('id-ID')}</p>
                 </div>
             </div>
@@ -363,20 +420,21 @@
                 pagination.innerHTML = '';
                 return;
             }
-            let html = '';
+            let html = '<ul class="pagination">';
             let start = Math.max(1, currentPage - 2);
             let end = Math.min(totalPages, start + 4);
             if (end - start < 4) start = Math.max(1, end - 4);
 
             if (currentPage > 1)
-                html += `<button onclick="changePage(${currentPage - 1})" class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50">‹</button>`;
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;"> < </a></li>`;
             for (let i = start; i <= end; i++) {
                 html += i === currentPage
-                    ? `<button class="px-3 py-1 text-sm bg-orange-500 text-white rounded">${i}</button>`
-                    : `<button onclick="changePage(${i})" class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50">${i}</button>`;
+                    ? `<li class="page-item active"><a class="page-link" href="#">${i}</a></li>`
+                    : `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
             }
             if (currentPage < totalPages)
-                html += `<button onclick="changePage(${currentPage + 1})" class="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50">›</button>`;
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;"> > </a></li>`;
+            html += '</ul>';
             pagination.innerHTML = html;
         };
 
@@ -384,12 +442,27 @@
         window.changePage = (page) => {
             currentPage = page;
             renderProducts();
-            window.scrollTo({ top: 300, behavior: 'smooth' });
+            // Scroll ke bagian produk
+            const productsSection = document.querySelector('.py-8.bg-white');
+            if (productsSection) {
+                productsSection.scrollIntoView({ behavior: 'smooth' });
+            }
         };
 
         // Fungsi filter produk berdasarkan kategori - @param {string} category - Nama kategori
         window.filterByCategory = (category) => {
             selectedCategory = category;
+            // Reset all cards to default background
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.style.backgroundImage = "url('../aset/vectorfilterhewan.png')";
+                card.classList.remove('active');
+            });
+            // Set active card background
+            const activeCard = document.querySelector(`.service-card[onclick="filterByCategory('${category}')"]`);
+            if (activeCard) {
+                activeCard.style.backgroundImage = "url('../aset/vectorfilterhewan_pick.png')";
+                activeCard.classList.add('active');
+            }
             applyFilters();
         };
 
