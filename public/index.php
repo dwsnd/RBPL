@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -17,17 +18,6 @@
         .hero-section {
             background: #fff;
             padding: 65px 0;
-        }
-
-        .hero-text {
-            font-size: 2.5rem;
-            font-weight: 750;
-        }
-
-        .nama-toko {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
         }
 
         .hero-section .container {
@@ -122,9 +112,9 @@
         <div class="container d-flex flex-wrap align-items-center justify-content-between position-relative"
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
-                <h6 class="nama-toko text-warning">Ling-Ling Pet Shop</h6>
-                <h1 class="hero-text mb-3">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
-                <a href="shopawal.php" class="btn btn-black mt-2">Mulai Belanja</a>
+                <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
+                <a href="#" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
