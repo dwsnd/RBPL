@@ -1,11 +1,13 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
+// Only start session if we're in a page that needs authentication
+$publicPages = ['index.php', 'shopawal.php', 'about.php', 'perawatan.php', 'penitipan.php', 'konsultasi.php'];
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+if (!in_array($currentPage, $publicPages) && session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once 'db.php';
-
-$currentPage = basename($_SERVER['PHP_SELF']);
 
 // fungsi untuk memeriksa apakah halaman aktif
 function isActive($page)
@@ -84,7 +86,7 @@ if (isset($_SESSION['id_pelanggan'])) {
                 </div>
 
                 <a class="font-semibold <?php echo isActive('shopawal.php'); ?>" href="shopawal.php">Toko</a>
-                <a class="font-semibold <?php echo isActive('aboutawal.php'); ?>" href="aboutawal.php">Tentang
+                <a class="font-semibold <?php echo isActive('about.php'); ?>" href="about.php">Tentang
                     Kami</a>
             </div>
 

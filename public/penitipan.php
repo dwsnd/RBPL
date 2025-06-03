@@ -87,27 +87,9 @@
             color: #fff;
         }
 
-        .layanan-icon img,
-        .produk-icon img {
-            max-height: 80px;
-        }
-
-        .section-title {
-            font-weight: 600;
-            font-size: 1.5rem;
-            margin: 40px 0 20px;
-        }
-
         footer {
             padding: 40px 0;
             background-color: #f8f9fa;
-        }
-
-        .cat-img {
-            width: 100%;
-            max-width: 1000px;
-            display: block;
-            margin: auto;
         }
 
         .form-control:focus,

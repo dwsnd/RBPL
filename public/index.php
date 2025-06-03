@@ -87,27 +87,10 @@
             color: #fff;
         }
 
-        .layanan-icon img,
-        .produk-icon img {
-            max-height: 80px;
-        }
-
         .section-title {
             font-weight: 600;
             font-size: 1.5rem;
             margin: 40px 0 20px;
-        }
-
-        .produk-card {
-            text-align: center;
-            padding: 20px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-        }
-
-        .produk-card img {
-            max-height: 120px;
-            object-fit: contain;
         }
 
         footer {
@@ -141,7 +124,7 @@
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="nama-toko text-warning">Ling-Ling Pet Shop</h6>
                 <h1 class="hero-text mb-3">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
-                <a href="#" class="btn btn-black mt-2">Mulai Belanja</a>
+                <a href="shopawal.php" class="btn btn-black mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -149,108 +132,174 @@
     <!-- hero rampung -->
 
     <!-- Layanan Kami -->
-    <section class="text-center py-5">
+    <section class="text-center py-4">
         <div class="container">
-            <h3 class="section-title mb-4">
-                <i class="fa-solid fa-paw text-warning"></i> <strong>Layanan Kami</strong>
+            <h3 class="section-title mb-4 font-bold text-2xl">
+                <i class="fa-solid fa-paw text-warning"></i> Layanan Kami
             </h3>
-            <div class="row g-3 justify-content-center">
-                <div class="col-6 col-md-3">
-                    <div class="rounded-4 p-4 shadow-sm" style="background-color: #e0e0e0;">
-                        <img src="../aset/shop_index.png" alt="Shop" class="img-fluid mb-2" style="width: 130px;">
-                        <p class="fw-semibold mb-0">Shop</p>
-                    </div>
+            <div class="row justify-content-center">
+                <div class="col-md-3 mb-3">
+                    <a href="shopawal.php" class="text-decoration-none text-dark">
+                        <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
+                            <div class="d-flex flex-column h-100">
+                                <img src="../aset/shop_index.png" class="card-img-top" alt="Shop"
+                                    style="height: 120px; object-fit: contain; padding: 10px;">
+                                <div class="card-body d-flex flex-column justify-content-between p-3">
+                                    <div>
+                                        <h6 class="mb-1 fw-bold text-medium">Shop</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="rounded-4 p-4 shadow-sm" style="background-color: #e0e0e0;">
-                        <img src="../aset/perawatan_index.png" alt="Perawatan" class="img-fluid mb-2" style="width: 130px;">
-                        <p class="fw-semibold mb-0">Perawatan</p>
-                    </div>
+                <div class="col-md-3 mb-3">
+                    <a href="perawatan.php" class="text-decoration-none text-dark">
+                        <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
+                            <div class="d-flex flex-column h-100">
+                                <img src="../aset/perawatan_index.png" class="card-img-top" alt="Perawatan"
+                                    style="height: 120px; object-fit: contain; padding: 10px;">
+                                <div class="card-body d-flex flex-column justify-content-between p-3">
+                                    <div>
+                                        <h6 class="mb-1 fw-bold text-medium">Perawatan</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="rounded-4 p-4 shadow-sm" style="background-color: #e0e0e0;">
-                        <img src="../aset/penitipan_index.png" alt="Penitipan" class="img-fluid mb-2" style="width: 130px;">
-                        <p class="fw-semibold mb-0">Penitipan</p>
-                    </div>
+                <div class="col-md-3 mb-3">
+                    <a href="penitipan.php" class="text-decoration-none text-dark">
+                        <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
+                            <div class="d-flex flex-column h-100">
+                                <img src="../aset/penitipan_index.png" class="card-img-top" alt="Penitipan"
+                                    style="height: 120px; object-fit: contain; padding: 10px;">
+                                <div class="card-body d-flex flex-column justify-content-between p-3">
+                                    <div>
+                                        <h6 class="mb-1 fw-bold text-medium">Penitipan</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-                <div class="col-6 col-md-3">
-                    <div class="rounded-4 p-4 shadow-sm" style="background-color: #e0e0e0;">
-                        <img src="../aset/konsultasi_index.png" alt="Konsultasi" class="img-fluid mb-2" style="width: 130px;">
-                        <p class="fw-semibold mb-0">Konsultasi</p>
-                    </div>
+                <div class="col-md-3 mb-3">
+                    <a href="konsultasi.php" class="text-decoration-none text-dark">
+                        <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
+                            <div class="d-flex flex-column h-100">
+                                <img src="../aset/konsultasi_index.png" class="card-img-top" alt="Konsultasi"
+                                    style="height: 120px; object-fit: contain; padding: 10px;">
+                                <div class="card-body d-flex flex-column justify-content-between p-3">
+                                    <div>
+                                        <h6 class="mb-1 fw-bold text-medium">Konsultasi</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-
-
     <!-- Konsultasi -->
-    <section class="py-5 bg-light">
-        <div class="container d-flex flex-wrap align-items-center justify-content-between">
-            <div class="col-lg-5 mb-4">
-                <img src="aset/solusi.png" class="img-fluid rounded" alt="Konsultasi">
-            </div>
-            <div class="col-lg-6">
-                <h5 class="fw-bold">Segera Hubungi Kami dan Dapatkan Solusi Terbaik</h5>
-                <p>Jika hewan kesayangan Anda sakit, butuh perawatan, atau layanan darurat, kami siap membantu. Dapatkan
-                    konsultasi, pengobatan, dan grooming dari tim profesional. Hubungi kami sekarang!</p>
-                <a href="#" class="btn btn-black">Memesan Jadwal</a>
+    <section class="py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-4 mb-4 mb-lg-0 ml-16">
+                    <div class="position-relative">
+                        <img src="../aset/konsulgambar_index.png" class="img-fluid" alt="Konsultasi">
+                    </div>
+                </div>
+                <div class="col-lg-6 ml-10">
+                    <h2 class="fw-bold text-2xl mb-4">Segera Hubungi Kami dan Dapatkan <span class="text-orange-500">Solusi
+                            Terbaik</span></h2>
+                    <p class="text-muted">Jika hewan kesayangan Anda sakit, butuh perawatan, atau layanan darurat,
+                        kami siap membantu. Dapatkan konsultasi, pengobatan, dan grooming dari tim profesional. Hubungi
+                        kami sekarang!</p>
+                    <a href="../auth/login.php" class="btn btn-black mt-3">Memesan Jadwal</a>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Produk Kami -->
-    <div class="container text-center">
-        <h3 class="section-title mb-3">
+    <div class="container text-center py-4">
+        <h3 class="section-title mb-4 font-bold text-2xl">
             <i class="fa-solid fa-paw text-warning"></i> Produk Kami
         </h3>
-        <div class="row">
-            <div class="col">
-                <div class="card" style="width: 18rem;">
-                    <img src="aset/aksesoris.png" class="card-img-top" alt="aksesoris">
-                    <div class="card-body">
-                        <h6>Aksesoris</h6>
-                        <p class="text-muted">84 produk</p>
+        <div class="row justify-content-center">
+            <div class="col-md-3 mb-3">
+                <a href="shopawal.php" class="text-decoration-none text-dark">
+                    <div class="card mx-auto h-100" style="width: 17rem;">
+                        <div class="d-flex flex-column h-100">
+                            <img src="../aset/aksesoris.jpg" class="card-img-top" alt="aksesoris"
+                                style="height: 200px; object-fit: cover;">
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-medium">Aksesoris</h6>
+                                    <p class="text-muted small mb-0">84 produk</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
-            <div class="col">
-                <div class="card" style="width: 18rem;">
-                    <img src="aset/makanan.png" class="card-img-top" alt="aksesoris">
-                    <div class="card-body">
-                        <h6>Makanan</h6>
-                        <p class="text-muted">64 produk</p>
+            <div class="col-md-3 mb-3">
+                <a href="shopawal.php" class="text-decoration-none text-dark">
+                    <div class="card mx-auto h-100" style="width: 17rem;">
+                        <div class="d-flex flex-column h-100">
+                            <img src="../aset/makanan.png" class="card-img-top" alt="makanan"
+                                style="height: 200px; object-fit: cover;">
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-medium">Makanan</h6>
+                                    <p class="text-muted small mb-0">64 produk</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
-            <div class="col">
-                <div class="card" style="width: 18rem;">
-                    <img src="aset/pasir.png" class="card-img-top" alt="aksesoris">
-                    <div class="card-body">
-                        <h6>Pasir</h6>
-                        <p class="text-muted">22 produk</p>
+            <div class="col-md-3 mb-3">
+                <a href="shopawal.php" class="text-decoration-none text-dark">
+                    <div class="card mx-auto h-100" style="width: 17rem;">
+                        <div class="d-flex flex-column h-100">
+                            <img src="../aset/pasir.png" class="card-img-top" alt="pasir"
+                                style="height: 200px; object-fit: cover;">
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-medium">Pasir</h6>
+                                    <p class="text-muted small mb-0">22 produk</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
-            <div class="col">
-                <div class="card" style="width: 18rem;">
-                    <img src="aset/vitamin.png" class="card-img-top" alt="aksesoris">
-                    <div class="card-body">
-                        <h6>Vitamin</h6>
-                        <p class="text-muted">16 produk</p>
+            <div class="col-md-3 mb-3">
+                <a href="shopawal.php" class="text-decoration-none text-dark">
+                    <div class="card mx-auto h-100" style="width: 17rem;">
+                        <div class="d-flex flex-column h-100">
+                            <img src="../aset/vitamin.jpg" class="card-img-top" alt="vitamin"
+                                style="height: 200px; object-fit: cover;">
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-medium">Vitamin</h6>
+                                    <p class="text-muted small mb-0">16 produk</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>
 
-
-
     <!-- Gambar Kucing -->
-    <div class="py-4">
-        <img src="aset/kucing.png" alt="Kucing" class="cat-img">
-    </div>
+    <section>
+        <img src="../aset/kucingindex.png" alt="Kucing" class="img-fluid w-full">
+    </section>
 
     <!-- Footer -->
     <?php require '../includes/footer.php'; ?>

@@ -174,7 +174,7 @@
 
 <body>
     <!-- Navbar -->
-    <?php require '../includes/header.php'; ?>
+    <?php require_once '../includes/header.php'; ?>
 
     <!-- Hero Section -->
     <section class="hero-section position-relative overflow-hidden">
