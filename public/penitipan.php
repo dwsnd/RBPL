@@ -133,7 +133,7 @@
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
                 <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan Berbicara<br> Tentang Kita!</h1>
-                <a href="#" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">

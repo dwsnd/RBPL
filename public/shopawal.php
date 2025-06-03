@@ -179,7 +179,7 @@
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
                 <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan Berbicara<br> Tentang Kita!</h1>
-                <a href="#" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -240,11 +240,11 @@
             <!-- Search and Filter -->
             <div class="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <div class="text-sm text-gray-600" id="productCount">
-                    Showing <span id="currentCount">0</span> of <span id="totalCount">0</span> results
+                    Menampilkan <span id="currentCount">0</span> dari <span id="totalCount">0</span> hasil
                 </div>
                 <div class="flex gap-2">
                     <div class="relative">
-                        <input type="text" placeholder="Search"
+                        <input type="text" placeholder="Cari"
                             class="pl-8 pr-4 py-2 text-sm border border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-500 w-48"
                             id="searchInput">
                         <i
@@ -273,7 +273,7 @@
         style="display: none;">
         <div class="bg-white p-6 rounded-lg shadow-lg">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
-            <p class="text-center mt-3 text-gray-600 text-sm">Loading products...</p>
+            <p class="text-center mt-3 text-gray-600 text-sm">Memuat Produk...</p>
         </div>
     </div>
 
@@ -319,9 +319,9 @@
         // Fungsi menampilkan pesan pilih kategori
         const showSelectCategoryMessage = () => {
             productsContainer.innerHTML = `
-            <div class="col-span-full text-center py-12">
+            <div class="col-span-full text-center py-16">
                 <i class="fas fa-paw text-orange-400 text-4xl mb-3"></i>
-                <p class="text-gray-600 font-medium">Silakan pilih kategori hewan peliharaan untuk melihat produk</p>
+                <p class="text-gray-600 text-base font-semibold">Silakan pilih kategori hewan peliharaan untuk melihat produk</p>
             </div>
         `;
             pagination.innerHTML = '';
@@ -388,14 +388,14 @@
                 </div>
                 <div class="p-3">
                     <div class="flex items-start justify-between mb-1">
-                        <h3 class="font-medium text-sm text-gray-800 line-clamp-2 leading-tight pr-2" title="${product.name}">
+                        <h3 class="font-semibold text-sm text-gray-800 line-clamp-2 leading-tight pr-2" title="${product.name}">
                             ${product.name}
                         </h3>
                         <button class="w-6 h-6 flex justify-center items-end" onclick="event.stopPropagation(); window.location.href='../auth/login.php'">
                             <i class="far fa-heart text-orange-400 text-lg"></i>
                         </button>
                     </div>
-                    <p class="text-orange-600 font-semibold text-sm">Rp${parseInt(product.price).toLocaleString('id-ID')}</p>
+                    <p class="text-orange-600 font-medium text-sm">Rp${parseInt(product.price).toLocaleString('id-ID')}</p>
                 </div>
             </div>
         `).join('');
