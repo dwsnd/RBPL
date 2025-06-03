@@ -132,7 +132,8 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan Berbicara<br> Tentang Kita!</h1>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan
+                    Berbicara<br> Tentang Kita!</h1>
                 <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
@@ -144,8 +145,7 @@
     <section class="py-12">
         <div class="container mx-auto px-4">
             <h2 class="text-center font-bold text-2xl mb-8">Apakah Anabul Kesayanganmu Mengalami Masalah Ini?</h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <?php
                 $gejala = [
                     [
@@ -183,12 +183,12 @@
                 ];
 
                 foreach ($gejala as $item) {
-                    echo '<div class="bg-gray-200 p-6 rounded-lg">
-                            <div class="flex items-center">
-                                <div class="text-2xl text-orange-500 mr-3">
+                    echo '<div class="bg-gray-200 p-4 rounded-lg h-full">
+                            <div class="flex items-center h-full">
+                                <div class="text-2xl text-orange-500 mr-3 flex-shrink-0">
                                     <i class="fas fa-' . $item['icon'] . '"></i>
                                 </div>
-                                <p class="mb-0">' . $item['text'] . '</p>
+                                <p class="mb-0 text-sm flex-grow">' . $item['text'] . '</p>
                             </div>
                           </div>';
                 }
@@ -221,10 +221,10 @@
 
                     foreach ($layanan as $index => $item) {
                         $number = $index + 1;
-                        echo '<div class="flex items-start">
+                        echo '<div class="flex items-start pl-32">
                                 <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
                                 </div>
-                                <p class="text-gray-700 leading-relaxed text-justify flex-1">' . $item['text'] . '</p>
+                                <p class="text-gray-700 leading-relaxed text-base flex-1">' . $item['text'] . '</p>
                               </div>';
                     }
                     ?>
@@ -232,13 +232,13 @@
             </div>
         </div>
     </section>
-    
+
     <!-- bagian fasilitas & benefit -->
     <section class="py-12">
         <div class="container mx-auto px-4">
             <div class="flex flex-wrap items-center">
                 <div class="w-full lg:w-7/12 lg:pl-8">
-                    <h2 class="text-orange-500 font-bold text-2xl mb-4 text-center">Syarat Penitipan Hewan
+                    <h2 class="text-orange-500 font-bold text-2xl mb-4 text-center pr-20">Syarat Penitipan Hewan
                     </h2>
                     <?php
                     $syarat = [
@@ -258,7 +258,7 @@
                         echo '<div class="flex items-start">
                                 <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
                                 </div>
-                                <p class="text-gray-700 leading-relaxed text-justify flex-1 mr-10">' . $item['text'] . '</p>
+                                <p class="text-gray-700 leading-relaxed text-base flex-1 mr-10">' . $item['text'] . '</p>
                               </div>';
                     }
                     ?>
@@ -271,12 +271,12 @@
     </section>
 
     <!-- bagian form booking -->
-    <section id="booking-form" class="py-12">
+    <section id="booking-form" class="py-20">
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto bg-white rounded-lg overflow-hidden shadow-lg">
                 <div class="bg-orange-500 text-white p-6 text-center">
-                    <h3 class="text-xl font-semibold mb-2">Form Layanan Grooming</h3>
-                    <p>Layanan perawatan untuk hewan kesayangan Anda</p>
+                    <h3 class="text-lg font-semibold mb-2">Form Layanan Grooming</h3>
+                    <p class="text-sm">Layanan perawatan untuk hewan kesayangan Anda</p>
                 </div>
 
                 <div class="p-8">
@@ -368,9 +368,9 @@
 
                             foreach ($formFields as $name => $field) {
                                 echo '<div class="row mb-3 align-items-center">';
-                                echo '<label class="col-md-4 col-form-label font-medium">' . $field['label'] . '</label>';
+                                echo '<label class="col-md-4 col-form-label font-medium text-sm">' . $field['label'] . '</label>';
                                 echo '<div class="col-md-8">';
-                                $class = 'form-control w-full p-3 border rounded-lg focus:border-orange-500 focus:ring focus:ring-orange-200';
+                                $class = 'form-control w-full p-2 text-sm border rounded-lg focus:border-orange-500 focus:ring focus:ring-orange-200';
                                 if ($field['type'] === 'select') {
                                     echo '<select name="' . $name . '" class="' . $class . '" ' .
                                         (isset($field['required']) ? 'required' : '') . '>';
@@ -390,13 +390,13 @@
                             ?>
                         </div>
 
-                        <div class="flex justify-between mt-8">
+                        <div class="flex justify-between mt-8 px-3">
                             <button type="reset"
-                                class="px-4 py-3 border !border-orange-400 text-orange-500 rounded-lg font-semibold hover:bg-orange-100 transition duration-200">
+                                class="py-2 px-4 text-sm border !border-orange-400 text-orange-500 rounded-lg font-semibold hover:bg-orange-100 transition duration-200">
                                 Reset
                             </button>
                             <button type="submit"
-                                class="px-4 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition duration-200">
+                                class="py-2 px-4 text-sm bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition duration-200">
                                 Pesan Sekarang
                             </button>
                         </div>

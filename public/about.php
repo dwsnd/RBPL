@@ -153,7 +153,7 @@
                         </div>
                         <div class="flex items-center justify-between">
                             <a href="../auth/login.php"
-                                class="w-1/2 mr-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 text-center">
+                                class="w-1/2 mr-2 bg-orange-500 hover:bg-orange-600 text-sm text-white font-semibold py-2 px-4 rounded-lg transition duration-300 text-center">
                                 Kirim Pesan
                             </a>
                             <div class="w-1/2 flex justify-center items-center text-2xl text-gray-400 gap-2"

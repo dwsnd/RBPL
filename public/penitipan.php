@@ -132,7 +132,8 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan Berbicara<br> Tentang Kita!</h1>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan
+                    Berbicara<br> Tentang Kita!</h1>
                 <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
@@ -144,7 +145,6 @@
     <section class="py-12">
         <div class="container mx-auto px-4">
             <h2 class="text-center font-bold text-2xl mb-8">Apakah Kamu Mengalami Masalah Ini?</h2>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <?php
                 $masalah = [
@@ -175,12 +175,12 @@
                 ];
 
                 foreach ($masalah as $item) {
-                    echo '<div class="bg-gray-200 p-6 rounded-lg">
-                            <div class="flex items-center">
-                                <div class="text-2xl text-orange-500 mr-3">
+                    echo '<div class="bg-gray-200 p-4 rounded-lg h-full">
+                            <div class="flex items-center h-full">
+                                <div class="text-2xl text-orange-500 mr-3 flex-shrink-0">
                                     <i class="fas fa-' . $item['icon'] . '"></i>
                                 </div>
-                                <p class="mb-0">' . $item['text'] . '</p>
+                                <p class="mb-0 text-sm flex-grow">' . $item['text'] . '</p>
                             </div>
                           </div>';
                 }
@@ -209,10 +209,10 @@
 
                     foreach ($syarat as $index => $item) {
                         $number = $index + 1;
-                        echo '<div class="flex items-start">
+                        echo '<div class="flex items-start pl-20">
                                 <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
                                 </div>
-                                <p class="text-gray-700 leading-relaxed text-justify flex-1">' . $item['text'] . '</p>
+                                <p class="text-gray-700 leading-relaxed text-base flex-1">' . $item['text'] . '</p>
                               </div>';
                     }
                     ?>
@@ -246,7 +246,7 @@
                         echo '<div class="flex items-start">
                                 <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
                                 </div>
-                                <p class="text-gray-700 leading-relaxed text-justify flex-1">' . $item['text'] . '</p>
+                                <p class="text-gray-700 leading-relaxed text-base flex-1 mr-10">' . $item['text'] . '</p>
                               </div>';
                     }
                     ?>
@@ -259,15 +259,14 @@
     </section>
 
     <!-- bagian fasilitas & benefit -->
-    <section class="py-12">
-        <div class="container mx-auto px-4 py-8 bg-orange-100 rounded-4xl">
-            <h2 class="text-center font-bold text-2xl mb-4">Dapatkan Harga Spesial Dari Kami!</h2>
-
-            <div class="text-center mb-8 rounded-4xl">
-                <p class="font-bold mb-6">Cuma Mulai Dari <strong>35 Ribu Rupiah</strong> Per Malam</p>
-                <a href="#booking-form"
-                    class="inline-flex items-center justify-center bg-orange-500 text-white px-6 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
-                    <i class="fab fa-whatsapp text-xl mr-2"></i>Saya Mau Booking Sekarang
+    <section class="py-20 px-16">
+        <div class="container mx-auto px-4 py-10 bg-orange-100 rounded-3xl">
+            <h2 class="text-center font-bold text-2xl mb-2">Dapatkan Harga Spesial Dari Kami!</h2>
+            <div class="text-center mb-8">
+                <p class="font-medium text-base mb-4">Cuma Mulai Dari <strong>35 Ribu Rupiah</strong> Per Malam</p>
+                <a href="../auth/login.php"
+                    class="inline-flex items-center justify-center text-sm bg-orange-500 text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
+                    <i class="fab fa-whatsapp text-2xl mr-2"></i>Saya Mau Booking Sekarang
                 </a>
             </div>
         </div>
@@ -278,7 +277,7 @@
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto bg-white rounded-lg overflow-hidden shadow-lg">
                 <div class="bg-orange-500 text-white p-6 text-center">
-                    <h3 class="text-xl font-semibold mb-2">Form Layanan Penitipan}</h3>
+                    <h3 class="text-lg font-semibold mb-2">Form Layanan Penitipan</h3>
                     <p>Layanan penitipan untuk hewan kesayangan Anda</p>
                 </div>
 
@@ -379,9 +378,9 @@
 
                             foreach ($formFields as $name => $field) {
                                 echo '<div class="row mb-3 align-items-center">';
-                                echo '<label class="col-md-4 col-form-label font-medium">' . $field['label'] . '</label>';
+                                echo '<label class="col-md-4 col-form-label font-medium text-sm">' . $field['label'] . '</label>';
                                 echo '<div class="col-md-8">';
-                                $class = 'form-control w-full p-3 border rounded-lg focus:border-orange-500 focus:ring focus:ring-orange-200';
+                                $class = 'form-control w-full p-2 text-sm border rounded-lg focus:border-orange-500 focus:ring focus:ring-orange-200';
                                 if ($field['type'] === 'select') {
                                     echo '<select name="' . $name . '" class="' . $class . '" ' .
                                         (isset($field['required']) ? 'required' : '') . '>';
