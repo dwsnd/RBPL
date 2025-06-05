@@ -113,7 +113,8 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Belajar Praktis untuk<br>Kebutuhan Hewan<br>Peliharaan Anda</h1>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Belajar Praktis untuk<br>Kebutuhan
+                    Hewan<br>Peliharaan Anda</h1>
                 <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
@@ -127,7 +128,7 @@
             <h3 class="section-title mb-4 font-bold text-2xl">
                 <i class="fa-solid fa-paw text-warning"></i> Layanan Kami
             </h3>
-            <div class="row justify-content-center">
+            <div class="row justify-content-center px-2">
                 <div class="col-md-3 mb-3">
                     <a href="shopawal.php" class="text-decoration-none text-dark">
                         <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
@@ -193,21 +194,25 @@
     </section>
 
     <!-- Konsultasi -->
-    <section class="py-5">
-        <div class="container">
+    <section class="py-8 bg-light">
+        <div class="container mx-auto px-4">
             <div class="row align-items-center">
-                <div class="col-lg-4 mb-4 mb-lg-0 ml-16">
-                    <div class="position-relative">
-                        <img src="../aset/konsulgambar_index.png" class="img-fluid" alt="Konsultasi">
-                    </div>
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <img src="../aset/konsulgambar_index.png" alt="Konsultasi" class="img-fluid rounded-lg shadow-sm"
+                        style="max-height: 400px; object-fit: cover;">
                 </div>
-                <div class="col-lg-6 ml-10">
-                    <h2 class="fw-bold text-2xl mb-4">Segera Hubungi Kami dan Dapatkan <span class="text-orange-500">Solusi
-                            Terbaik</span></h2>
-                    <p class="text-muted">Jika hewan kesayangan Anda sakit, butuh perawatan, atau layanan darurat,
+                <div class="col-lg-7">
+                    <h2 class="fw-bold text-2xl mb-3">Segera Hubungi Kami dan Dapatkan <span
+                            class="text-orange-500">Solusi Terbaik</span></h2>
+                    <p class="text-muted mb-4">Jika hewan kesayangan Anda sakit, butuh perawatan, atau layanan darurat,
                         kami siap membantu. Dapatkan konsultasi, pengobatan, dan grooming dari tim profesional. Hubungi
                         kami sekarang!</p>
-                    <a href="../auth/login.php" class="btn btn-black mt-3">Memesan Jadwal</a>
+                    <div class="d-flex gap-3">
+                        <a href="../auth/login.php" class="btn btn-black">Memesan Jadwal</a>
+                        <a href="https://wa.me/6283867056070" class="btn btn-outline-dark d-flex align-items-center">
+                            <i class="fas fa-phone-alt me-2"></i>Hubungi Kami
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -218,7 +223,7 @@
         <h3 class="section-title mb-4 font-bold text-2xl">
             <i class="fa-solid fa-paw text-warning"></i> Produk Kami
         </h3>
-        <div class="row justify-content-center">
+        <div class="row justify-content-center px-2">
             <div class="col-md-3 mb-3">
                 <a href="shopawal.php" class="text-decoration-none text-dark">
                     <div class="card mx-auto h-100" style="width: 17rem;">

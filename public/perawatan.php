@@ -132,7 +132,8 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan Berbicara<br> Tentang Kita!</h1>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan
+                    Berbicara<br> Tentang Kita!</h1>
                 <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
@@ -144,7 +145,6 @@
     <section class="py-12">
         <div class="container mx-auto px-4">
             <h2 class="text-center font-bold text-2xl mb-8">Apakah Anabul Kesayanganmu Mengalami Masalah Ini?</h2>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <?php
                 $masalah = [
@@ -175,12 +175,12 @@
                 ];
 
                 foreach ($masalah as $item) {
-                    echo '<div class="bg-gray-200 p-6 rounded-lg">
-                            <div class="flex items-center">
-                                <div class="text-2xl text-orange-500 mr-3">
+                    echo '<div class="bg-gray-200 p-4 rounded-lg h-full">
+                            <div class="flex items-center h-full">
+                                <div class="text-2xl text-orange-500 mr-6 flex-shrink-0">
                                     <i class="fas fa-' . $item['icon'] . '"></i>
                                 </div>
-                                <p class="mb-0">' . $item['text'] . '</p>
+                                <p class="text-sm flex-grow">' . $item['text'] . '</p>
                             </div>
                           </div>';
                 }
@@ -197,42 +197,44 @@
                     <img src="../aset/anjingperawatan.png" alt="Grooming Illustration" class="w-full">
                 </div>
                 <div class="w-full lg:w-7/12 lg:pl-8">
-                    <h2 class="text-orange-500 font-bold text-2xl mb-4">Segera Lakukan Grooming Pada Anabul Kesayangan!
+                    <h2 class="text-orange-500 font-bold text-2xl mb-3">Segera Lakukan Grooming Pada Anabul Kesayangan!
                     </h2>
-                    <p class="mb-6">Grooming rutin sangat penting untuk menjaga kesehatan dan kenyamanan si kecil
-                        kesayangan Anda. Namun, kami memahami beberapa kendala yang mungkin Anda hadapi:</p>
+                    <p class="mb-2 text-base">Grooming rutin sangat penting untuk menjaga kesehatan dan kenyamanan si
+                        kecil kesayangan Anda. Namun, kami memahami beberapa kendala yang mungkin
+                        <br>Anda hadapi:
+                    </p>
 
                     <?php
                     $kendala = [
                         ['icon' => 'exclamation-triangle', 'text' => 'Tidak memahami teknik grooming yang tepat dan aman untuk Anabul Anda'],
                         ['icon' => 'clock', 'text' => 'Kesibukan yang membuat Anda tidak punya waktu cukup untuk melakukan grooming sendiri'],
-                        ['icon' => 'question-circle', 'text' => 'Bingung memilih produk perawatan yang aman dan sesuai untuk kondisi Anabul Anda']
+                        ['icon' => 'question-circle', 'text' => 'Bingung memilih produk perawatan yang aman dan sesuai untuk kondisi <br>Anabul Anda']
                     ];
 
                     foreach ($kendala as $item) {
                         echo '<div class="flex items-start">
-                                <div class="mr-4">
+                                <div class="mr-4 items-center justify-center text-lg">
                                     <i class="fas fa-' . $item['icon'] . '"></i>
                                 </div>
-                                <p class="mb-4">' . $item['text'] . '</p>
+                                <p class="mb-2 text-base leading-relaxed">' . $item['text'] . '</p>
                               </div>';
                     }
                     ?>
-
-                    <a href="#"
-                        class="inline-flex items-center justify-center bg-orange-500 text-white px-6 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
-                        <i class="fab fa-whatsapp text-xl mr-2"></i>Hubungi Kami
+                    <a href="https://wa.me/083867056070"
+                        class="inline-flex items-center justify-center bg-orange-500 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-orange-600 transition duration-200">
+                        <i class="fab fa-whatsapp text-2xl mr-2"></i>Hubungi Kami
                     </a>
-                    <span class="ml-4 fw-semibold">Konsultasi permasalahan anabulmu sekarang!</span>
+                    <span class="ml-4 items-center justify-center text-base fw-semibold">Konsultasi permasalahan
+                        anabulmu sekarang!</span>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- bagian perawatan -->
-    <section class="py-12">
-        <div class="container mx-auto px-4 py-8 bg-orange-100 rounded-4xl">
-            <h2 class="text-center font-bold text-2xl mb-12">Ada Perawatan Apa Aja Kalau Kamu Grooming di Ling-Ling
+    <section class="py-12 px-16">
+        <div class="container mx-auto px-4 py-10 bg-orange-100 rounded-3xl">
+            <h2 class="text-center font-bold text-2xl mb-10">Ada Perawatan Apa Aja Kalau Kamu Grooming di Ling-Ling
                 Petshop</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
@@ -241,38 +243,38 @@
                     [
                         'icon' => 'database',
                         'title' => 'Basic',
-                        'description' => 'Layanan grooming anti kutu, grooming anti jamur, pemeriksaan kesehatan, dan pemberian obat cacing untuk hewan peliharaan Anda'
+                        'description' => 'Layanan dasar yang mencakup grooming anti kutu & jamur, pemeriksaan kesehatan, serta pemberian obat cacing untuk menjaga kebersihan dan kesehatan hewan peliharaan Anda'
                     ],
                     [
                         'icon' => 'band-aid',
                         'title' => 'Mix',
-                        'description' => 'Grooming basic + suntik vitamin untuk kesehatan optimal hewan peliharaan Anda'
+                        'description' => 'Paket perawatan lengkap dengan grooming basic ditambah suntik vitamin untuk meningkatkan daya tahan tubuh dan vitalitas hewan kesayangan Anda'
                     ],
                     [
                         'icon' => 'trophy',
                         'title' => 'Complete',
-                        'description' => 'Perawatan menyeluruh yang terdiri dari grooming mix + tes Revolution untuk pemeriksaan parasit pada hewan kesayangan Anda'
+                        'description' => 'Layanan premium mencakup grooming mix ditambah tes Revolution untuk deteksi dan perlindungan menyeluruh dari parasit sebagai solusi total bagi kesehatan hewan peliharaan Anda'
                     ]
                 ];
 
                 foreach ($services as $service) {
                     echo '<div class="text-center px-4">
-                            <div class="text-4xl text-orange-500 mb-4">
+                            <div class="text-5xl text-orange-500 mb-3">
                                 <i class="fas fa-' . $service['icon'] . '"></i>
                             </div>
-                            <h3 class="font-bold text-xl mb-4">' . $service['title'] . '</h3>
-                            <p class="mb-0">' . $service['description'] . '</p>
+                            <h3 class="font-bold text-lg mb-3">' . $service['title'] . '</h3>
+                            <p class="mb-0 text-sm text-justify">' . $service['description'] . '</p>
                           </div>';
                 }
                 ?>
             </div>
 
             <div class="text-center mt-8 mb-8 rounded-4xl">
-                <p class="font-bold mb-6">Benefit: Semua jenis grooming sudah termasuk gunting kuku, pembersihan
+                <p class="font-bold mb-4 text-sm">Benefit: Semua jenis grooming sudah termasuk gunting kuku, pembersihan
                     telinga, rapihkan bulu paw, dan bagian bokong</p>
                 <a href="#booking-form"
-                    class="inline-flex items-center justify-center bg-orange-500 text-white px-6 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
-                    <i class="fab fa-whatsapp text-xl mr-2"></i>Saya Mau Booking Sekarang
+                    class="inline-flex items-center justify-center bg-orange-500 text-sm text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
+                    <i class="fab fa-whatsapp text-2xl mr-2"></i>Saya Mau Booking Sekarang
                 </a>
             </div>
         </div>
@@ -283,8 +285,8 @@
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto bg-white rounded-lg overflow-hidden shadow-lg">
                 <div class="bg-orange-500 text-white p-6 text-center">
-                    <h3 class="text-xl font-semibold mb-2">Form Layanan Grooming</h3>
-                    <p>Layanan perawatan untuk hewan kesayangan Anda</p>
+                    <h3 class="text-lg font-semibold mb-2">Form Layanan Grooming</h3>
+                    <p class="text-sm">Layanan perawatan untuk hewan kesayangan Anda</p>
                 </div>
 
                 <div class="p-8">
@@ -376,9 +378,9 @@
 
                             foreach ($formFields as $name => $field) {
                                 echo '<div class="row mb-3 align-items-center">';
-                                echo '<label class="col-md-4 col-form-label font-medium">' . $field['label'] . '</label>';
+                                echo '<label class="col-md-4 col-form-label font-medium text-sm">' . $field['label'] . '</label>';
                                 echo '<div class="col-md-8">';
-                                $class = 'form-control w-full p-3 border rounded-lg focus:border-orange-500 focus:ring focus:ring-orange-200';
+                                $class = 'form-control w-full p-3 text-sm border rounded-lg focus:border-orange-500 focus:ring focus:ring-orange-200';
                                 if ($field['type'] === 'select') {
                                     echo '<select name="' . $name . '" class="' . $class . '" ' .
                                         (isset($field['required']) ? 'required' : '') . '>';
@@ -398,13 +400,13 @@
                             ?>
                         </div>
 
-                        <div class="flex justify-between mt-8">
+                        <div class="flex justify-between mt-8 px-3">
                             <button type="reset"
-                                class="px-4 py-3 border !border-orange-400 text-orange-500 rounded-lg font-semibold hover:bg-orange-100 transition duration-200">
+                                class="px-4 py-2 border !border-orange-400 text-orange-500 rounded-lg font-semibold text-sm hover:bg-orange-100 transition duration-200">
                                 Reset
                             </button>
                             <button type="submit"
-                                class="px-4 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition duration-200">
+                                class="px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold text-sm hover:bg-orange-600 transition duration-200">
                                 Pesan Sekarang
                             </button>
                         </div>

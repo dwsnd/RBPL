@@ -185,10 +185,10 @@
                 foreach ($gejala as $item) {
                     echo '<div class="bg-gray-200 p-4 rounded-lg h-full">
                             <div class="flex items-center h-full">
-                                <div class="text-2xl text-orange-500 mr-3 flex-shrink-0">
+                                <div class="text-2xl text-orange-500 mr-6 flex-shrink-0">
                                     <i class="fas fa-' . $item['icon'] . '"></i>
                                 </div>
-                                <p class="mb-0 text-sm flex-grow">' . $item['text'] . '</p>
+                                <p class="text-sm flex-grow">' . $item['text'] . '</p>
                             </div>
                           </div>';
                 }
@@ -202,10 +202,10 @@
         <div class="container mx-auto px-4">
             <div class="flex flex-wrap items-center">
                 <div class="w-full lg:w-5/12 mb-6 lg:mb-0">
-                    <img src="../aset/anjingpenitipan1.png" alt="Grooming Illustration" class="w-full">
+                    <img src="../aset/konsultasi1.png" alt="Grooming Illustration" class="w-full">
                 </div>
                 <div class="w-full lg:w-7/12 lg:pl-8">
-                    <h2 class="text-orange-500 font-bold text-2xl mb-4 text-center">Fasilitas & Layanan
+                    <h2 class="text-orange-500 font-bold text-2xl mb-4 text-center pl-20">Fasilitas & Layanan
                     </h2>
                     <?php
                     $layanan = [
@@ -222,7 +222,7 @@
                     foreach ($layanan as $index => $item) {
                         $number = $index + 1;
                         echo '<div class="flex items-start pl-32">
-                                <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
+                                <div class="flex items-center justify-center font-semibold text-base mr-4">' . $number . '</i>
                                 </div>
                                 <p class="text-gray-700 leading-relaxed text-base flex-1">' . $item['text'] . '</p>
                               </div>';
@@ -256,7 +256,7 @@
                     foreach ($syarat as $index => $item) {
                         $number = $index + 1;
                         echo '<div class="flex items-start">
-                                <div class="flex items-center justify-center font-semibold text-lg mr-4">' . $number . '</i>
+                                <div class="flex items-center justify-center font-semibold text-base mr-4">' . $number . '</i>
                                 </div>
                                 <p class="text-gray-700 leading-relaxed text-base flex-1 mr-10">' . $item['text'] . '</p>
                               </div>';
@@ -264,7 +264,7 @@
                     ?>
                 </div>
                 <div class="w-full lg:w-5/12 mb-6 lg:mb-0">
-                    <img src="../aset/anjingpenitipan2.png" alt="Grooming Illustration" class="w-full">
+                    <img src="../aset/konsultasi2.png" alt="Grooming Illustration" class="w-full">
                 </div>
             </div>
         </div>
@@ -392,11 +392,11 @@
 
                         <div class="flex justify-between mt-8 px-3">
                             <button type="reset"
-                                class="py-2 px-4 text-sm border !border-orange-400 text-orange-500 rounded-lg font-semibold hover:bg-orange-100 transition duration-200">
+                                class="py-2 px-4 text-sm border !border-orange-400 text-orange-500 rounded-lg font-semibold  text-sm hover:bg-orange-100 transition duration-200">
                                 Reset
                             </button>
                             <button type="submit"
-                                class="py-2 px-4 text-sm bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition duration-200">
+                                class="py-2 px-4 text-sm bg-orange-500 text-white rounded-lg font-semibold  text-sm hover:bg-orange-600 transition duration-200">
                                 Pesan Sekarang
                             </button>
                         </div>

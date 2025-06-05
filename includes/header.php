@@ -76,11 +76,11 @@ if (isset($_SESSION['id_pelanggan'])) {
                     <div class="absolute pt-2 hidden group-hover:block w-48 z-50">
                         <div class="bg-white rounded-lg shadow-lg py-2">
                             <a href="perawatan.php"
-                                class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-500 transition-colors duration-200">Perawatan</a>
+                                class="block px-4 py-2 text-base text-gray-700 hover:bg-orange-50 hover:text-orange-500 transition-colors duration-200">Perawatan</a>
                             <a href="penitipan.php"
-                                class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-500 transition-colors duration-200">Penitipan</a>
+                                class="block px-4 py-2 text-base text-gray-700 hover:bg-orange-50 hover:text-orange-500 transition-colors duration-200">Penitipan</a>
                             <a href="konsultasi.php"
-                                class="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-500 transition-colors duration-200">Konsultasi</a>
+                                class="block px-4 py-2 text-base text-gray-700 hover:bg-orange-50 hover:text-orange-500 transition-colors duration-200">Konsultasi</a>
                         </div>
                     </div>
                 </div>
