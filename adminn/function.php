@@ -72,3 +72,15 @@ function upload()
     move_uploaded_file($tmpName, 'img/' . $namaFileBaru);
     return $namaFileBaru;
 }
+
+function hapus($id)
+{
+    global $conn;
+    mysqli_query($conn, "DELETE FROM produk WHERE id = $id");
+
+    return mysqli_affected_rows($conn); 
+}
+
+function ubah($id){
+
+}

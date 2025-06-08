@@ -140,14 +140,12 @@ $produk = query("SELECT * FROM produk");
                                     <td><?= $row['stock']; ?></td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                                <a href="ubah.php?id_menu=<?= $row["id"]; ?>" 
-                                                   class="btn btn-sm btn-warning">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>
-                                                <button onclick="confirmDelete('<?= $row["id"]; ?>')" class="btn btn-sm btn-danger">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </div>
+                                            <a href="ubah.php?id_menu=<?= $row["id"]; ?>"
+                                                class="btn btn-sm btn-warning">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                             <a href="javascript:void(0);" onclick="confirmDelete('<?= $row['id']; ?>')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -163,7 +161,23 @@ $produk = query("SELECT * FROM produk");
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Yakin ingin menghapus?',
+                text: "Data yang dihapus tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'hapus.php?id=' + id;
+                }
+            })
+        }
+    </script>
 </body>
 
 </html>
