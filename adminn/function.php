@@ -81,6 +81,30 @@ function hapus($id)
     return mysqli_affected_rows($conn); 
 }
 
-function ubah($id){
-
+function ubah($data)
+{
+    global $conn;
+    $id = $data["id"];
+    $name = htmlspecialchars($data["name"]);
+    $price = htmlspecialchars($data["price"]);
+    $category = htmlspecialchars($data["category"]);
+    $stock = htmlspecialchars($data["stock"]);
+    $description = htmlspecialchars($data["description"]);
+    $gambarLama = htmlspecialchars($data["gambarLama"]);
+    if($_FILES['image']['error']===4){
+        $image = $gambarLama;
+    } else {
+        $image = upload();
+    }
+    $query = "UPDATE produk SET 
+            name = '$name',
+            price = '$price',
+            category = '$category',
+            stock = '$stock',
+            description = '$description',
+            image = '$image'
+            WHERE id = $id
+            ";
+    mysqli_query($conn, $query);
+    return mysqli_affected_rows($conn);
 }

@@ -74,6 +74,7 @@ $produk = query("SELECT * FROM produk");
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -140,7 +141,7 @@ $produk = query("SELECT * FROM produk");
                                     <td><?= $row['stock']; ?></td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="ubah.php?id_menu=<?= $row["id"]; ?>"
+                                            <a href="ubah.php?id=<?= $row["id"]; ?>"
                                                 class="btn btn-sm btn-warning">
                                                 <i class="fa fa-edit"></i>
                                             </a>
