@@ -1,3 +1,8 @@
+<?php
+require 'function.php';
+$produk = query("SELECT * FROM produk");
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -108,30 +113,56 @@
                     <h3>Data Produk</h3>
                     <input type="search" class="form-control w-25" placeholder="Search...">
                 </div>
+
+                <!-- Tabel -->
+                <div class="container">
+                    <a href="tambah.php" class="btn btn-warning mb-3">Tambah Data</a>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Gambar</th>
+                                <th>Nama</th>
+                                <th>Harga</th>
+                                <th>Kategori</th>
+                                <th>Stok</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($produk as $row) : ?>
+                                <tr>
+                                    <td><?= $row['id']; ?></td>
+                                    <td><img src="aset/produk/kucing<?= $row["image"]; ?>" width="100" alt="Gambar"></td>
+                                    <td><?= $row['name']; ?></td>
+                                    <td><?= $row['price']; ?></td>
+                                    <td><?= $row['category']; ?></td>
+                                    <td><?= $row['stock']; ?></td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                                <a href="ubah.php?id_menu=<?= $row["id"]; ?>" 
+                                                   class="btn btn-sm btn-warning">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <button onclick="confirmDelete('<?= $row["id"]; ?>')" class="btn btn-sm btn-danger">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                    </table>
+                </div>
             </main>
         </div>
     </div>
 
+
+
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Chart.js sing nggu duwur
-        const ctx = document.getElementById('chartOrder');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Jumlah Pesanan',
-                    data: [30, 90, 35, 20, 15, 25, 50, 80, 40, 90, 95, 30],
-                    borderColor: '#ff7f50',
-                    backgroundColor: 'rgba(255,127,80,0.2)',
-                    tension: 0.3,
-                    fill: true
-                }]
-            }
-        });
-    </script>
 
 </body>
 
