@@ -50,6 +50,7 @@
                 </div>
             </div>
         </div>
-        <img src="../aset/Shapebawah.png" class="absolute left-[85%] top-[85%] w-[13%] z-[1]" alt="Shapebawah">
+        <img src="/RBPL/CopyRBPL/aset/Shapebawah.png" class="absolute left-[85%] top-[85%] w-[13%] z-[1]"
+            alt="Shapebawah">
     </div>
 </footer>

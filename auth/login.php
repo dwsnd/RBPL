@@ -11,24 +11,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($email_or_phone && $password) {
         // mencari pelanggan berdasarkan email atau nomor telepon
-        $query = "SELECT * FROM pelanggan WHERE email = '$email_or_phone' OR nomor_telepon = '$email_or_phone'";
-        $result = $conn->query($query);
+        $query = "SELECT * FROM pelanggan WHERE email = :email_or_phone OR nomor_telepon = :email_or_phone";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute(['email_or_phone' => $email_or_phone]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($result->num_rows === 1) {
-            $user = $result->fetch_assoc();
+        if ($result) {
             // verifikasi password
-            if ($password === $user['password']) {
+            if ($password === $result['password']) {
                 // set session
                 $_SESSION['logged_in'] = true;
-                $_SESSION['id_pelanggan'] = $user['id_pelanggan'];
-                $_SESSION['nama'] = $user['nama'];
-                $_SESSION['email'] = $user['email'];
+                $_SESSION['id_pelanggan'] = $result['id_pelanggan'];
+                $_SESSION['nama'] = $result['nama'];
+                $_SESSION['email'] = $result['email'];
 
                 if ($remember) {
-                    setcookie('email', $user['email'], time() + (86400), "/"); // 1 day
+                    setcookie('email', $result['email'], time() + (86400), "/"); // 1 day
                 }
 
-                header("Location: ../dashboard/index.php");
+                header("Location: ../dashboard/indexpelanggan.php");
                 exit();
             } else {
                 $error_message = "Password yang Anda masukkan salah!";

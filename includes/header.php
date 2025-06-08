@@ -3,11 +3,18 @@
 $publicPages = ['index.php', 'shopawal.php', 'about.php', 'perawatan.php', 'penitipan.php', 'konsultasi.php'];
 $currentPage = basename($_SERVER['PHP_SELF']);
 
+// Include database connection
+require_once __DIR__ . '/db.php';
+
+// Check if database connection is successful
+if (!isset($pdo) || !isset($conn)) {
+    die("Database connection failed. Please check your configuration.");
+}
+
+// Start session if not in public page
 if (!in_array($currentPage, $publicPages) && session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-require_once 'db.php';
 
 // fungsi untuk memeriksa apakah halaman aktif
 function isActive($page)
@@ -33,11 +40,45 @@ $servicePages = ['perawatan.php', 'penitipan.php', 'konsultasi.php'];
 // mendapatkan user data saat login
 $userData = null;
 if (isset($_SESSION['id_pelanggan'])) {
-    $query = "SELECT * FROM pelanggan WHERE id_pelanggan = '" . $_SESSION['id_pelanggan'] . "'";
-    $result = $conn->query($query);
-    if ($result && $result->num_rows > 0) {
-        $userData = $result->fetch_assoc();
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM pelanggan WHERE id_pelanggan = ?");
+        $stmt->execute([$_SESSION['id_pelanggan']]);
+        if ($stmt->rowCount() > 0) {
+            $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+    } catch (PDOException $e) {
+        // Handle error silently or log it
+        error_log("Error fetching user data: " . $e->getMessage());
     }
+}
+
+// Function to get correct photo path
+function getPhotoPath($photoProfile)
+{
+    if (empty($photoProfile)) {
+        return '';
+    }
+
+    // Remove any leading slashes
+    $photoProfile = ltrim($photoProfile, '/');
+
+    // Try different possible paths
+    $possiblePaths = [
+        'uploads/pelanggan/' . $photoProfile,
+        '../uploads/pelanggan/' . $photoProfile,
+        '../../uploads/pelanggan/' . $photoProfile,
+        '/uploads/pelanggan/' . $photoProfile
+    ];
+
+    // Check each possible path
+    foreach ($possiblePaths as $path) {
+        if (file_exists($path)) {
+            return $path;
+        }
+    }
+
+    // If no path works, return empty string to trigger fallback
+    return '';
 }
 ?>
 
@@ -56,7 +97,8 @@ if (isset($_SESSION['id_pelanggan'])) {
                 </svg>
             </button>
 
-            <div class="hidden lg:flex items-center space-x-8">
+            <!-- Desktop Menu -->
+            <div class="hidden lg:flex items-center space-x-8" id="desktop-menu">
                 <a class="font-semibold <?php echo isActive('index.php'); ?>" href="index.php">Beranda</a>
 
                 <!-- dropdown menu -->
@@ -86,8 +128,23 @@ if (isset($_SESSION['id_pelanggan'])) {
                 </div>
 
                 <a class="font-semibold <?php echo isActive('shopawal.php'); ?>" href="shopawal.php">Toko</a>
-                <a class="font-semibold <?php echo isActive('about.php'); ?>" href="about.php">Tentang
-                    Kami</a>
+                <a class="font-semibold <?php echo isActive('about.php'); ?>" href="about.php">Tentang Kami</a>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div class="lg:hidden hidden" id="mobile-menu">
+                <div class="absolute top-full left-0 right-0 bg-white shadow-lg rounded-b-lg py-4 px-4 space-y-4">
+                    <a class="block font-semibold <?php echo isActive('index.php'); ?>" href="index.php">Beranda</a>
+                    <a class="block font-semibold <?php echo isActive('perawatan.php'); ?>"
+                        href="perawatan.php">Perawatan</a>
+                    <a class="block font-semibold <?php echo isActive('penitipan.php'); ?>"
+                        href="penitipan.php">Penitipan</a>
+                    <a class="block font-semibold <?php echo isActive('konsultasi.php'); ?>"
+                        href="konsultasi.php">Konsultasi</a>
+                    <a class="block font-semibold <?php echo isActive('shopawal.php'); ?>" href="shopawal.php">Toko</a>
+                    <a class="block font-semibold <?php echo isActive('about.php'); ?>" href="about.php">Tentang
+                        Kami</a>
+                </div>
             </div>
 
             <div class="hidden lg:flex items-center space-x-6">
@@ -113,31 +170,34 @@ if (isset($_SESSION['id_pelanggan'])) {
                         </a>
                     </div>
                 <?php endif; ?>
+
                 <!-- profil -->
                 <?php if ($userData): ?>
                     <div class="relative">
                         <button id="profileMenuBtn"
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all">
+                            class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all overflow-hidden">
                             <?php if (empty($userData['foto_profil'])): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
-                                    width="24" height="24" viewBox="0 0 256 256" xml:space="preserve">
-                                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;"
-                                        transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
-                                        <path
-                                            d="M 85.091 90 h -8.372 c 0 -17.49 -14.229 -31.719 -31.719 -31.719 S 13.281 72.51 13.281 90 H 4.909 c 0 -22.107 17.985 -40.091 40.091 -40.091 S 85.091 67.893 85.091 90 z"
-                                            style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255, 255, 255); fill-rule: nonzero; opacity: 1;"
-                                            transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
-                                        <path
-                                            d="M 45 46.484 c -12.816 0 -23.242 -10.426 -23.242 -23.242 S 32.184 0 45 0 s 23.242 10.426 23.242 23.242 S 57.816 46.484 45 46.484 z M 45 8.372 c -8.199 0 -14.87 6.67 -14.87 14.87 s 6.67 14.87 14.87 14.87 s 14.87 -6.67 14.87 -14.87 S 53.199 8.372 45 8.372 z"
-                                            style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(255, 255, 255); fill-rule: nonzero; opacity: 1;"
-                                            transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
-                                    </g>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                    <path
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                                 </svg>
                             <?php else: ?>
-                                <img src="uploads/pelanggan/<?php echo htmlspecialchars($userData['foto_profil']); ?>"
-                                    alt="Profil" class="w-8 h-8 rounded-full object-cover" />
+                                <?php $photoPath = getPhotoPath($userData['foto_profil']); ?>
+                                <img src="<?php echo htmlspecialchars($photoPath); ?>" alt="Profil"
+                                    class="w-full h-full object-cover rounded-full"
+                                    style="width: 40px; height: 40px; object-fit: cover;"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <!-- Fallback icon jika gambar tidak dapat dimuat -->
+                                <div class="w-full h-full flex items-center justify-center" style="display: none;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                        fill="blue">
+                                        <path
+                                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                    </svg>
+                                </div>
                             <?php endif; ?>
                         </button>
+
                         <!-- dropdown -->
                         <div id="profileDropdown"
                             class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl z-50 py-3 px-4 hidden"
@@ -145,25 +205,32 @@ if (isset($_SESSION['id_pelanggan'])) {
                             <div class="text-xs text-gray-500 mb-2">Saat ini menggunakan</div>
                             <div class="flex items-center mb-3">
                                 <?php if (empty($userData['foto_profil'])): ?>
-                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        version="1.1" width="40" height="40" viewBox="0 0 256 256" xml:space="preserve">
-                                        <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;"
-                                            transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                                    <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center mr-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                            fill="currentColor">
                                             <path
-                                                d="M 53.026 45.823 c 3.572 -2.527 5.916 -6.682 5.916 -11.381 C 58.941 26.754 52.688 20.5 45 20.5 s -13.942 6.254 -13.942 13.942 c 0 4.699 2.344 8.854 5.916 11.381 C 28.172 49.092 21.883 57.575 21.883 67.5 c 0 1.104 0.896 2 2 2 s 2 -0.896 2 -2 c 0 -10.541 8.576 -19.116 19.117 -19.116 S 64.116 56.959 64.116 67.5 c 0 1.104 0.896 2 2 2 s 2 -0.896 2 -2 C 68.116 57.575 61.827 49.092 53.026 45.823 z M 35.058 34.442 c 0 -5.482 4.46 -9.942 9.942 -9.942 c 5.481 0 9.941 4.46 9.941 9.942 s -4.46 9.942 -9.941 9.942 C 39.518 44.384 35.058 39.924 35.058 34.442 z"
-                                                style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"
-                                                transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
-                                            <path
-                                                d="M 45 0 C 20.187 0 0 20.187 0 45 c 0 24.813 20.187 45 45 45 c 24.813 0 45 -20.187 45 -45 C 90 20.187 69.813 0 45 0 z M 45 86 C 22.393 86 4 67.607 4 45 S 22.393 4 45 4 s 41 18.393 41 41 S 67.607 86 45 86 z"
-                                                style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"
-                                                transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
-                                        </g>
-                                    </svg>
+                                                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    </div>
                                 <?php else: ?>
-                                    <img src="uploads/pelanggan/<?php echo htmlspecialchars($userData['foto_profil']); ?>"
-                                        alt="Profil" class="w-12 h-12 rounded-full object-cover mr-3" />
+                                    <?php $photoPath = getPhotoPath($userData['foto_profil']); ?>
+                                    <div class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0">
+                                        <img src="<?php echo htmlspecialchars($photoPath); ?>" alt="Profil"
+                                            class="w-full h-full object-cover"
+                                            style="width: 48px; height: 48px; object-fit: cover;"
+                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                        <!-- Fallback untuk dropdown -->
+                                        <div class="w-full h-full bg-gray-300 flex items-center justify-center"
+                                            style="display: none;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                                fill="currentColor">
+                                                <path
+                                                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                            </svg>
+                                        </div>
+                                    </div>
                                 <?php endif; ?>
-                                <div class="ml-3">
+                                <div class="flex-grow">
                                     <div class="font-bold text-base text-gray-900">
                                         <?php echo htmlspecialchars($userData['nama_lengkap']); ?>
                                     </div>
@@ -171,7 +238,7 @@ if (isset($_SESSION['id_pelanggan'])) {
                                     </div>
                                 </div>
                             </div>
-                            <button onclick="window.location.href='../dashboard/profile.php'"
+                            <button onclick="window.location.href='../profilpelanggan/dakun.php'"
                                 class="w-full text-left font-semibold py-2 px-1 rounded hover:bg-orange-50 mb-1">Profil
                                 Akun</button>
                             <button onclick="window.location.href='../auth/logout.php'"
@@ -192,25 +259,31 @@ if (isset($_SESSION['id_pelanggan'])) {
 <script>
     // mobile menu toggle
     const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.querySelector('.lg\\:flex');
-    mobileMenuButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
 
     // profile dropdown toggle (klik, bukan hover)
     const profileMenuBtn = document.getElementById('profileMenuBtn');
     const profileDropdown = document.getElementById('profileDropdown');
+
     if (profileMenuBtn && profileDropdown) {
         profileMenuBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             profileDropdown.classList.toggle('hidden');
         });
+
         // close dropdown on click outside
         document.addEventListener('click', function (e) {
             if (!profileDropdown.classList.contains('hidden')) {
                 profileDropdown.classList.add('hidden');
             }
         });
+
         profileDropdown.addEventListener('click', function (e) {
             e.stopPropagation();
         });
