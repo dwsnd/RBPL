@@ -1,6 +1,24 @@
 <?php
 require 'function.php';
-$produk = query("SELECT * FROM produk");
+// $produk = query("SELECT * FROM produk");
+
+// search sko keyword
+if (isset($_GET['keyword']) && !empty($_GET['keyword'])) {
+    $keyword = htmlspecialchars($_GET['keyword']);
+    $produk = query("SELECT * FROM produk WHERE name LIKE '%$keyword%' OR category LIKE '%$keyword%'");
+} else {
+    $produk = query("SELECT * FROM produk");
+}
+
+// dinggo halaman jml data per halaman pahinatiomn
+$jumlahDataPerHalaman = 8;
+$jumlahData = count(query("SELECT * FROM produk"));
+$jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
+$halamanAktif = (isset($_GET["halaman"])) ? (int)$_GET["halaman"] : 1;
+$awalData = ($jumlahDataPerHalaman * $halamanAktif) - $jumlahDataPerHalaman;
+
+// manut gpt
+$produk = query("SELECT * FROM produk LIMIT $awalData, $jumlahDataPerHalaman");
 ?>
 
 <!DOCTYPE html>
@@ -73,6 +91,23 @@ $produk = query("SELECT * FROM produk");
             border-radius: 1rem;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+
+        .pagination .page-item.active .page-link {
+            background-color: #ffc107;
+            /* kuning bootstrap */
+            border-color: #ffc107;
+            color: #fff;
+        }
+
+        .pagination .page-link {
+            color: #ffc107;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #ffe08a;
+            border-color: #ffc107;
+            color: #212529;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -112,7 +147,15 @@ $produk = query("SELECT * FROM produk");
             <main class="col-md-10 p-4">
                 <div class="d-flex justify-content-between mb-3">
                     <h3>Data Produk</h3>
-                    <input type="search" class="form-control w-25" placeholder="Search...">
+                    <form action="" method="GET" class="d-flex">
+                        <input type="text" name="keyword" class="form-control me-2 w-75" placeholder="Cari produk..." value="<?= isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '' ?>">
+                        <button type="submit" class="btn btn-outline-primary me-2" title="Cari">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        <a href="dataproduk.php" class="btn btn-outline-secondary" title="Reset">
+                            <i class="fa fa-sync-alt"></i>
+                        </a>
+                    </form>
                 </div>
 
                 <!-- Tabel -->
@@ -145,12 +188,40 @@ $produk = query("SELECT * FROM produk");
                                                 class="btn btn-sm btn-warning">
                                                 <i class="fa fa-edit"></i>
                                             </a>
-                                             <a href="javascript:void(0);" onclick="confirmDelete('<?= $row['id']; ?>')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
+                                            <a href="javascript:void(0);" onclick="confirmDelete('<?= $row['id']; ?>')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
+                        </tbody>
                     </table>
+
+                    <!-- hlmn -->
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <?php if ($halamanAktif > 1) : ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?halaman=<?= $halamanAktif - 1; ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php for ($i = 1; $i <= $jumlahHalaman; $i++) : ?>
+                                <li class="page-item <?= ($i == $halamanAktif) ? 'active' : ''; ?>">
+                                    <a class="page-link" href="?halaman=<?= $i; ?>"><?= $i; ?></a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <?php if ($halamanAktif < $jumlahHalaman) : ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?halaman=<?= $halamanAktif + 1; ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
                 </div>
             </main>
         </div>
