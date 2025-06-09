@@ -10,7 +10,7 @@ require_once 'db.php';
 try {
     // Query to get all products from database
     $query = "SELECT 
-                id, 
+                id_produk as id, 
                 name, 
                 price, 
                 image, 

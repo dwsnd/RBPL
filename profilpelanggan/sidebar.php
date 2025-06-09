@@ -34,7 +34,7 @@ function getMenuItemClasses($baseName)
                 </a>
             </div>
             <div class="<?php echo getMenuItemClasses('favorit'); ?> px-3 py-2 rounded-lg cursor-pointer text-sm">
-                <a href="../favorit.php" class="flex items-center gap-2">
+                <a href="../favorit/favorit.php" class="flex items-center gap-2">
                     <i class="fas fa-heart w-5"></i>
                     <span>Favorit</span>
                 </a>

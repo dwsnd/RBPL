@@ -37,6 +37,12 @@ if (!$anabul) {
     exit();
 }
 
+// Get anabul photos
+$foto_query = "SELECT * FROM anabul_foto WHERE id_anabul = ? ORDER BY urutan ASC";
+$foto_stmt = $pdo->prepare($foto_query);
+$foto_stmt->execute([$anabul_id]);
+$anabul_fotos = $foto_stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -45,99 +51,145 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('Nama hewan dan kategori hewan wajib diisi.');
         }
 
-        // Handle photo upload (optional for edit)
-        $foto_name = $anabul['foto']; // Keep existing photo by default
+        // Handle photo deletions
+        if (isset($_POST['deleted_photos']) && is_array($_POST['deleted_photos'])) {
+            foreach ($_POST['deleted_photos'] as $deleted_photo) {
+                // Delete from database
+                $delete_foto_query = "DELETE FROM anabul_foto WHERE id_anabul = ? AND nama_file = ?";
+                $delete_foto_stmt = $pdo->prepare($delete_foto_query);
+                $delete_foto_stmt->execute([$anabul_id, $deleted_photo]);
 
-        if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-            $allowed_types = ['image/jpeg', 'image/jpg', 'image/png'];
-            $max_size = 5 * 1024 * 1024; // 5MB
-
-            if (!in_array($_FILES['foto']['type'], $allowed_types)) {
-                throw new Exception('Format file tidak didukung. Gunakan JPG, JPEG, atau PNG.');
-            }
-
-            if ($_FILES['foto']['size'] > $max_size) {
-                throw new Exception('Ukuran file terlalu besar. Maksimal 5MB.');
-            }
-
-            // Create upload directory if not exists
-            $upload_dir = '../uploads/anabul/';
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-
-            // Generate unique filename
-            $file_extension = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-            $new_foto_name = uniqid('anabul_') . '.' . $file_extension;
-            $upload_path = $upload_dir . $new_foto_name;
-
-            if (move_uploaded_file($_FILES['foto']['tmp_name'], $upload_path)) {
-                // Delete old photo if exists
-                if (!empty($anabul['foto']) && file_exists($upload_dir . $anabul['foto'])) {
-                    unlink($upload_dir . $anabul['foto']);
+                // Delete file from filesystem
+                $file_path = '../../uploads/anabul/' . $deleted_photo;
+                if (file_exists($file_path)) {
+                    unlink($file_path);
                 }
-                $foto_name = $new_foto_name;
-            } else {
-                throw new Exception('Gagal mengunggah foto baru.');
             }
         }
 
-        // Prepare data for update
-        $data = [
-            'nama_hewan' => trim($_POST['nama_hewan']),
-            'kategori_hewan' => $_POST['kategori_hewan'],
-            'jenis_ras' => !empty($_POST['jenis_ras']) ? trim($_POST['jenis_ras']) : null,
-            'umur_tahun' => !empty($_POST['umur_tahun']) ? (int) $_POST['umur_tahun'] : null,
-            'umur_bulan' => !empty($_POST['umur_bulan']) ? (int) $_POST['umur_bulan'] : null,
-            'berat' => !empty($_POST['berat']) ? (float) $_POST['berat'] : null,
-            'jenis_kelamin' => !empty($_POST['jenis_kelamin']) ? $_POST['jenis_kelamin'] : null,
-            'riwayat_kesehatan' => !empty($_POST['riwayat_kesehatan']) ? trim($_POST['riwayat_kesehatan']) : null,
-            'karakteristik' => !empty($_POST['karakteristik']) ? trim($_POST['karakteristik']) : null,
-            'foto' => $foto_name,
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
+        // Handle photo uploads
+        $uploaded_files = [];
+        $upload_dir = '../../uploads/anabul/';
 
-        // Update anabul data
-        $update_query = "UPDATE anabul SET 
-            nama_hewan = ?, 
-            kategori_hewan = ?, 
-            jenis_ras = ?, 
-            umur_tahun = ?, 
-            umur_bulan = ?, 
-            berat = ?, 
-            jenis_kelamin = ?, 
-            riwayat_kesehatan = ?, 
-            karakteristik = ?, 
-            foto = ?, 
-            updated_at = ? 
-            WHERE id_anabul = ? AND id_pelanggan = ?";
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
 
-        $update_stmt = $pdo->prepare($update_query);
-        $update_result = $update_stmt->execute([
-            $data['nama_hewan'],
-            $data['kategori_hewan'],
-            $data['jenis_ras'],
-            $data['umur_tahun'],
-            $data['umur_bulan'],
-            $data['berat'],
-            $data['jenis_kelamin'],
-            $data['riwayat_kesehatan'],
-            $data['karakteristik'],
-            $data['foto'],
-            $data['updated_at'],
-            $anabul_id,
-            $pelanggan_id
-        ]);
+        if (isset($_FILES['foto']) && is_array($_FILES['foto']['name'])) {
+            $allowed_types = ['image/jpeg', 'image/jpg', 'image/png'];
+            $max_size = 5 * 1024 * 1024; // 5MB
+            $max_files = 4;
 
-        if ($update_result) {
+            // Validate number of files
+            if (count($_FILES['foto']['name']) > $max_files) {
+                throw new Exception("Maksimal {$max_files} foto yang dapat diunggah.");
+            }
+
+            foreach ($_FILES['foto']['name'] as $key => $name) {
+                if ($_FILES['foto']['error'][$key] === UPLOAD_ERR_OK) {
+                    $file_type = $_FILES['foto']['type'][$key];
+                    $file_size = $_FILES['foto']['size'][$key];
+                    $file_tmp = $_FILES['foto']['tmp_name'][$key];
+
+                    if (!in_array($file_type, $allowed_types)) {
+                        throw new Exception('Format file tidak didukung. Gunakan JPG, JPEG, atau PNG.');
+                    }
+
+                    if ($file_size > $max_size) {
+                        throw new Exception('Ukuran file terlalu besar. Maksimal 5MB.');
+                    }
+
+                    $file_extension = pathinfo($name, PATHINFO_EXTENSION);
+                    $new_foto_name = uniqid('anabul_') . '.' . $file_extension;
+                    $upload_path = $upload_dir . $new_foto_name;
+
+                    if (move_uploaded_file($file_tmp, $upload_path)) {
+                        $uploaded_files[] = $new_foto_name;
+                    } else {
+                        throw new Exception('Gagal mengunggah foto.');
+                    }
+                }
+            }
+        }
+
+        // Begin transaction
+        $pdo->beginTransaction();
+
+        try {
+            // Update anabul data
+            $update_query = "UPDATE anabul SET 
+                nama_hewan = ?, 
+                kategori_hewan = ?, 
+                jenis_ras = ?, 
+                umur_tahun = ?, 
+                umur_bulan = ?, 
+                berat = ?, 
+                jenis_kelamin = ?, 
+                riwayat_kesehatan = ?, 
+                karakteristik = ?, 
+                updated_at = ? 
+                WHERE id_anabul = ? AND id_pelanggan = ?";
+
+            $update_stmt = $pdo->prepare($update_query);
+            $update_result = $update_stmt->execute([
+                trim($_POST['nama_hewan']),
+                $_POST['kategori_hewan'],
+                !empty($_POST['jenis_ras']) ? trim($_POST['jenis_ras']) : null,
+                !empty($_POST['umur_tahun']) ? (int) $_POST['umur_tahun'] : null,
+                !empty($_POST['umur_bulan']) ? (int) $_POST['umur_bulan'] : null,
+                !empty($_POST['berat']) ? (float) $_POST['berat'] : null,
+                !empty($_POST['jenis_kelamin']) ? $_POST['jenis_kelamin'] : null,
+                !empty($_POST['riwayat_kesehatan']) ? trim($_POST['riwayat_kesehatan']) : null,
+                !empty($_POST['karakteristik']) ? trim($_POST['karakteristik']) : null,
+                date('Y-m-d H:i:s'),
+                $anabul_id,
+                $pelanggan_id
+            ]);
+
+            if (!$update_result) {
+                throw new Exception('Gagal memperbarui data anabul.');
+            }
+
+            // Handle photo updates
+            if (!empty($uploaded_files)) {
+                // Get current max order
+                $max_order_query = "SELECT MAX(urutan) as max_order FROM anabul_foto WHERE id_anabul = ?";
+                $max_order_stmt = $pdo->prepare($max_order_query);
+                $max_order_stmt->execute([$anabul_id]);
+                $max_order = $max_order_stmt->fetch(PDO::FETCH_ASSOC)['max_order'] ?? 0;
+
+                // Insert new photos
+                $insert_foto_query = "INSERT INTO anabul_foto (id_anabul, nama_file, urutan) VALUES (?, ?, ?)";
+                $insert_foto_stmt = $pdo->prepare($insert_foto_query);
+
+                foreach ($uploaded_files as $index => $filename) {
+                    $insert_foto_stmt->execute([
+                        $anabul_id,
+                        $filename,
+                        $max_order + $index + 1
+                    ]);
+                }
+
+                // Update main photo in anabul table if no main photo exists
+                if (empty($anabul['foto_utama'])) {
+                    $update_main_foto_query = "UPDATE anabul SET foto_utama = ? WHERE id_anabul = ?";
+                    $update_main_foto_stmt = $pdo->prepare($update_main_foto_query);
+                    $update_main_foto_stmt->execute([$uploaded_files[0], $anabul_id]);
+                }
+            }
+
+            $pdo->commit();
+
             $_SESSION['notification'] = [
                 'type' => 'success',
                 'message' => 'Data anabul berhasil diperbarui!'
             ];
             header("Location: profil_anabul.php");
             exit();
-        } else {
-            throw new Exception('Gagal memperbarui data anabul.');
+
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            throw $e;
         }
 
     } catch (Exception $e) {
@@ -146,10 +198,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ling-Ling Pet Shop - Tambah Anabul</title>
+    <title>Ling-Ling Pet Shop - Edit Anabul</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -210,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .remove-btn {
             position: absolute;
             top: 8px;
-            right: 8px;
+            left: 8px;
             width: 28px;
             height: 28px;
             background: #ef4444;
@@ -231,89 +286,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: scale(1.1);
         }
 
-        #preview-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .preview-item,
-        .add-more-item {
-            flex: 0 0 calc(25% - 0.75rem);
-            max-width: calc(25% - 0.75rem);
-        }
-
-        .add-more-item {
-            height: 200px;
-            border: 2px dashed #d1d5db;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
+        /* Custom Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background-color: #f8f9fa;
         }
 
-        .add-more-item:hover {
-            border-color: #fb923c;
-            background-color: #fef3f2;
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Popup Notification Styles */
-        .popup-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 8px;
-            color: white;
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-button {
+            padding: 8px 24px;
+            border-radius: 6px;
             font-size: 14px;
             font-weight: 500;
-            z-index: 1000;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: opacity 0.3s, transform 0.3s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .popup-notification.show {
-            opacity: 1;
-            transform: translateY(0);
+        .modal-button.cancel {
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
         }
 
-        .file-name {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.7);
+        .modal-button.cancel:hover {
+            background-color: #e5e7eb;
+        }
+
+        .modal-button.confirm {
+            background-color: #ef4444;
             color: white;
-            padding: 4px 8px;
-            font-size: 12px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            border: none;
         }
 
-        @media (max-width: 768px) {
-
-            .preview-item,
-            .add-more-item {
-                flex: 0 0 calc(50% - 0.5rem);
-                max-width: calc(50% - 0.5rem);
-            }
-        }
-
-        @media (max-width: 480px) {
-
-            .preview-item,
-            .add-more-item {
-                flex: 0 0 100%;
-                max-width: 100%;
-            }
+        .modal-button.confirm:hover {
+            background-color: #dc2626;
         }
     </style>
 </head>
@@ -340,10 +377,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Error Message -->
                 <?php if (isset($error_message)): ?>
-                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-                                <strong>Error:</strong>
-                                <?php echo htmlspecialchars($error_message); ?>
-                            </div>
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                        <strong>Error:</strong>
+                        <?php echo htmlspecialchars($error_message); ?>
+                    </div>
                 <?php endif; ?>
 
                 <!-- Form -->
@@ -351,36 +388,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form action="" method="POST" enctype="multipart/form-data">
                         <!-- Upload Foto -->
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                Foto Hewan Peliharaan
-                            </label>
-
-                            <?php if (!empty($anabul['foto'])): ?>
-                                        <div class="mb-4">
-                                            <img src="../uploads/anabul/<?php echo htmlspecialchars($anabul['foto']); ?>"
-                                                alt="Foto saat ini" class="max-w-xs rounded-lg shadow-md">
-                                            <p class="text-sm text-gray-600 mt-2">Foto saat ini</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <?php foreach ($anabul_fotos as $foto): ?>
+                                    <div class="relative bg-gray-100 rounded-lg">
+                                        <img src="../../uploads/anabul/<?php echo htmlspecialchars($foto['nama_file']); ?>"
+                                            alt="Foto anabul" class="w-full h-48 object-contain rounded-lg">
+                                        <div class="absolute top-2 right-2">
+                                            <span class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                                Foto <?php echo $foto['urutan']; ?>
+                                            </span>
                                         </div>
-                            <?php endif; ?>
+                                        <button type="button"
+                                            onclick="removeExistingPhoto('<?php echo htmlspecialchars($foto['nama_file']); ?>', this)"
+                                            class="remove-btn">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                <?php endforeach; ?>
 
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors"
-                                onclick="document.getElementById('foto').click()" ondrop="handleDrop(event)"
-                                ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                                <div id="upload-area" class="cursor-pointer">
-                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                    <p class="text-sm text-gray-600 mb-1">Klik untuk mengganti foto</p>
-                                    <p class="text-xs text-gray-500">Format: JPG, PNG (max 5MB)</p>
+                                <!-- Upload Zone -->
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors h-48 flex items-center justify-center"
+                                    onclick="document.getElementById('foto').click()" ondrop="handleDrop(event)"
+                                    ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                                    <div id="upload-area" class="cursor-pointer">
+                                        <i class="fas fa-plus text-3xl text-gray-400 mb-2"></i>
+                                        <p class="text-sm text-gray-600">Tambah foto</p>
+                                        <p class="text-xs text-gray-500" id="remaining-slots">
+                                            <?php echo 4 - count($anabul_fotos); ?> slot tersisa
+                                        </p>
+                                    </div>
+                                    <input type="file" id="foto" name="foto[]" accept="image/*" class="hidden" multiple
+                                        onchange="handleFileSelect(this)">
                                 </div>
-                                <input type="file" id="foto" name="foto" accept="image/*" class="hidden"
-                                    onchange="previewImage(this)">
-                                <div id="image-preview" class="hidden mt-4">
-                                    <img id="preview-img" src="" alt="Preview"
-                                        class="max-w-xs mx-auto rounded-lg shadow-md">
-                                    <button type="button" onclick="removeImage()"
-                                        class="mt-2 text-red-500 hover:text-red-700 text-sm">
-                                        <i class="fas fa-trash"></i> Hapus
-                                    </button>
-                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Foto saat ini</p>
+                        </div>
+
+                        <!-- Preview Area -->
+                        <div id="preview-area" class="hidden mt-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <span id="photo-counter" class="text-sm text-gray-600">0/4 foto dipilih</span>
+                                <button type="button" onclick="removeAllImages()"
+                                    class="text-red-500 hover:text-red-700 text-sm px-3 py-1 rounded border border-red-200 hover:bg-red-50 transition-colors">
+                                    <i class="fas fa-trash mr-1"></i> Hapus Semua
+                                </button>
+                            </div>
+                            <div id="preview-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <!-- Preview images will be inserted here -->
                             </div>
                         </div>
 
@@ -513,51 +567,255 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </form>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <script>
-                function previewImage(input) {
-                    if (input.files && input.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            document.getElementById('preview-img').src = e.target.result;
-                            document.getElementById('image-preview').classList.remove('hidden');
-                            document.getElementById('upload-area').classList.add('hidden');
+    <!-- Custom Confirmation Modal -->
+    <div id="customConfirmModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-[1000] hidden">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md mx-auto">
+            <div class="text-xl font-bold text-gray-900 mb-4 text-center" id="confirmMessage"></div>
+            <div class="flex justify-end space-x-3">
+                <button id="confirmCancelBtn"
+                    class="px-6 py-2 border border-gray-200 text-gray-700 rounded-full hover:bg-gray-100 transition-colors text-sm">
+                    Batal
+                </button>
+                <button id="confirmOKBtn"
+                    class="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors text-sm">
+                    Ya, Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let selectedFiles = [];
+        const maxFiles = 4;
+        const maxFileSize = 5 * 1024 * 1024; // 5MB
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+        // Helper functions
+        function getExistingPhotoCount() {
+            return document.querySelectorAll('.grid > div:not(:last-child) img').length;
+        }
+
+        function getPreviewPhotoCount() {
+            return document.querySelectorAll('#preview-grid .relative').length;
+        }
+
+        function getTotalPhotoCount() {
+            return getExistingPhotoCount() + getPreviewPhotoCount();
+        }
+
+        function updatePhotoCounters() {
+            const existingPhotos = getExistingPhotoCount();
+            const previewPhotos = getPreviewPhotoCount();
+            const totalPhotos = existingPhotos + previewPhotos;
+
+            document.getElementById('photo-counter').textContent = `${previewPhotos} foto dipilih`;
+            document.getElementById('remaining-slots').textContent = `${maxFiles - totalPhotos} slot tersisa`;
+        }
+
+        function validateFiles(files) {
+            const errors = [];
+
+            // Check total count
+            if (getTotalPhotoCount() + files.length > maxFiles) {
+                errors.push(`Maksimal ${maxFiles} foto yang dapat diunggah. Anda sudah memiliki ${getExistingPhotoCount()} foto dan ${getPreviewPhotoCount()} foto yang akan diupload, serta mencoba menambahkan ${files.length} foto lagi.`);
+            }
+
+            // Validate each file
+            Array.from(files).forEach((file, index) => {
+                if (!allowedTypes.includes(file.type)) {
+                    errors.push(`File "${file.name}" tidak didukung. Gunakan JPG, JPEG, atau PNG.`);
+                }
+                if (file.size > maxFileSize) {
+                    errors.push(`File "${file.name}" terlalu besar. Maksimal 5MB per file.`);
+                }
+            });
+
+            return errors;
+        }
+
+        function createPreviewItem(file, index) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'relative';
+
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-full h-48 object-cover rounded-lg shadow-md';
+                    img.alt = `Foto ${index + 1}`;
+
+                    const badge = document.createElement('div');
+                    badge.className = 'absolute top-2 right-2';
+                    badge.innerHTML = `
+                        <span class="bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                            Foto ${getExistingPhotoCount() + getPreviewPhotoCount() + index + 1}
+                        </span>
+                    `;
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-btn';
+                    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    removeBtn.onclick = function () {
+                        const fileIndex = selectedFiles.indexOf(file);
+                        if (fileIndex > -1) {
+                            selectedFiles.splice(fileIndex, 1);
                         }
-                        reader.readAsDataURL(input.files[0]);
-                    }
+                        previewItem.remove();
+                        updatePhotoCounters();
+                    };
+
+                    previewItem.appendChild(img);
+                    previewItem.appendChild(badge);
+                    previewItem.appendChild(removeBtn);
+                    resolve(previewItem);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Custom confirmation modal functions
+        function showCustomConfirm(message, callback) {
+            const modal = document.getElementById('customConfirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+            const okBtn = document.getElementById('confirmOKBtn');
+
+            messageEl.textContent = message;
+            modal.classList.remove('hidden');
+
+            const handleConfirm = () => {
+                modal.classList.add('hidden');
+                callback(true);
+                cleanup();
+            };
+
+            const handleCancel = () => {
+                modal.classList.add('hidden');
+                callback(false);
+                cleanup();
+            };
+
+            const cleanup = () => {
+                okBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            okBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
+        }
+
+        async function handleFileSelect(input) {
+            if (input.files && input.files.length > 0) {
+                const files = Array.from(input.files);
+                const errors = validateFiles(files);
+
+                if (errors.length > 0) {
+                    showCustomConfirm(errors.join('\n'), (result) => {
+                        if (result) {
+                            input.value = '';
+                        }
+                    });
+                    return;
                 }
 
-                function removeImage() {
-                    document.getElementById('foto').value = '';
-                    document.getElementById('image-preview').classList.add('hidden');
-                    document.getElementById('upload-area').classList.remove('hidden');
+                // Add files to selectedFiles array
+                selectedFiles.push(...files);
+
+                // Show preview area
+                document.getElementById('preview-area').classList.remove('hidden');
+
+                // Update preview grid
+                const previewGrid = document.getElementById('preview-grid');
+
+                // Create previews
+                for (let i = 0; i < files.length; i++) {
+                    const previewItem = await createPreviewItem(files[i], i);
+                    previewGrid.appendChild(previewItem);
                 }
 
-                function handleDrop(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                updatePhotoCounters();
 
-                    const files = e.dataTransfer.files;
-                    if (files.length > 0) {
-                        document.getElementById('foto').files = files;
-                        previewImage(document.getElementById('foto'));
-                    }
+                // Clear the input to allow selecting the same file again
+                input.value = '';
+            }
+        }
 
-                    e.target.classList.remove('border-orange-400');
+        function removeAllImages() {
+            showCustomConfirm('Yakin ingin menghapus semua foto yang akan diupload?', (result) => {
+                if (result) {
+                    selectedFiles = [];
+                    document.getElementById('preview-area').classList.add('hidden');
+                    document.getElementById('preview-grid').innerHTML = '';
+                    updatePhotoCounters();
                 }
+            });
+        }
 
-                function handleDragOver(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.target.classList.add('border-orange-400');
-                }
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-                function handleDragLeave(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.target.classList.remove('border-orange-400');
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length > 0) {
+                const dataTransfer = new DataTransfer();
+                files.forEach(file => dataTransfer.items.add(file));
+
+                const input = document.getElementById('foto');
+                input.files = dataTransfer.files;
+                handleFileSelect(input);
+            }
+
+            e.target.classList.remove('border-orange-400');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.target.classList.add('border-orange-400');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.target.classList.remove('border-orange-400');
+        }
+
+        function removeExistingPhoto(filename, button) {
+            showCustomConfirm('Yakin ingin menghapus foto ini?', (result) => {
+                if (result) {
+                    const container = button.closest('.relative');
+                    container.remove();
+
+                    // Add hidden input to track deleted photos
+                    const form = document.querySelector('form');
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'deleted_photos[]';
+                    input.value = filename;
+                    form.appendChild(input);
+
+                    updatePhotoCounters();
                 }
-            </script>
+            });
+        }
+
+        // Form submission handling
+        document.querySelector('form').addEventListener('submit', function (e) {
+            if (selectedFiles.length > 0) {
+                const dataTransfer = new DataTransfer();
+                selectedFiles.forEach(file => dataTransfer.items.add(file));
+
+                const input = document.getElementById('foto');
+                input.files = dataTransfer.files;
+            }
+        });
+    </script>
 </body>
 
 </html>

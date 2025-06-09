@@ -538,7 +538,7 @@ $current_photo_url = getProfilePhotoUrl($pelanggan['foto_profil']);
     <div id="customConfirmModal"
         class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-[1000] hidden">
         <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md mx-auto">
-            <div class="text-xl font-bold text-gray-900 mb-4" id="confirmMessage"></div>
+            <div class="text-xl font-bold text-gray-900 mb-4 text-center" id="confirmMessage"></div>
             <div class="flex justify-end space-x-3">
                 <button id="confirmCancelBtn"
                     class="px-6 py-2 border border-gray-200 text-gray-700 rounded-full hover:bg-gray-100 transition-colors text-sm">

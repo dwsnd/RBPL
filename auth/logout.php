@@ -1,20 +1,15 @@
 <?php
-require_once '../includes/db.php';
+session_start();
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Cek apakah user sudah login
-if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    // Set pesan logout
-    $_SESSION['logout_message'] = "Anda berhasil keluar dari sistem.";
-}
-
-// Hapus semua data session
+// Hapus semua session variables
 $_SESSION = array();
 
-// Hapus cookie session
+// Hapus cookie jika ada (remember me cookie)
+if (isset($_COOKIE['email'])) {
+    setcookie('email', '', time() - 3600, "/"); // Set expired time
+}
+
+// Hapus session cookie
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(
@@ -28,10 +23,14 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Hancurkan session
+// Destroy session
 session_destroy();
 
+// Set logout message untuk ditampilkan di halaman login
+session_start();
+$_SESSION['logout_message'] = "Anda berhasil logout!";
+
 // Redirect ke halaman login
-header("Location: ../public/index.php");
+header("Location: login.php");
 exit();
 ?>

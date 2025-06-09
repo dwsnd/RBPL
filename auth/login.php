@@ -17,12 +17,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            // verifikasi password
-            if ($password === $result['password']) {
-                // set session
+            // verifikasi password dengan password_verify untuk hashed password
+            if (password_verify($password, $result['password'])) {
+                // set session dengan nama kolom yang benar
                 $_SESSION['logged_in'] = true;
                 $_SESSION['id_pelanggan'] = $result['id_pelanggan'];
-                $_SESSION['nama'] = $result['nama'];
+                $_SESSION['nama'] = $result['nama_lengkap']; // Sesuaikan dengan kolom database
                 $_SESSION['email'] = $result['email'];
 
                 if ($remember) {
@@ -51,8 +51,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
         @keyframes fadeOut {
             from {
                 opacity: 1;
@@ -80,6 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body class="bg-gray-100 font-sans">
     <?php
+    // Popup untuk registrasi berhasil
     if (isset($_SESSION['registered']) && $_SESSION['registered'] === true) {
         echo '
         <div id="successPopup" class="popup">
@@ -103,44 +110,70 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         unset($_SESSION['registered']);
     }
+
+    // Popup untuk logout berhasil
+    if (isset($_SESSION['logout_message'])) {
+        echo '
+        <div id="logoutPopup" class="popup">
+            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-5 py-4 rounded relative" role="alert">
+                <span class="block sm:inline">' . $_SESSION['logout_message'] . '</span>
+            </div>
+        </div>
+        <script>
+            window.addEventListener("DOMContentLoaded", function() {
+                const popup = document.getElementById("logoutPopup");
+                
+                // menghilang 2 detik
+                setTimeout(() => {
+                    popup.classList.add("popup-exit");
+                    setTimeout(() => {
+                        popup.remove();
+                    }, 500);
+                }, 2000);
+            });
+        </script>';
+
+        unset($_SESSION['logout_message']);
+    }
     ?>
 
     <div class="flex min-h-screen">
         <!-- bagian kiri -->
         <div class="hidden md:flex md:w-1/2 bg-orange-400 flex-col items-center justify-center">
-            <h1 class="text-white text-3xl font-bold mt-12 z-10">Selamat Datang di Ling-Ling Pet Shop</h1>
+            <h1 class="text-white text-3xl font-bold text-center pt-10">Selamat Datang di Ling-Ling Pet Shop</h1>
             <a href="../public/index.php">
-                <div class="relative z-10 mt-5">
-                    <img src="../aset/iconloginregis.png" alt="Person holding a cat" class="max-w-md">
+                <div class="relative mt-16">
+                    <img src="../aset/iconloginregis.png" alt="Person holding a cat" class="max-w-sm">
                 </div>
             </a>
         </div>
 
         <!-- bagian kanan -->
-        <div class="w-full md:w-1/2 p-6 flex flex-col justify-start mt-6 items-center">
+        <div class="w-full md:w-1/2 flex items-center justify-center p-6">
             <div class="w-full max-w-md">
-                <h2 class="text-2xl font-bold text-center mb-8">Masuk</h2>
+                <h2 class="text-2xl font-bold text-center mb-6">Masuk</h2>
 
                 <?php if (isset($error_message)): ?>
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                        <?= $error_message ?>
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm">
+                        <?= htmlspecialchars($error_message) ?>
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="" id="loginForm">
-                    <div class="mb-4">
+                <form method="POST" action="" id="loginForm" class="space-y-4">
+                    <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Alamat Email atau Nomor
                             Telepon</label>
                         <input type="text" id="email" name="email"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-                            placeholder="Masukkan email atau nomor telepon anda" required>
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
+                            placeholder="Masukkan email atau nomor telepon anda"
+                            value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>" required>
                     </div>
 
-                    <div class="mb-4">
+                    <div>
                         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                         <div class="relative">
                             <input type="password" id="password" name="password"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
                                 placeholder="Masukkan password anda" required>
                             <button type="button" onclick="togglePassword()"
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800">
@@ -155,14 +188,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
 
-                    <div class="flex items-center mb-4">
+                    <div class="flex items-center">
                         <input type="checkbox" id="remember" name="remember"
                             class="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded">
                         <label for="remember" class="ml-2 block text-sm text-gray-700">Tetap ingat saya</label>
                     </div>
 
                     <button type="submit" id="submitBtn"
-                        class="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                        class="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
                         Masuk
                     </button>
                 </form>
@@ -171,8 +204,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <a href="lupapassword.php" class="text-sm text-gray-600 hover:text-orange-500">Lupa password?</a>
                 </div>
 
-                <div class="text-center mt-8">
-                    <p class="text-base text-gray-600">
+                <div class="text-center mt-6">
+                    <p class="text-sm text-gray-600">
                         Belum punya akun?
                         <a href="registrasi.php" class="text-orange-500 font-medium hover:text-orange-600">Daftar</a>
                     </p>
