@@ -1,3 +1,48 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['id_pelanggan'])) {
+    header("Location:../auth/login.php");
+    exit();
+}
+
+if (!isset($pdo)) {
+    require_once '../includes/db.php';
+}
+
+// Ambil foto profil pelanggan
+$pelanggan_id = $_SESSION['id_pelanggan'];
+$query = "SELECT foto_profil, nama_lengkap FROM pelanggan WHERE id_pelanggan = ?";
+$stmt = $pdo->prepare($query);
+$stmt->execute([$pelanggan_id]);
+$userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+function getProfilePhoto($userData)
+{
+    if (empty($userData['foto_profil'])) {
+        return '../aset/default-profile.png'; // Default profile image path
+    }
+
+    $possible_paths = [
+        '../uploads/pelanggan/' . $userData['foto_profil'],
+        'uploads/pelanggan/' . $userData['foto_profil'],
+        '../' . $userData['foto_profil']
+    ];
+
+    foreach ($possible_paths as $path) {
+        if (file_exists($path)) {
+            return $path;
+        }
+    }
+
+    return '../aset/default-profile.png'; // Return default if no valid path found
+}
+
+$profile_photo = getProfilePhoto($userData);
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -17,11 +62,11 @@
         /* Hero Section */
         .hero-section {
             background: #fff;
-            padding: 65px 0;
+            padding: 40px 0;
         }
 
         .hero-section .container {
-            min-height: 460px;
+            min-height: 400px;
             position: relative;
             z-index: 2;
         }
@@ -30,7 +75,7 @@
             position: absolute;
             right: 40px;
             top: 13%;
-            width: 50%;
+            width: 45%;
             z-index: 1;
         }
 
@@ -38,7 +83,7 @@
             position: absolute;
             right: 40px;
             top: 14%;
-            width: 50%;
+            width: 45%;
             z-index: 2;
             transition: transform 0.3s ease;
         }
@@ -50,8 +95,8 @@
         .shape-leftup {
             position: absolute;
             left: 15%;
-            top: -12%;
-            width: 13%;
+            top: -8%;
+            width: 11%;
             z-index: 1;
         }
 
@@ -59,7 +104,7 @@
             position: absolute;
             left: 25%;
             bottom: 5%;
-            width: 11%;
+            width: 9%;
             z-index: 1;
         }
 
@@ -67,8 +112,9 @@
             background: #000;
             color: #fff;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             font-weight: 600;
+            font-size: 0.9rem;
             transition: 0.2s;
         }
 
@@ -79,8 +125,8 @@
 
         .section-title {
             font-weight: 600;
-            font-size: 1.5rem;
-            margin: 40px 0 20px;
+            font-size: 1.3rem;
+            margin: 30px 0 15px;
         }
 
         footer {
@@ -93,28 +139,69 @@
             display: block;
             margin: auto;
         }
+
+        .card {
+            margin-bottom: 15px;
+        }
+
+        .card-body {
+            padding: 0.75rem;
+        }
+
+        .card h6 {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .card p {
+            font-size: 0.8rem;
+        }
+
+        .row {
+            margin-bottom: 1rem;
+        }
+
+        .col-md-3 {
+            padding: 0 8px;
+        }
+
+        /* Profile photo styles */
+        .profile-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-photo-container {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: #f3f4f6;
+        }
     </style>
 </head>
 
 <body>
     <!-- Navbar -->
+
     <?php require '../includes/header.php'; ?>
 
     <!-- Hero Section -->
     <section class="hero-section position-relative overflow-hidden">
-        <!-- SHAPE BESAR KANAN -->
         <img src="../aset/Shape2.png" class="shape-main" alt="Shape">
-        <!-- SHAPE KECIL KIRI ATAS -->
         <img src="../aset/Shape.png" class="shape-leftup" alt="Shape2">
-        <!-- SHAPE KECIL KIRI BAWAH -->
         <img src="../aset/Shape1.png" class="shape-leftdown" alt="Shape1">
         <div class="container d-flex flex-wrap align-items-center justify-content-between position-relative"
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
-                <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Kalau Hewan Bisa Pilih, 
-                    <br>Mereka Udah Booking di Sini Duluan!</h1>
-                <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <h6 class="text-orange-500 text-sm font-semibold mb-2">Ling-Ling Pet Shop</h6>
+                <h1 class="text-3xl font-bold text-grey-900 leading-snug mb-3">Kalau Hewan Bisa Pilih,
+                    <br>Mereka Udah Booking di Sini Duluan!
+                </h1>
+                <a href="shop_pelanggan.php" class="btn btn-black text-sm mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -122,21 +209,21 @@
     <!-- hero rampung -->
 
     <!-- Layanan Kami -->
-    <section class="text-center py-4">
+    <section id="layanan" class="text-center py-3">
         <div class="container">
-            <h3 class="section-title mb-4 font-bold text-2xl">
+            <h3 class="section-title mb-3 font-bold">
                 <i class="fa-solid fa-paw text-orange-500"></i> Layanan Kami
             </h3>
             <div class="row justify-content-center px-2">
                 <div class="col-md-3 mb-3">
-                    <a href="shopawal.php" class="text-decoration-none text-dark">
-                        <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
+                    <a href="shop_pelanggan.php" class="text-decoration-none text-dark">
+                        <div class="card mx-auto" style="width: 15rem; background-color: #e0e0e0;">
                             <div class="d-flex flex-column h-100">
                                 <img src="../aset/shop_index.png" class="card-img-top" alt="Shop"
-                                    style="height: 120px; object-fit: contain; padding: 10px;">
-                                <div class="card-body d-flex flex-column justify-content-between p-3">
+                                    style="height: 100px; object-fit: contain; padding: 8px;">
+                                <div class="card-body d-flex flex-column justify-content-between p-2">
                                     <div>
-                                        <h6 class="mb-1 fw-bold text-medium">Shop</h6>
+                                        <h6 class="mb-1 fw-bold">Shop</h6>
                                     </div>
                                 </div>
                             </div>
@@ -144,7 +231,7 @@
                     </a>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <a href="perawatan.php" class="text-decoration-none text-dark">
+                    <a href="perawatan_pelanggan.php" class="text-decoration-none text-dark">
                         <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
                             <div class="d-flex flex-column h-100">
                                 <img src="../aset/perawatan_index.png" class="card-img-top" alt="Perawatan"
@@ -159,7 +246,7 @@
                     </a>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <a href="penitipan.php" class="text-decoration-none text-dark">
+                    <a href="penitipan_pelanggan.php" class="text-decoration-none text-dark">
                         <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
                             <div class="d-flex flex-column h-100">
                                 <img src="../aset/penitipan_index.png" class="card-img-top" alt="Penitipan"
@@ -174,7 +261,7 @@
                     </a>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <a href="konsultasi.php" class="text-decoration-none text-dark">
+                    <a href="konsultasi_pelanggan.php" class="text-decoration-none text-dark">
                         <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
                             <div class="d-flex flex-column h-100">
                                 <img src="../aset/konsultasi_index.png" class="card-img-top" alt="Konsultasi"
@@ -207,7 +294,7 @@
                         kami siap membantu. Dapatkan konsultasi, pengobatan, dan grooming dari tim profesional. Hubungi
                         kami sekarang!</p>
                     <div class="d-flex gap-3">
-                        <a href="../auth/login.php" class="btn btn-black">Memesan Jadwal</a>
+                        <a href="#layanan" class="btn btn-black">Memesan Jadwal</a>
                         <a href="https://wa.me/6288217723999" class="btn btn-outline-dark d-flex align-items-center">
                             <i class="fas fa-phone-alt me-2"></i>Hubungi Kami
                         </a>
@@ -224,7 +311,7 @@
         </h3>
         <div class="row justify-content-center px-2">
             <div class="col-md-3 mb-3">
-                <a href="shopawal.php" class="text-decoration-none text-dark">
+                <a href="shop_pelanggan.php" class="text-decoration-none text-dark">
                     <div class="card mx-auto h-100" style="width: 17rem;">
                         <div class="d-flex flex-column h-100">
                             <img src="../aset/aksesoris.jpg" class="card-img-top" alt="aksesoris"
@@ -240,7 +327,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-3">
-                <a href="shopawal.php" class="text-decoration-none text-dark">
+                <a href="shop_pelanggan.php" class="text-decoration-none text-dark">
                     <div class="card mx-auto h-100" style="width: 17rem;">
                         <div class="d-flex flex-column h-100">
                             <img src="../aset/makanan.png" class="card-img-top" alt="makanan"
@@ -256,7 +343,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-3">
-                <a href="shopawal.php" class="text-decoration-none text-dark">
+                <a href="shop_pelanggan.php" class="text-decoration-none text-dark">
                     <div class="card mx-auto h-100" style="width: 17rem;">
                         <div class="d-flex flex-column h-100">
                             <img src="../aset/pasir.png" class="card-img-top" alt="pasir"
@@ -272,7 +359,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-3">
-                <a href="shopawal.php" class="text-decoration-none text-dark">
+                <a href="shop_pelanggan.php" class="text-decoration-none text-dark">
                     <div class="card mx-auto h-100" style="width: 17rem;">
                         <div class="d-flex flex-column h-100">
                             <img src="../aset/vitamin.jpg" class="card-img-top" alt="vitamin"

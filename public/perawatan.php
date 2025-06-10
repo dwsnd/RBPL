@@ -131,8 +131,9 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Jika Hewan Bisa Berbicara,<br>Mereka Akan
-                    Berbicara<br> Tentang Kita!</h1>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Grooming Bukan Sekadar 
+                    <br>Mandi Ini Biar Mereka 
+                    <br>Glow Up Total!</h1>
                 <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
@@ -219,7 +220,7 @@
                               </div>';
                     }
                     ?>
-                    <a href="https://wa.me/083867056070"
+                    <a href="https://wa.me/6288217723999"
                         class="inline-flex items-center justify-center bg-orange-500 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-orange-600 transition duration-200">
                         <i class="fab fa-whatsapp text-2xl mr-2"></i>Hubungi Kami
                     </a>
@@ -271,7 +272,7 @@
             <div class="text-center mt-8 mb-8 rounded-4xl">
                 <p class="font-bold mb-4 text-sm">Benefit: Semua jenis grooming sudah termasuk gunting kuku, pembersihan
                     telinga, rapihkan bulu paw, dan bagian bokong</p>
-                <a href="#booking-form"
+                <a href="../auth/login.php"
                     class="inline-flex items-center justify-center bg-orange-500 text-sm text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
                     <i class="fab fa-whatsapp text-2xl mr-2"></i>Saya Mau Booking Sekarang
                 </a>

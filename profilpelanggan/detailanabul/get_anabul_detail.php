@@ -33,7 +33,7 @@ if (isset($_GET['id'])) {
                 <?php if (!empty($anabul['foto_utama'])): ?>
                     <img src="../../uploads/anabul/<?php echo htmlspecialchars($anabul['foto_utama']); ?>"
                         alt="<?php echo htmlspecialchars($anabul['nama_hewan']); ?>"
-                        class="w-full h-full object-cover object-center">
+                        class="w-full h-full object-contain object-fit object-center">
                 <?php else: ?>
                     <div class="w-full h-full flex items-center justify-center">
                         <i class="fas fa-paw text-gray-400 text-5xl"></i>

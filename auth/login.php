@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     setcookie('email', $result['email'], time() + (86400), "/"); // 1 day
                 }
 
-                header("Location: ../dashboard/indexpelanggan.php");
+                header("Location: ../dashboard/index_pelanggan.php");
                 exit();
             } else {
                 $error_message = "Password yang Anda masukkan salah!";

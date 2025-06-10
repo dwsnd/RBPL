@@ -1,3 +1,21 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once '../includes/db.php';
+
+// Fetch user data if logged in
+$user_data = [];
+if (isset($_SESSION['id_pelanggan'])) {
+    $id_pelanggan = $_SESSION['id_pelanggan'];
+    $query = "SELECT nama_lengkap, nomor_telepon FROM pelanggan WHERE id_pelanggan = '$id_pelanggan'";
+    $result = mysqli_query($conn, $query);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $user_data = mysqli_fetch_assoc($result);
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 

@@ -26,7 +26,7 @@
                 <p class="text-black text-sm mb-2">
                     Senin - Sabtu<br>
                     Jam 09.00 - 21.00<br>
-                    +62 838-6705-6070
+                    +62 882-1772-3999
                 </p>
 
                 <!-- Ikon media sosial -->
@@ -50,7 +50,7 @@
                 </div>
             </div>
         </div>
-        <img src="/RBPL/CopyRBPL/aset/Shapebawah.png" class="absolute left-[85%] top-[85%] w-[13%] z-[1]"
+        <img src="/RBPL/REBEL1/aset/Shapebawah.png" class="absolute left-[85%] top-[85%] w-[13%] z-[1]"
             alt="Shapebawah">
     </div>
 </footer>
