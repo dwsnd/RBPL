@@ -80,38 +80,6 @@
         footer {
             padding: 40px 0;
         }
-
-        .form-control:focus,
-        select:focus,
-        input:focus {
-            border-color: #fd7e14 !important;
-            box-shadow: 0 0 0 0.2rem rgba(253, 126, 20, 0.25) !important;
-        }
-
-
-        select.form-control {
-            color: #888;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23000' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 12px;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding-right: 2.5rem !important;
-        }
-
-        select.form-control option {
-            color: #888 !important;
-        }
-
-        select.form-control option:checked {
-            color: #000 !important;
-        }
-
-        select.form-control option:first-child {
-            color: #888 !important;
-        }
     </style>
 </head>
 
@@ -131,9 +99,10 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Titipin? Gas! Kita Rawat 
-                    <br>Kayak Punya Sendiri.</h1>
-                <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Titipin? Gas! Kita Rawat
+                    <br>Kayak Punya Sendiri.
+                </h1>
+                <a href="shop.php" class="btn btn-black text-base mt-2">Mulai Penitipan Hewan</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -257,160 +226,16 @@
         </div>
     </section>
 
-    <!-- bagian fasilitas & benefit -->
+    <!-- promo -->
     <section class="py-20 px-16">
         <div class="container mx-auto px-4 py-10 bg-orange-100 rounded-3xl">
-            <h2 class="text-center font-bold text-2xl mb-2">Dapatkan Harga Spesial Dari Kami!</h2>
+            <h2 class="text-center font-bold text-2xl mb-2">Penitipan Hewan Terpercaya & Aman!</h2>
             <div class="text-center mb-8">
-                <p class="font-medium text-base mb-4">Cuma Mulai Dari <strong>35 Ribu Rupiah</strong> Per Malam</p>
+                <p class="font-medium text-base mb-4">Mulai Dari <strong>40 Ribu Rupiah</strong> Per Hari</p>
                 <a href="../auth/login.php"
                     class="inline-flex items-center justify-center text-sm bg-orange-500 text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
-                    <i class="fab fa-whatsapp text-2xl mr-2"></i>Saya Mau Booking Sekarang
+                    <i class="fas fa-heart text-2xl mr-2"></i>Booking Penitipan Sekarang
                 </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Booking Form Section -->
-    <section id="booking-form" class="py-12">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto bg-white rounded-lg overflow-hidden shadow-lg">
-                <div class="bg-orange-500 text-white p-6 text-center">
-                    <h3 class="text-lg font-semibold mb-2">Form Layanan Penitipan</h3>
-                    <p class="text-sm">Layanan penitipan untuk hewan kesayangan Anda</p>
-                </div>
-
-                <div class="p-8">
-                    <form action="../auth/login.php" method="post" class="space-y-6" id="bookingForm">
-                        <div class="container mx-auto">
-                            <?php
-                            $formFields = [
-                                'nama_lengkap' => [
-                                    'label' => 'Nama Pelanggan',
-                                    'type' => 'text',
-                                    'placeholder' => 'Masukkan nama lengkap Anda',
-                                    'required' => true
-                                ],
-                                'nomor_telepon' => [
-                                    'label' => 'Nomor Telepon',
-                                    'type' => 'tel',
-                                    'placeholder' => 'Masukkan nomor telepon Anda',
-                                    'required' => true
-                                ],
-                                'kontak_darurat' => [
-                                    'label' => 'Kontak Darurat',
-                                    'type' => 'tel',
-                                    'placeholder' => 'Masukkan nomor darurat Anda',
-                                    'required' => true
-                                ],
-                                'pet_name' => [
-                                    'label' => 'Nama Hewan Peliharaan',
-                                    'type' => 'text',
-                                    'placeholder' => 'Masukkan nama hewan peliharaan Anda',
-                                    'required' => true
-                                ],
-                                'pet_category' => [
-                                    'label' => 'Kategori Hewan',
-                                    'type' => 'select',
-                                    'options' => [
-                                        '' => 'Pilih kategori hewan',
-                                        'kucing' => 'Kucing',
-                                        'anjing' => 'Anjing',
-                                        'kelinci' => 'Kelinci',
-                                        'hamster' => 'Hamster'
-                                    ]
-                                ],
-                                'pet_special' => ['label' => 'Ciri-Ciri Khusus Hewan (Opsional)', 'type' => 'text', 'placeholder' => 'Contoh: Warna bulu, ukuran, atau kondisi khusus'],
-                                'service_type' => [
-                                    'label' => 'Layanan Perawatan',
-                                    'type' => 'select',
-                                    'options' => [
-                                        '' => 'Pilih layanan grooming',
-                                        'basic' => 'Basic (Rp 150.000)',
-                                        'mix' => 'Mix (Rp 200.000)',
-                                        'complete' => 'Complete (Rp 250.000)'
-                                    ]
-                                ],
-                                'service_datein' => [
-                                    'label' => 'Tanggal Perawatan',
-                                    'type' => 'date',
-                                    'placeholder' => 'Pilih tanggal masuk',
-                                    'min' => date('Y-m-d')
-                                ],
-                                'service_dateout' => [
-                                    'label' => 'Tanggal Perawatan',
-                                    'type' => 'date',
-                                    'placeholder' => 'Pilih tanggal keluar',
-                                    'min' => date('Y-m-d')
-                                ],
-                                'pet_foods' => [
-                                    'label' => 'Pola Makan',
-                                    'type' => 'text',
-                                    'placeholder' => 'Masukkan pola makan hewan peliharaan (opsional)',
-                                    'required' => true
-                                ],
-                                'pet_medicines' => [
-                                    'label' => 'Obat-Obatan',
-                                    'type' => 'text',
-                                    'placeholder' => 'Masukkan nama obat-obatan untuk hewan peliharaan (opsional)',
-                                    'required' => true
-                                ],
-                                'pet_habits' => [
-                                    'label' => 'Kebiasaan Penting',
-                                    'type' => 'text',
-                                    'placeholder' => 'Masukkan kebiasaan penting hewan peliharaan (opsional)',
-                                    'required' => true
-                                ],
-                                'total_price' => ['label' => 'Total Harga', 'type' => 'text', 'placeholder' => 'Rp0', 'readonly' => true],
-                                'payment_method' => [
-                                    'label' => 'Pembayaran',
-                                    'type' => 'select',
-                                    'options' => [
-                                        '' => 'Pilih metode pembayaran',
-                                        'cash' => 'Cash',
-                                        'transfer' => 'Transfer Bank',
-                                        'qris' => 'QRIS',
-                                        'ewallet' => 'E-Wallet'
-                                    ]
-                                ]
-                            ];
-
-                            foreach ($formFields as $name => $field) {
-                                echo '<div class="row mb-3 align-items-center">';
-                                echo '<label class="col-md-4 col-form-label font-medium text-sm">' . $field['label'] . '</label>';
-                                echo '<div class="col-md-8">';
-                                $class = 'form-control w-full p-2 text-sm border rounded-lg focus:border-orange-500 focus:ring focus:ring-orange-200';
-                                if ($field['type'] === 'select') {
-                                    echo '<select name="' . $name . '" class="' . $class . '" ' .
-                                        (isset($field['required']) ? 'required' : '') . '>';
-                                    foreach ($field['options'] as $value => $label) {
-                                        echo '<option value="' . $value . '">' . $label . '</option>';
-                                    }
-                                    echo '</select>';
-                                } else {
-                                    echo '<input type="' . $field['type'] . '" name="' . $name . '" 
-                                      class="' . $class . '" 
-                                      placeholder="' . $field['placeholder'] . '" 
-                                      ' . (isset($field['readonly']) ? 'readonly' : '') . '
-                                      ' . (isset($field['required']) ? 'required' : '') . '>';
-                                }
-                                echo '</div></div>';
-                            }
-                            ?>
-                        </div>
-
-                        <div class="flex justify-between mt-8 px-3">
-                            <button type="reset"
-                                class="px-4 py-2 border !border-orange-400 text-orange-500 rounded-lg font-semibold text-sm hover:bg-orange-100 transition duration-200">
-                                Reset
-                            </button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold text-sm hover:bg-orange-600 transition duration-200">
-                                Pesan Sekarang
-                            </button>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
     </section>
@@ -419,59 +244,6 @@
     <?php require '../includes/footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('bookingForm');
-            const serviceType = form.querySelector('select[name="service_type"]');
-            const groomer = form.querySelector('select[name="groomer"]');
-            const totalPrice = form.querySelector('input[name="total_price"]');
-            const petCategory = form.querySelector('select[name="pet_category"]');
-            const serviceTime = form.querySelector('select[name="service_time"]');
-            const paymentMethod = form.querySelector('select[name="payment_method"]');
-
-            // Function to handle select color changes
-            function handleSelectColor(select) {
-                select.style.color = select.value ? '#000' : '#888';
-            }
-
-            // Add event listeners for all select elements
-            [serviceType, groomer, petCategory, serviceTime, paymentMethod].forEach(select => {
-                select.addEventListener('change', function () {
-                    handleSelectColor(this);
-                });
-                // Set initial color
-                handleSelectColor(select);
-            });
-
-            const hargaPerawatan = {
-                'basic': 150000,
-                'mix': 200000,
-                'complete': 250000
-            };
-
-            const hargaGroomer = {
-                'andi': 50000,
-                'budi': 45000,
-                'cindy': 55000,
-                'dina': 50000
-            };
-
-            function updateTotalPrice() {
-                const selectedService = serviceType.value;
-                const selectedGroomer = groomer.value;
-
-                if (selectedService && selectedGroomer) {
-                    const total = hargaPerawatan[selectedService] + hargaGroomer[selectedGroomer];
-                    totalPrice.value = 'Rp ' + total.toLocaleString('id-ID');
-                } else {
-                    totalPrice.value = 'Rp0';
-                }
-            }
-
-            serviceType.addEventListener('change', updateTotalPrice);
-            groomer.addEventListener('change', updateTotalPrice);
-        });
-    </script>
 </body>
 
 </html>

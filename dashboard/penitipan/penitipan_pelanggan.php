@@ -653,10 +653,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Grooming Bukan Sekadar 
-                    <br>Mandi Ini Biar Mereka 
-                    <br>Glow Up Total!</h1>
-                <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Grooming Bukan Sekadar
+                    <br>Mandi Ini Biar Mereka
+                    <br>Glow Up Total!
+                </h1>
+                <a href="shop.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -710,7 +711,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </section>
-    
+
     <!-- syarat penitipan -->
     <section class="py-12">
         <div class="container mx-auto px-4">
@@ -742,7 +743,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </section>
-    
+
     <!-- bagian fasilitas & benefit -->
     <section class="py-12">
         <div class="container mx-auto px-4">
@@ -779,7 +780,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </section>
-    
+
     <!-- bagian fasilitas & benefit -->
     <section class="py-20 px-16">
         <div class="container mx-auto px-4 py-10 bg-orange-100 rounded-3xl">

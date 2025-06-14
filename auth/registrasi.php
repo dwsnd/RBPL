@@ -3,7 +3,7 @@ session_start();
 
 require '../includes/db.php';
 
-// checking
+// Checking
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -48,7 +48,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
                     // memasukkan data ke db menggunakan prepared statement
-                    // Sesuaikan nama kolom dengan database: nama_lengkap bukan nama
                     $query = "INSERT INTO pelanggan (email, nama_lengkap, nomor_telepon, password, alamat) 
                              VALUES (:email, :nama_lengkap, :nomor_telepon, :password, :alamat)";
                     $stmt = $pdo->prepare($query);
@@ -56,13 +55,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if (
                         $stmt->execute([
                             'email' => $email,
-                            'nama_lengkap' => $nama_lengkap, // Sesuai dengan kolom database
+                            'nama_lengkap' => $nama_lengkap,
                             'nomor_telepon' => $nomor_telepon,
                             'password' => $hashed_password,
-                            'alamat' => '' // Default kosong, bisa diisi nanti di profil
+                            'alamat' => ''
                         ])
                     ) {
-                        // set session untuk pesan sukses
                         $_SESSION['registered'] = true;
 
                         header("Location: login.php");
@@ -85,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar</title>
+    <title>Ling-Ling Pet Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -94,14 +92,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         body {
             font-family: 'Poppins', sans-serif;
         }
+
+        /* Popup notification styles */
+        .popup-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .popup-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 
 <body class="bg-gray-100 font-sans">
+    <!-- Add popup notification div -->
+    <div id="popupNotification" class="popup-notification"></div>
+
     <div class="flex min-h-screen">
         <!-- bagian kiri -->
         <div class="hidden md:flex md:w-1/2 bg-orange-400 flex-col items-center justify-center">
-            <h1 class="text-white text-3xl font-bold text-center pt-10">Selamat Datang di Ling-Ling Pet Shop</h1>
+            <h1 class="text-white text-2xl font-bold text-center pt-10">Selamat Datang di Ling-Ling Pet Shop</h1>
             <a href="../public/index.php">
                 <div class="relative mt-16">
                     <img src="../aset/iconloginregis.png" alt="Person holding a cat" class="max-w-sm">
@@ -115,14 +137,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h2 class="text-2xl font-bold text-center mb-6">Daftar</h2>
 
                 <?php if (isset($error_message)): ?>
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm">
-                        <?= htmlspecialchars($error_message) ?>
-                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            showPopup('<?= htmlspecialchars($error_message) ?>', 'error');
+                        });
+                    </script>
                 <?php endif; ?>
 
                 <form method="POST" action="" id="registrationForm" class="space-y-4">
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Alamat Email</label>
+                        <label for="email" class="block text-base font-medium text-gray-700 mb-1">Alamat Email</label>
                         <input type="email" id="email" name="email"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
                             placeholder="Masukkan email anda" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
@@ -131,7 +155,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <div>
-                        <label for="namalengkap" class="block text-sm font-medium text-gray-700 mb-1">Nama
+                        <label for="namalengkap" class="block text-base font-medium text-gray-700 mb-1">Nama
                             Lengkap</label>
                         <input type="text" id="namalengkap" name="namalengkap"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
@@ -141,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <div>
-                        <label for="nomortelepon" class="block text-sm font-medium text-gray-700 mb-1">Nomor
+                        <label for="nomortelepon" class="block text-base font-medium text-gray-700 mb-1">Nomor
                             Telepon</label>
                         <input type="tel" id="nomortelepon" name="nomortelepon"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
@@ -153,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label for="password" class="block text-base font-medium text-gray-700 mb-1">Password</label>
                         <div class="relative">
                             <input type="password" id="password" name="password"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
@@ -173,7 +197,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <div>
-                        <label for="konfirmasipassword" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi
+                        <label for="konfirmasipassword"
+                            class="block text-base font-medium text-gray-700 mb-1">Konfirmasi
                             Password</label>
                         <div class="relative">
                             <input type="password" id="konfirmasipassword" name="konfirmasipassword"
@@ -193,15 +218,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <button type="submit" id="submitBtn"
-                        class="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                        class="text-base w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
                         Daftar
                     </button>
                 </form>
 
                 <div class="text-center mt-6">
-                    <p class="text-sm text-gray-600">
+                    <p class="text-base text-gray-600">
                         Sudah punya akun?
-                        <a href="login.php" class="text-orange-500 font-medium hover:text-orange-600">Masuk</a>
+                        <a href="login.php"
+                            class="text-base text-orange-500 font-medium hover:text-orange-600">Masuk</a>
                     </p>
                 </div>
             </div>
@@ -227,6 +253,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script>
+        // Function to show popup notification
+        function showPopup(message, type = 'success') {
+            const popup = document.getElementById('popupNotification');
+            popup.textContent = message;
+            popup.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+            popup.classList.add('show');
+
+            // Hide popup after 3 seconds
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
         // Custom confirmation modal functions
         function showCustomConfirm(message, callback) {
             const modal = document.getElementById('customConfirmModal');
