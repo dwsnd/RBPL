@@ -2,7 +2,6 @@
     <!-- Konten footer -->
     <div class="container mb-0 px-4 py-8 relative">
         <div class="flex flex-wrap justify-between">
-            <!-- Bagian kiri: Logo dan alamat -->
             <div class="w-full md:w-1/2 mb-2 md:mb-0">
                 <div class="flex items-center mb-3">
                     <i class="fas fa-paw text-orange-500 text-2xl mr-3"></i>
@@ -20,7 +19,6 @@
                 </p>
             </div>
 
-            <!-- Bagian kanan: Jam buka dan media sosial -->
             <div class="w-full md:w-1/3 text-right">
                 <h2 class="text-base text-black font-bold mt-2 mb-2">Jam Buka</h2>
                 <p class="text-black text-sm mb-2">
@@ -29,7 +27,6 @@
                     +62 882-1772-3999
                 </p>
 
-                <!-- Ikon media sosial -->
                 <div class="flex justify-end space-x-4 mt-3 mb-3">
                     <a href="https://www.facebook.com/lingling.petshop.9/"
                         class="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white hover:bg-orange-500 transition-colors">

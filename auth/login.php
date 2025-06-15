@@ -3,26 +3,26 @@ session_start();
 
 require '../includes/db.php';
 
-// checking
+// Checking
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email_or_phone = $_POST['email'];
     $password = $_POST['password'];
     $remember = isset($_POST['remember']) ? true : false;
 
     if ($email_or_phone && $password) {
-        // mencari pelanggan berdasarkan email atau nomor telepon
+        // Mencari pelanggan berdasarkan email atau nomor telepon
         $query = "SELECT * FROM pelanggan WHERE email = :email_or_phone OR nomor_telepon = :email_or_phone";
         $stmt = $pdo->prepare($query);
         $stmt->execute(['email_or_phone' => $email_or_phone]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            // verifikasi password dengan password_verify untuk hashed password
+            // Verifikasi password dengan password_verify untuk hashed password
             if (password_verify($password, $result['password'])) {
-                // set session dengan nama kolom yang benar
+                // Set session dengan nama kolom yang benar
                 $_SESSION['logged_in'] = true;
                 $_SESSION['id_pelanggan'] = $result['id_pelanggan'];
-                $_SESSION['nama'] = $result['nama_lengkap']; // Sesuaikan dengan kolom database
+                $_SESSION['nama'] = $result['nama_lengkap'];
                 $_SESSION['email'] = $result['email'];
 
                 if ($remember) {
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Ling-Ling Pet Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -59,52 +59,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-family: 'Poppins', sans-serif;
         }
 
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-
-            to {
-                opacity: 0;
-            }
-        }
-
-        .popup {
+        .popup-notification {
             position: fixed;
             top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 50;
-            transition: opacity 0.5s ease;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease-in-out;
         }
 
-        .popup-exit {
-            animation: fadeOut 0.5s forwards;
+        .popup-notification.show {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 
 <body class="bg-gray-100 font-sans">
     <?php
-    // Popup untuk registrasi berhasil
     if (isset($_SESSION['registered']) && $_SESSION['registered'] === true) {
         echo '
-        <div id="successPopup" class="popup">
-            <div class="bg-green-100 border border-green-400 text-green-700 px-5 py-4 rounded relative" role="alert">
-                <span class="block sm:inline">Akun berhasil dibuat! Silakan login.</span>
-            </div>
-        </div>
+        <div id="popupNotification" class="popup-notification">Akun berhasil dibuat! Silakan login.</div>
+
         <script>
             window.addEventListener("DOMContentLoaded", function() {
-                const popup = document.getElementById("successPopup");
+                const popup = document.getElementById("popupNotification");
+                popup.classList.add("show");
                 
-                // menghilang 2 detik
                 setTimeout(() => {
-                    popup.classList.add("popup-exit");
-                    setTimeout(() => {
-                        popup.remove();
-                    }, 500);
-                }, 2000);
+                    popup.classList.remove("show");
+                }, 3000);
             });
         </script>';
 
@@ -114,22 +104,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Popup untuk logout berhasil
     if (isset($_SESSION['logout_message'])) {
         echo '
-        <div id="logoutPopup" class="popup">
-            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-5 py-4 rounded relative" role="alert">
-                <span class="block sm:inline">' . $_SESSION['logout_message'] . '</span>
-            </div>
-        </div>
+        <div id="popupNotification" class="popup-notification">' . $_SESSION['logout_message'] . '</div>
         <script>
             window.addEventListener("DOMContentLoaded", function() {
-                const popup = document.getElementById("logoutPopup");
+                const popup = document.getElementById("popupNotification");
+                popup.classList.add("show");
                 
-                // menghilang 2 detik
                 setTimeout(() => {
-                    popup.classList.add("popup-exit");
-                    setTimeout(() => {
-                        popup.remove();
-                    }, 500);
-                }, 2000);
+                    popup.classList.remove("show");
+                }, 3000);
             });
         </script>';
 
@@ -140,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="flex min-h-screen">
         <!-- bagian kiri -->
         <div class="hidden md:flex md:w-1/2 bg-orange-400 flex-col items-center justify-center">
-            <h1 class="text-white text-3xl font-bold text-center pt-10">Selamat Datang di Ling-Ling Pet Shop</h1>
+            <h1 class="text-white text-2xl font-bold text-center pt-10">Selamat Datang di Ling-Ling Pet Shop</h1>
             <a href="../public/index.php">
                 <div class="relative mt-16">
                     <img src="../aset/iconloginregis.png" alt="Person holding a cat" class="max-w-sm">
@@ -161,7 +144,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <form method="POST" action="" id="loginForm" class="space-y-4">
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Alamat Email atau Nomor
+                        <label for="email" class="block text-base font-medium text-gray-700 mb-1">Alamat Email atau
+                            Nomor
                             Telepon</label>
                         <input type="text" id="email" name="email"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
@@ -170,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label for="password" class="block text-base font-medium text-gray-700 mb-1">Password</label>
                         <div class="relative">
                             <input type="password" id="password" name="password"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-sm"
@@ -205,9 +189,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="text-center mt-6">
-                    <p class="text-sm text-gray-600">
+                    <p class="text-base text-gray-600">
                         Belum punya akun?
-                        <a href="registrasi.php" class="text-orange-500 font-medium hover:text-orange-600">Daftar</a>
+                        <a href="registrasi.php"
+                            class="text-base text-orange-500 font-medium hover:text-orange-600">Daftar</a>
                     </p>
                 </div>
             </div>

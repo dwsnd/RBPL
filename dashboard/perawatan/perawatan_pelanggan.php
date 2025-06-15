@@ -383,10 +383,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Grooming Bukan Sekadar 
-                    <br>Mandi Ini Biar Mereka 
-                    <br>Glow Up Total!</h1>
-                <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Grooming Bukan Sekadar
+                    <br>Mandi Ini Biar Mereka
+                    <br>Glow Up Total!
+                </h1>
+                <a href="shop.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -440,7 +441,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </section>
-    
+
     <!-- info perawatan -->
     <section class="py-12">
         <div class="container mx-auto px-4">
@@ -455,7 +456,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         kecil kesayangan Anda. Namun, kami memahami beberapa kendala yang mungkin
                         <br>Anda hadapi:
                     </p>
-    
+
                     <?php
                     $kendala = [
                         ['icon' => 'exclamation-triangle', 'text' => 'Tidak memahami teknik grooming yang tepat dan aman untuk Anabul Anda'],
@@ -482,13 +483,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </section>
-    
+
     <!-- bagian perawatan -->
     <section class="py-12 px-16">
         <div class="container mx-auto px-4 py-10 bg-orange-100 rounded-3xl">
             <h2 class="text-center font-bold text-2xl mb-10">Ada Perawatan Apa Aja Kalau Kamu Grooming di Ling-Ling
                 Petshop</h2>
-    
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
                 <?php
                 $services = [
@@ -520,7 +521,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 ?>
             </div>
-    
+
             <div class="text-center mt-8 mb-8 rounded-4xl">
                 <p class="font-bold mb-4 text-sm">Benefit: Semua jenis grooming sudah termasuk gunting kuku, pembersihan
                     telinga, rapihkan bulu paw, dan bagian bokong</p>
@@ -531,7 +532,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </section>
-    
+
     <!-- bagian form booking -->
     <section id="booking-form" class="py-12">
         <div class="container mx-auto px-4">

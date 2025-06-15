@@ -1,6 +1,6 @@
 <?php
 // Only start session if we're in a page that needs authentication
-$publicPages = ['index.php', 'shopawal.php', 'about.php', 'perawatan.php', 'penitipan.php', 'konsultasi.php'];
+$publicPages = ['index.php', 'shop.php', 'about.php', 'perawatan.php', 'penitipan.php', 'konsultasi.php', 'detail_produk.php'];
 $currentPage = basename($_SERVER['PHP_SELF']);
 
 // Include database connection
@@ -82,7 +82,7 @@ function getCorrectPath($page)
                 }
                 break;
 
-            case 'shopawal.php':
+            case 'shop.php':
                 if ($isInDashboardSubfolder) {
                     return '../shop/shop_pelanggan.php';
                 } elseif ($isInDashboard) {
@@ -124,7 +124,7 @@ function isActive($page)
             case 'konsultasi.php':
                 $expectedPage = 'konsultasi_pelanggan.php';
                 break;
-            case 'shopawal.php':
+            case 'shop.php':
                 $expectedPage = 'shop_pelanggan.php';
                 break;
             default:
@@ -383,8 +383,8 @@ function getFavoritePath()
                     </div>
                 </div>
 
-                <a class="font-semibold <?php echo isActive('shopawal.php'); ?>"
-                    href="<?php echo getCorrectPath('shopawal.php'); ?>">Toko</a>
+                <a class="font-semibold <?php echo isActive('shop.php'); ?>"
+                    href="<?php echo getCorrectPath('shop.php'); ?>">Toko</a>
                 <a class="font-semibold <?php echo isActive('about.php'); ?>"
                     href="<?php echo getCorrectPath('about.php'); ?>">Tentang Kami</a>
             </div>
@@ -400,8 +400,8 @@ function getFavoritePath()
                         href="<?php echo getCorrectPath('penitipan.php'); ?>">Penitipan</a>
                     <a class="block font-semibold <?php echo isActive('konsultasi.php'); ?>"
                         href="<?php echo getCorrectPath('konsultasi.php'); ?>">Konsultasi</a>
-                    <a class="block font-semibold <?php echo isActive('shopawal.php'); ?>"
-                        href="<?php echo getCorrectPath('shopawal.php'); ?>">Toko</a>
+                    <a class="block font-semibold <?php echo isActive('shop.php'); ?>"
+                        href="<?php echo getCorrectPath('shop.php'); ?>">Toko</a>
                     <a class="block font-semibold <?php echo isActive('about.php'); ?>"
                         href="<?php echo getCorrectPath('about.php'); ?>">Tentang
                         Kami</a>
@@ -410,103 +410,103 @@ function getFavoritePath()
 
             <div class="hidden lg:flex items-center space-x-6">
                 <?php if ($userData): ?>
-                        <!-- favorite-->
-                        <div class="relative">
-                            <a href="<?php echo getFavoritePath(); ?>" class="text-gray-700 hover:text-orange-500">
-                                <i class="fa-regular fa-heart text-2xl"></i>
-                                <span
-                                    class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
-                                    <?php echo isset($_SESSION['fav_count']) ? $_SESSION['fav_count'] : 0; ?>
-                                </span>
-                            </a>
-                        </div>
-                        <!-- keranjang -->
-                        <div class="relative">
-                            <a href="<?php echo getCartPath(); ?>" class="text-gray-700 hover:text-orange-500">
-                                <i class="fa-solid fa-cart-shopping text-2xl"></i>
-                                <span
-                                    class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
-                                    <?php echo isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0; ?>
-                                </span>
-                            </a>
-                        </div>
+                    <!-- favorite-->
+                    <div class="relative">
+                        <a href="<?php echo getFavoritePath(); ?>" class="text-gray-700 hover:text-orange-500">
+                            <i class="fa-regular fa-heart text-2xl"></i>
+                            <span
+                                class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                                <?php echo isset($_SESSION['fav_count']) ? $_SESSION['fav_count'] : 0; ?>
+                            </span>
+                        </a>
+                    </div>
+                    <!-- keranjang -->
+                    <div class="relative">
+                        <a href="<?php echo getCartPath(); ?>" class="text-gray-700 hover:text-orange-500">
+                            <i class="fa-solid fa-cart-shopping text-2xl"></i>
+                            <span
+                                class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
+                                <?php echo isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0; ?>
+                            </span>
+                        </a>
+                    </div>
                 <?php endif; ?>
 
                 <!-- profil -->
                 <?php if ($userData): ?>
-                        <div class="relative">
-                            <button id="profileMenuBtn"
-                                class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all overflow-hidden">
+                    <div class="relative">
+                        <button id="profileMenuBtn"
+                            class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all overflow-hidden">
 
-                                <?php
-                                $photoPath = '';
-                                if (!empty($userData['foto_profil'])) {
-                                    $photoPath = getPhotoPath($userData['foto_profil']);
-                                }
-                                ?>
+                            <?php
+                            $photoPath = '';
+                            if (!empty($userData['foto_profil'])) {
+                                $photoPath = getPhotoPath($userData['foto_profil']);
+                            }
+                            ?>
 
-                                <?php if (!empty($photoPath)): ?>
-                                        <img src="<?php echo htmlspecialchars($photoPath); ?>" alt="Profil"
-                                            class="w-full h-full object-cover rounded-full"
-                                            style="width: 40px; height: 40px; object-fit: cover;"
-                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                                <?php endif; ?>
+                            <?php if (!empty($photoPath)): ?>
+                                <img src="<?php echo htmlspecialchars($photoPath); ?>" alt="Profil"
+                                    class="w-full h-full object-cover rounded-full"
+                                    style="width: 40px; height: 40px; object-fit: cover;"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <?php endif; ?>
 
-                                <!-- Default/Fallback icon -->
-                                <div class="w-full h-full flex items-center justify-center bg-orange-400"
-                                    style="display: <?php echo empty($photoPath) ? 'flex' : 'none'; ?>">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                        fill="white">
-                                        <path
-                                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                                    </svg>
-                                </div>
-                            </button>
-
-                            <!-- dropdown -->
-                            <div id="profileDropdown"
-                                class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl z-50 py-3 px-4 hidden"
-                                style="min-width: 250px;">
-                                <div class="text-xs text-gray-500 mb-2">Saat ini menggunakan</div>
-                                <div class="flex items-center mb-3">
-                                    <div
-                                        class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0 bg-gray-300 flex items-center justify-center">
-                                        <?php if (!empty($photoPath)): ?>
-                                                <img src="<?php echo htmlspecialchars($photoPath); ?>" alt="Profil"
-                                                    class="w-full h-full object-cover"
-                                                    style="width: 48px; height: 48px; object-fit: cover;"
-                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                                        <?php endif; ?>
-                                        <!-- Fallback untuk dropdown -->
-                                        <div class="w-full h-full bg-gray-300 flex items-center justify-center"
-                                            style="display: <?php echo empty($photoPath) ? 'flex' : 'none'; ?>">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                                fill="currentColor">
-                                                <path
-                                                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow">
-                                        <div class="font-bold text-base text-gray-900">
-                                            <?php echo htmlspecialchars($userData['nama_lengkap']); ?>
-                                        </div>
-                                        <div class="text-sm text-gray-500"><?php echo htmlspecialchars($userData['email']); ?>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button onclick="window.location.href='<?php echo getProfilePath(); ?>'"
-                                    class="w-full text-left font-semibold py-2 px-1 rounded hover:bg-orange-50 mb-1">Profil
-                                    Akun</button>
-                                <button onclick="window.location.href='<?php echo getLogoutPath(); ?>'"
-                                    class="w-full text-left font-semibold py-2 px-1 rounded hover:bg-orange-50 text-red-500">Keluar</button>
+                            <!-- Default/Fallback icon -->
+                            <div class="w-full h-full flex items-center justify-center bg-orange-400"
+                                style="display: <?php echo empty($photoPath) ? 'flex' : 'none'; ?>">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="white">
+                                    <path
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                </svg>
                             </div>
+                        </button>
+
+                        <!-- dropdown -->
+                        <div id="profileDropdown"
+                            class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl z-50 py-3 px-4 hidden"
+                            style="min-width: 250px;">
+                            <div class="text-xs text-gray-500 mb-2">Saat ini menggunakan</div>
+                            <div class="flex items-center mb-3">
+                                <div
+                                    class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0 bg-gray-300 flex items-center justify-center">
+                                    <?php if (!empty($photoPath)): ?>
+                                        <img src="<?php echo htmlspecialchars($photoPath); ?>" alt="Profil"
+                                            class="w-full h-full object-cover"
+                                            style="width: 48px; height: 48px; object-fit: cover;"
+                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                    <?php endif; ?>
+                                    <!-- Fallback untuk dropdown -->
+                                    <div class="w-full h-full bg-gray-300 flex items-center justify-center"
+                                        style="display: <?php echo empty($photoPath) ? 'flex' : 'none'; ?>">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                            fill="currentColor">
+                                            <path
+                                                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="font-bold text-base text-gray-900">
+                                        <?php echo htmlspecialchars($userData['nama_lengkap']); ?>
+                                    </div>
+                                    <div class="text-sm text-gray-500"><?php echo htmlspecialchars($userData['email']); ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="window.location.href='<?php echo getProfilePath(); ?>'"
+                                class="w-full text-left font-semibold py-2 px-1 rounded hover:bg-orange-50 mb-1">Profil
+                                Akun</button>
+                            <button onclick="window.location.href='<?php echo getLogoutPath(); ?>'"
+                                class="w-full text-left font-semibold py-2 px-1 rounded hover:bg-orange-50 text-red-500">Keluar</button>
                         </div>
+                    </div>
                 <?php else: ?>
-                        <a href="<?php echo getAuthPath('login.php'); ?>"
-                            class="font-semibold px-4 py-2 border-2 border-orange-500 text-orange-500 rounded hover:bg-orange-500 hover:text-white transition-colors">Masuk</a>
-                        <a href="<?php echo getAuthPath('registrasi.php'); ?>"
-                            class="font-semibold px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors">Daftar</a>
+                    <a href="<?php echo getAuthPath('login.php'); ?>"
+                        class="font-semibold px-4 py-2 border-2 border-orange-500 text-orange-500 rounded hover:bg-orange-500 hover:text-white transition-colors">Masuk</a>
+                    <a href="<?php echo getAuthPath('registrasi.php'); ?>"
+                        class="font-semibold px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors">Daftar</a>
                 <?php endif; ?>
             </div>
         </div>

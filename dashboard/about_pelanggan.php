@@ -127,10 +127,11 @@ if (isset($_SESSION['id_pelanggan'])) {
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Kita Sayang Hewan Kayak 
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Kita Sayang Hewan Kayak
                     <br>Keluarga Sendiri,
-                    <br>Seriusan!</h1>
-                <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                    <br>Seriusan!
+                </h1>
+                <a href="shop.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">

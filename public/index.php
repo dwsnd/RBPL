@@ -112,9 +112,10 @@
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
                 <h6 class="text-orange-500 text-base font-semibold mb-2">Ling-Ling Pet Shop</h6>
-                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Kalau Hewan Bisa Pilih, 
-                    <br>Mereka Udah Booking di Sini Duluan!</h1>
-                <a href="shopawal.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <h1 class="text-4xl font-bold text-grey-900 leading-snug mb-3">Kalau Hewan Bisa Pilih,
+                    <br>Mereka Udah Booking di Sini Duluan!
+                </h1>
+                <a href="shop.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -129,7 +130,7 @@
             </h3>
             <div class="row justify-content-center px-2">
                 <div class="col-md-3 mb-3">
-                    <a href="shopawal.php" class="text-decoration-none text-dark">
+                    <a href="shop.php" class="text-decoration-none text-dark">
                         <div class="card mx-auto" style="width: 17rem; background-color: #e0e0e0;">
                             <div class="d-flex flex-column h-100">
                                 <img src="../aset/shop_index.png" class="card-img-top" alt="Shop"
@@ -224,7 +225,7 @@
         </h3>
         <div class="row justify-content-center px-2">
             <div class="col-md-3 mb-3">
-                <a href="shopawal.php" class="text-decoration-none text-dark">
+                <a href="shop.php" class="text-decoration-none text-dark">
                     <div class="card mx-auto h-100" style="width: 17rem;">
                         <div class="d-flex flex-column h-100">
                             <img src="../aset/aksesoris.jpg" class="card-img-top" alt="aksesoris"
@@ -240,7 +241,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-3">
-                <a href="shopawal.php" class="text-decoration-none text-dark">
+                <a href="shop.php" class="text-decoration-none text-dark">
                     <div class="card mx-auto h-100" style="width: 17rem;">
                         <div class="d-flex flex-column h-100">
                             <img src="../aset/makanan.png" class="card-img-top" alt="makanan"
@@ -256,7 +257,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-3">
-                <a href="shopawal.php" class="text-decoration-none text-dark">
+                <a href="shop.php" class="text-decoration-none text-dark">
                     <div class="card mx-auto h-100" style="width: 17rem;">
                         <div class="d-flex flex-column h-100">
                             <img src="../aset/pasir.png" class="card-img-top" alt="pasir"
@@ -272,7 +273,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-3">
-                <a href="shopawal.php" class="text-decoration-none text-dark">
+                <a href="shop.php" class="text-decoration-none text-dark">
                     <div class="card mx-auto h-100" style="width: 17rem;">
                         <div class="d-flex flex-column h-100">
                             <img src="../aset/vitamin.jpg" class="card-img-top" alt="vitamin"
