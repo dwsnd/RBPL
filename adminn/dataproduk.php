@@ -11,7 +11,7 @@ if (isset($_GET['keyword']) && !empty($_GET['keyword'])) {
 }
 
 // dinggo halaman jml data per halaman pahinatiomn
-$jumlahDataPerHalaman = 8;
+$jumlahDataPerHalaman = 4;
 $jumlahData = count(query("SELECT * FROM produk"));
 $jumlahHalaman = ceil($jumlahData / $jumlahDataPerHalaman);
 $halamanAktif = (isset($_GET["halaman"])) ? (int)$_GET["halaman"] : 1;
@@ -176,19 +176,19 @@ $produk = query("SELECT * FROM produk LIMIT $awalData, $jumlahDataPerHalaman");
                         <tbody>
                             <?php foreach ($produk as $row) : ?>
                                 <tr>
-                                    <td><?= $row['id']; ?></td>
-                                    <td><img src="aset/produk/kucing<?= $row["image"]; ?>" width="100" alt="Gambar"></td>
+                                    <td><?= $row['id_produk']; ?></td>
+                                    <td><img src="<?= $row["image"]; ?>" width="100" alt="Gambar"></td>
                                     <td><?= $row['name']; ?></td>
                                     <td><?= $row['price']; ?></td>
                                     <td><?= $row['category']; ?></td>
                                     <td><?= $row['stock']; ?></td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="ubah.php?id=<?= $row["id"]; ?>"
+                                            <a href="ubah.php?id_produk=<?= $row["id_produk"]; ?>"
                                                 class="btn btn-sm btn-warning">
                                                 <i class="fa fa-edit"></i>
                                             </a>
-                                            <a href="javascript:void(0);" onclick="confirmDelete('<?= $row['id']; ?>')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
+                                            <a href="javascript:void(0);" onclick="confirmDelete('<?= $row['id_produk']; ?>')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
                                         </div>
                                     </td>
                                 </tr>
