@@ -23,7 +23,7 @@ $anabul_id = (int) $_GET['id'];
 $pelanggan_id = $_SESSION['id_pelanggan'];
 
 // Get anabul data with owner verification
-$query = "SELECT * FROM anabul WHERE id_anabul = ? AND id_pelanggan = ?";
+$query = "SELECT * FROM anabul WHERE id_anabul = ? AND id_pelanggan = ? AND status = 'aktif'";
 $stmt = $pdo->prepare($query);
 $stmt->execute([$anabul_id, $pelanggan_id]);
 $anabul = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -47,8 +47,8 @@ $anabul_fotos = $foto_stmt->fetchAll(PDO::FETCH_ASSOC);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Validate required fields
-        if (empty($_POST['nama_hewan']) || empty($_POST['kategori_hewan'])) {
-            throw new Exception('Nama hewan dan kategori hewan wajib diisi.');
+        if (empty($_POST['nama_hewan']) || empty($_POST['spesies'])) {
+            throw new Exception('Nama hewan dan spesies wajib diisi.');
         }
 
         // Handle photo deletions
@@ -119,28 +119,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update anabul data
             $update_query = "UPDATE anabul SET 
                 nama_hewan = ?, 
-                kategori_hewan = ?, 
-                jenis_ras = ?, 
+                spesies = ?, 
+                ras = ?, 
                 umur_tahun = ?, 
                 umur_bulan = ?, 
-                berat = ?, 
+                berat_kg = ?, 
                 jenis_kelamin = ?, 
-                riwayat_kesehatan = ?, 
-                karakteristik = ?, 
+                riwayat_penyakit = ?, 
+                ciri_khusus = ?, 
                 updated_at = ? 
                 WHERE id_anabul = ? AND id_pelanggan = ?";
 
             $update_stmt = $pdo->prepare($update_query);
             $update_result = $update_stmt->execute([
                 trim($_POST['nama_hewan']),
-                $_POST['kategori_hewan'],
-                !empty($_POST['jenis_ras']) ? trim($_POST['jenis_ras']) : null,
+                $_POST['spesies'],
+                !empty($_POST['ras']) ? trim($_POST['ras']) : null,
                 !empty($_POST['umur_tahun']) ? (int) $_POST['umur_tahun'] : null,
                 !empty($_POST['umur_bulan']) ? (int) $_POST['umur_bulan'] : null,
-                !empty($_POST['berat']) ? (float) $_POST['berat'] : null,
+                !empty($_POST['berat_kg']) ? (float) $_POST['berat_kg'] : null,
                 !empty($_POST['jenis_kelamin']) ? $_POST['jenis_kelamin'] : null,
-                !empty($_POST['riwayat_kesehatan']) ? trim($_POST['riwayat_kesehatan']) : null,
-                !empty($_POST['karakteristik']) ? trim($_POST['karakteristik']) : null,
+                !empty($_POST['riwayat_penyakit']) ? trim($_POST['riwayat_penyakit']) : null,
+                !empty($_POST['ciri_khusus']) ? trim($_POST['ciri_khusus']) : null,
                 date('Y-m-d H:i:s'),
                 $anabul_id,
                 $pelanggan_id
@@ -451,33 +451,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     placeholder="Masukkan nama peliharaan" required>
                             </div>
 
-                            <!-- Kategori Hewan -->
+                            <!-- Spesies -->
                             <div>
-                                <label for="kategori_hewan" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Kategori Hewan <span class="text-red-500">*</span>
+                                <label for="spesies" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Spesies <span class="text-red-500">*</span>
                                 </label>
-                                <select id="kategori_hewan" name="kategori_hewan"
+                                <select id="spesies" name="spesies"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                     required>
                                     <option value="">Pilih jenis hewan</option>
-                                    <option value="Kucing" <?php echo $anabul['kategori_hewan'] === 'Kucing' ? 'selected' : ''; ?>>Kucing</option>
-                                    <option value="Anjing" <?php echo $anabul['kategori_hewan'] === 'Anjing' ? 'selected' : ''; ?>>Anjing</option>
-                                    <option value="Burung" <?php echo $anabul['kategori_hewan'] === 'Burung' ? 'selected' : ''; ?>>Burung</option>
-                                    <option value="Hamster" <?php echo $anabul['kategori_hewan'] === 'Hamster' ? 'selected' : ''; ?>>Hamster</option>
-                                    <option value="Kelinci" <?php echo $anabul['kategori_hewan'] === 'Kelinci' ? 'selected' : ''; ?>>Kelinci</option>
-                                    <option value="Ikan" <?php echo $anabul['kategori_hewan'] === 'Ikan' ? 'selected' : ''; ?>>Ikan</option>
-                                    <option value="Reptil" <?php echo $anabul['kategori_hewan'] === 'Reptil' ? 'selected' : ''; ?>>Reptil</option>
-                                    <option value="Lainnya" <?php echo $anabul['kategori_hewan'] === 'Lainnya' ? 'selected' : ''; ?>>Lainnya</option>
+                                    <option value="kucing" <?php echo $anabul['spesies'] === 'kucing' ? 'selected' : ''; ?>>Kucing</option>
+                                    <option value="anjing" <?php echo $anabul['spesies'] === 'anjing' ? 'selected' : ''; ?>>Anjing</option>
+                                    <option value="burung" <?php echo $anabul['spesies'] === 'burung' ? 'selected' : ''; ?>>Burung</option>
+                                    <option value="hamster" <?php echo $anabul['spesies'] === 'hamster' ? 'selected' : ''; ?>>Hamster</option>
+                                    <option value="kelinci" <?php echo $anabul['spesies'] === 'kelinci' ? 'selected' : ''; ?>>Kelinci</option>
+                                    <option value="lainnya" <?php echo $anabul['spesies'] === 'lainnya' ? 'selected' : ''; ?>>Lainnya</option>
                                 </select>
                             </div>
 
-                            <!-- Jenis Ras/Spesies -->
+                            <!-- Ras -->
                             <div>
-                                <label for="jenis_ras" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Jenis Ras/Spesies Spesifik
+                                <label for="ras" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Ras/Spesies Spesifik
                                 </label>
-                                <input type="text" id="jenis_ras" name="jenis_ras"
-                                    value="<?php echo htmlspecialchars($anabul['jenis_ras'] ?? ''); ?>"
+                                <input type="text" id="ras" name="ras"
+                                    value="<?php echo htmlspecialchars($anabul['ras'] ?? ''); ?>"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                     placeholder="Masukkan ras/spesies">
                             </div>
@@ -511,10 +509,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <!-- Berat -->
                             <div>
-                                <label for="berat" class="block text-sm font-medium text-gray-700 mb-1">Berat</label>
+                                <label for="berat_kg" class="block text-sm font-medium text-gray-700 mb-1">Berat</label>
                                 <div class="flex">
-                                    <input type="number" id="berat" name="berat" step="0.1" min="0"
-                                        value="<?php echo $anabul['berat'] ?? ''; ?>"
+                                    <input type="number" id="berat_kg" name="berat_kg" step="0.1" min="0"
+                                        value="<?php echo $anabul['berat_kg'] ?? ''; ?>"
                                         class="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                         placeholder="0">
                                     <span
@@ -534,22 +532,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </select>
                             </div>
 
-                            <!-- Riwayat Kesehatan -->
+                            <!-- Riwayat Penyakit -->
                             <div class="md:col-span-2">
-                                <label for="riwayat_kesehatan"
-                                    class="block text-sm font-medium text-gray-700 mb-1">Riwayat Kesehatan</label>
-                                <textarea id="riwayat_kesehatan" name="riwayat_kesehatan" rows="3"
+                                <label for="riwayat_penyakit"
+                                    class="block text-sm font-medium text-gray-700 mb-1">Riwayat Penyakit</label>
+                                <textarea id="riwayat_penyakit" name="riwayat_penyakit" rows="3"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                                    placeholder="Contoh: vaksinasi, alergi, atau penyakit"><?php echo htmlspecialchars($anabul['riwayat_kesehatan'] ?? ''); ?></textarea>
+                                    placeholder="Contoh: vaksinasi, alergi, atau penyakit"><?php echo htmlspecialchars($anabul['riwayat_penyakit'] ?? ''); ?></textarea>
                             </div>
 
-                            <!-- Tanda atau Karakteristik -->
+                            <!-- Ciri Khusus -->
                             <div class="md:col-span-2">
-                                <label for="karakteristik" class="block text-sm font-medium text-gray-700 mb-1">Tanda
-                                    atau Karakteristik Unik Hewan Peliharaan</label>
-                                <textarea id="karakteristik" name="karakteristik" rows="3"
+                                <label for="ciri_khusus" class="block text-sm font-medium text-gray-700 mb-1">Ciri
+                                    Khusus Hewan Peliharaan</label>
+                                <textarea id="ciri_khusus" name="ciri_khusus" rows="3"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                                    placeholder="Contoh: bulu berwarna, tanda lahir, atau disabilitas"><?php echo htmlspecialchars($anabul['karakteristik'] ?? ''); ?></textarea>
+                                    placeholder="Contoh: bulu berwarna, tanda lahir, atau disabilitas"><?php echo htmlspecialchars($anabul['ciri_khusus'] ?? ''); ?></textarea>
                             </div>
                         </div>
 

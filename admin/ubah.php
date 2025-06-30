@@ -32,14 +32,55 @@ $table = match ($type) {
     default => 'produk'
 };
 
-$data = query("SELECT * FROM $table WHERE $id_column=$id")[0];
+if ($type == 'penitipan') {
+    $data = query("SELECT p.*, a.spesies, a.nama_hewan, a.ras, pel.nama_lengkap, pel.nomor_telepon, pel.id_pelanggan FROM penitipan p JOIN anabul a ON p.id_anabul = a.id_anabul JOIN pelanggan pel ON a.id_pelanggan = pel.id_pelanggan WHERE p.id_penitipan = $id");
+    if ($data)
+        $data = $data[0];
+} else if ($type == 'perawatan') {
+    $data = query("SELECT pr.*, pel.nama_lengkap, pel.email, pel.nomor_telepon, a.nama_hewan, a.spesies, a.ras, l.nama_layanan, l.kategori_layanan, p.nomor_pesanan, p.status_pembayaran FROM perawatan pr JOIN pesanan_layanan pl ON pr.id_pesanan_layanan = pl.id_detail JOIN pesanan p ON pl.id_pesanan = p.id_pesanan JOIN pelanggan pel ON p.id_pelanggan = pel.id_pelanggan JOIN anabul a ON pr.id_anabul = a.id_anabul JOIN layanan l ON pl.id_layanan = l.id_layanan WHERE pr.id_perawatan = $id");
+    if ($data)
+        $data = $data[0];
+} else if ($type == 'konsultasi') {
+    $data = query("SELECT k.*, p.id_pelanggan, p.status_pembayaran, a.nama_hewan, a.spesies, a.ras FROM konsultasi k JOIN pesanan p ON k.id_pesanan = p.id_pesanan JOIN anabul a ON k.id_anabul = a.id_anabul WHERE k.id_konsultasi = $id");
+    if ($data)
+        $data = $data[0];
+} else if ($type == 'anabul') {
+    $data = query("SELECT * FROM anabul WHERE id_anabul = $id");
+    if ($data)
+        $data = $data[0];
+} else {
+    $data = query("SELECT * FROM $table WHERE $id_column=$id");
+    if ($data)
+        $data = $data[0];
+}
+
+// Check if data exists
+if (empty($data)) {
+    echo "<script>
+        alert('Data tidak ditemukan!');
+        document.location.href='data$type.php';
+    </script>";
+    exit();
+}
 
 // FIXED: Process form submission with proper file handling
 if (isset($_POST["submit"])) {
+    // Hitung jumlah hari untuk penitipan
+    if ($type == 'penitipan') {
+        $tanggal_checkin = $_POST['tanggal_checkin'] ?? '';
+        $tanggal_checkout = $_POST['tanggal_checkout'] ?? '';
+        $jumlah_hari = 0;
+        if ($tanggal_checkin && $tanggal_checkout) {
+            $date1 = new DateTime($tanggal_checkin);
+            $date2 = new DateTime($tanggal_checkout);
+            $jumlah_hari = $date1->diff($date2)->days;
+        }
+        $_POST['jumlah_hari'] = $jumlah_hari;
+    }
     // Combine POST and FILES data into a single array
     $data = array_merge($_POST, ['foto_utama' => $_FILES['foto_utama'] ?? null]);
 
-    if (update($data, $type) > 0) {
+    if (update($data, $type) !== false) {
         echo "
             <script>
             alert('Data berhasil diubah!');

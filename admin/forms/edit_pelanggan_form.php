@@ -3,8 +3,8 @@
     <div class="col-sm-3 text-start">Nama</div>
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
-        <input type="text" class="form-control" name="nama" style="background-color: #e0e0e0;" required
-            value="<?= $data["nama"] ?>">
+        <input type="text" class="form-control" name="nama_lengkap" style="background-color: #e0e0e0;" required
+            value="<?= $data["nama_lengkap"] ?>">
     </div>
 </div>
 

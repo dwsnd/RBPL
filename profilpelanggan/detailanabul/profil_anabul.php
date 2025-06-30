@@ -21,7 +21,7 @@ $stmt->execute([$pelanggan_id]);
 $pelanggan = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Ambil data anabul milik pelanggan
-$query_anabul = "SELECT * FROM anabul WHERE id_pelanggan = ? ORDER BY created_at DESC";
+$query_anabul = "SELECT * FROM anabul WHERE id_pelanggan = ? AND status = 'aktif' ORDER BY created_at DESC";
 $stmt_anabul = $pdo->prepare($query_anabul);
 $stmt_anabul->execute([$pelanggan_id]);
 $data_anabul = $stmt_anabul->fetchAll(PDO::FETCH_ASSOC);
@@ -33,7 +33,7 @@ $data_anabul = $stmt_anabul->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ling-Ling Pet Shop - Profil Saya</title>
+    <title>Ling-Ling Pet Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">

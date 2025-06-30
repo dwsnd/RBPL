@@ -10,6 +10,14 @@ if (!isset($_SESSION['id_pelanggan'])) {
     exit();
 }
 
+if (isset($_GET['check_availability']) && isset($_GET['date'])) {
+    header('Content-Type: application/json');
+    $selected_date = mysqli_real_escape_string($conn, $_GET['date']);
+    $available_slots = getAvailableTimeSlots($conn, $selected_date);
+    echo json_encode($available_slots);
+    exit();
+}
+
 $id_pelanggan = $_SESSION['id_pelanggan'];
 
 // Fetch user data
@@ -22,7 +30,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 // Fetch user's pets data
 $pets_data = [];
-$pets_query = "SELECT id_anabul, nama_hewan, kategori_hewan, karakteristik FROM anabul WHERE id_pelanggan = '$id_pelanggan'";
+$pets_query = "SELECT id_anabul, nama_hewan, spesies, ciri_khusus FROM anabul WHERE id_pelanggan = '$id_pelanggan' AND status = 'aktif'";
 $pets_result = mysqli_query($conn, $pets_query);
 if ($pets_result && mysqli_num_rows($pets_result) > 0) {
     while ($row = mysqli_fetch_assoc($pets_result)) {
@@ -30,95 +38,206 @@ if ($pets_result && mysqli_num_rows($pets_result) > 0) {
     }
 }
 
-// Process form submission
+// Fetch services data
+$services_data = [];
+$services_query = "SELECT id_layanan, nama_layanan, jenis_layanan, harga FROM layanan WHERE jenis_layanan = 'perawatan'";
+$services_result = mysqli_query($conn, $services_query);
+if ($services_result && mysqli_num_rows($services_result) > 0) {
+    while ($row = mysqli_fetch_assoc($services_result)) {
+        $services_data[] = $row;
+    }
+}
+
+function getAvailableTimeSlots($conn, $selected_date = null)
+{
+    // Daftar semua slot waktu yang tersedia
+    $all_time_slots = [
+        'pagi' => '08:00 - 10:00',
+        'siang' => '10:00 - 12:00',
+        'sore' => '13:00 - 15:00',
+        'sore-akhir' => '15:00 - 17:00'
+    ];
+
+    // Jika tidak ada tanggal yang dipilih, return semua slot
+    if (!$selected_date) {
+        return $all_time_slots;
+    }
+
+    // PERBAIKAN: Query langsung ke tabel perawatan
+    $booked_query = "SELECT waktu_mulai, waktu_selesai 
+                     FROM perawatan 
+                     WHERE status_pesanan NOT IN ('cancelled', 'rejected', 'completed') 
+                     AND tanggal_perawatan = '$selected_date'
+                     AND status_pesanan IN ('scheduled', 'in_progress')";
+
+    $booked_result = mysqli_query($conn, $booked_query);
+    $booked_times = [];
+
+    if ($booked_result && mysqli_num_rows($booked_result) > 0) {
+        while ($row = mysqli_fetch_assoc($booked_result)) {
+            // Konversi waktu database ke slot waktu
+            $waktu_mulai = $row['waktu_mulai'];
+            if ($waktu_mulai == '08:00:00')
+                $booked_times[] = 'pagi';
+            elseif ($waktu_mulai == '10:00:00')
+                $booked_times[] = 'siang';
+            elseif ($waktu_mulai == '13:00:00')
+                $booked_times[] = 'sore';
+            elseif ($waktu_mulai == '15:00:00')
+                $booked_times[] = 'sore-akhir';
+        }
+    }
+
+    // Filter slot waktu yang masih tersedia
+    $available_slots = [];
+    foreach ($all_time_slots as $key => $display_time) {
+        if (!in_array($key, $booked_times)) {
+            $available_slots[$key] = $display_time;
+        }
+    }
+
+    return $available_slots;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama_lengkap = mysqli_real_escape_string($conn, $_POST['nama_lengkap']);
     $nomor_telepon = mysqli_real_escape_string($conn, $_POST['nomor_telepon']);
     $pet_name = mysqli_real_escape_string($conn, $_POST['pet_name']);
-    $pet_category = mysqli_real_escape_string($conn, $_POST['pet_category']);
+    $pet_species = mysqli_real_escape_string($conn, $_POST['pet_category']);
     $pet_special = mysqli_real_escape_string($conn, $_POST['pet_special']);
-    $service_type = mysqli_real_escape_string($conn, $_POST['service_type']);
+    $id_layanan = mysqli_real_escape_string($conn, $_POST['service_type']);
     $service_date = mysqli_real_escape_string($conn, $_POST['service_date']);
     $service_time = mysqli_real_escape_string($conn, $_POST['service_time']);
     $id_anabul_existing = isset($_POST['id_anabul_existing']) ? $_POST['id_anabul_existing'] : null;
 
-    // Calculate total price
-    $harga_layanan = [
-        'basic' => 150000,
-        'mix' => 200000,
-        'complete' => 250000
-    ];
-    $total_harga = $harga_layanan[$service_type];
+    // Konversi service_time ke waktu database
+    $waktu_mulai = '';
+    $waktu_selesai = '';
+    switch ($service_time) {
+        case 'pagi':
+            $waktu_mulai = '08:00:00';
+            $waktu_selesai = '10:00:00';
+            break;
+        case 'siang':
+            $waktu_mulai = '10:00:00';
+            $waktu_selesai = '12:00:00';
+            break;
+        case 'sore':
+            $waktu_mulai = '13:00:00';
+            $waktu_selesai = '15:00:00';
+            break;
+        case 'sore-akhir':
+            $waktu_mulai = '15:00:00';
+            $waktu_selesai = '17:00:00';
+            break;
+    }
 
-    // Start transaction
-    mysqli_begin_transaction($conn);
+    // Cek ketersediaan waktu
+    $check_availability = "SELECT COUNT(*) as total FROM perawatan 
+                          WHERE tanggal_perawatan = '$service_date' 
+                          AND waktu_mulai = '$waktu_mulai'
+                          AND status_pesanan IN ('scheduled', 'in_progress')";
 
-    try {
-        $id_anabul = null;
+    $availability_result = mysqli_query($conn, $check_availability);
+    $availability_data = mysqli_fetch_assoc($availability_result);
 
-        // If existing pet is selected
-        if ($id_anabul_existing && $id_anabul_existing !== 'new') {
-            $id_anabul = $id_anabul_existing;
-        } else {
-            // Insert new pet data
-            $insert_pet = "INSERT INTO anabul (id_pelanggan, nama_hewan, kategori_hewan, karakteristik, created_at) 
-                          VALUES ('$id_pelanggan', '$pet_name', '$pet_category', '$pet_special', NOW())";
+    if ($availability_data['total'] > 0) {
+        $error_message = "Maaf, waktu yang dipilih sudah tidak tersedia. Silakan pilih waktu lain.";
+    } else {
+        // Start transaction
+        mysqli_begin_transaction($conn);
 
-            if (mysqli_query($conn, $insert_pet)) {
-                $id_anabul = mysqli_insert_id($conn);
+        try {
+            $id_anabul = null;
+
+            // Handle pet data
+            if ($id_anabul_existing && $id_anabul_existing !== 'new') {
+                $id_anabul = $id_anabul_existing;
             } else {
-                throw new Exception("Error inserting pet data: " . mysqli_error($conn));
+                // Insert new pet data
+                $insert_pet = "INSERT INTO anabul (id_pelanggan, nama_hewan, spesies, ciri_khusus, created_at) 
+                              VALUES ('$id_pelanggan', '$pet_name', '$pet_species', '$pet_special', NOW())";
+
+                if (mysqli_query($conn, $insert_pet)) {
+                    $id_anabul = mysqli_insert_id($conn);
+                } else {
+                    throw new Exception("Error inserting pet data: " . mysqli_error($conn));
+                }
             }
+
+            // Get service price from database
+            $price_query = "SELECT harga FROM layanan WHERE id_layanan = '$id_layanan'";
+            $price_result = mysqli_query($conn, $price_query);
+            if (!$price_result) {
+                throw new Exception("Error getting service price: " . mysqli_error($conn));
+            }
+            $service_data = mysqli_fetch_assoc($price_result);
+            if (!$service_data) {
+                throw new Exception("Service not found");
+            }
+            $total_harga = $service_data['harga'];
+
+            // Insert ke tabel pesanan terlebih dahulu
+            $insert_pesanan = "INSERT INTO pesanan 
+                              (nomor_pesanan, id_pelanggan, jenis_pesanan, total_harga, 
+                               metode_pembayaran, status_pembayaran, status_pesanan, 
+                               catatan_pelanggan, catatan_admin, created_at, updated_at) 
+                              VALUES 
+                              (CONCAT('PES-', DATE_FORMAT(NOW(), '%Y%m%d'), '-', LPAD(FLOOR(RAND() * 9999), 4, '0')), 
+                               '$id_pelanggan', 'perawatan', '$total_harga', 'cash', 'pending', 'pending', 
+                               'Booking layanan grooming', '', NOW(), NOW())";
+
+            if (mysqli_query($conn, $insert_pesanan)) {
+                $id_pesanan = mysqli_insert_id($conn);
+
+                // Insert ke tabel pesanan_layanan
+                $insert_layanan = "INSERT INTO pesanan_layanan 
+                                  (id_pesanan, id_layanan, id_anabul, harga_layanan) 
+                                  VALUES 
+                                  ('$id_pesanan', '$id_layanan', '$id_anabul', '$total_harga')";
+
+                if (mysqli_query($conn, $insert_layanan)) {
+                    $id_pesanan_layanan = mysqli_insert_id($conn);
+
+                    // Kemudian insert ke tabel perawatan
+                    $insert_perawatan = "INSERT INTO perawatan 
+                                        (id_pesanan_layanan, paket_perawatan, id_anabul, tanggal_perawatan, 
+                                         waktu_mulai, waktu_selesai, petugas, kondisi_awal, 
+                                         kondisi_akhir, catatan_perawatan, foto_sebelum, foto_sesudah, 
+                                         status_pesanan, created_at, updated_at) 
+                                        VALUES 
+                                        ('$id_pesanan_layanan', '$id_layanan', '$id_anabul', '$service_date', 
+                                         '$waktu_mulai', '$waktu_selesai', '', '', '', 
+                                         'Booking layanan grooming - Waktu: $service_time', '', '', 
+                                         'scheduled', NOW(), NOW())";
+
+                    if (mysqli_query($conn, $insert_perawatan)) {
+                        $id_perawatan = mysqli_insert_id($conn);
+
+                        // Commit transaction
+                        mysqli_commit($conn);
+
+                        // Set success message
+                        $_SESSION['success_message'] = "Pesanan layanan grooming berhasil dibuat! ID Perawatan: " . $id_perawatan;
+
+                        // Redirect immediately without form reset
+                        header('Location: ../../profilpelanggan/pesanan/index_pesanan.php');
+                        exit();
+                    } else {
+                        throw new Exception("Error inserting perawatan data: " . mysqli_error($conn));
+                    }
+                } else {
+                    throw new Exception("Error inserting layanan data: " . mysqli_error($conn));
+                }
+            } else {
+                throw new Exception("Error inserting main order: " . mysqli_error($conn));
+            }
+
+        } catch (Exception $e) {
+            // Rollback transaction
+            mysqli_rollback($conn);
+            $error_message = $e->getMessage();
         }
-
-        // Insert booking/order data
-        $insert_order = "INSERT INTO pesanan_layanan 
-                        (id_pelanggan, id_anabul, jenis_layanan, tanggal_layanan, waktu_layanan, 
-                         total_harga, status_pesanan, created_at) 
-                        VALUES 
-                        ('$id_pelanggan', '$id_anabul', '$service_type', '$service_date', '$service_time', 
-                         '$total_harga', 'pending', NOW())";
-
-        if (mysqli_query($conn, $insert_order)) {
-            $id_pesanan = mysqli_insert_id($conn);
-
-            // Commit transaction
-            mysqli_commit($conn);
-
-            // Set success message
-            $_SESSION['success_message'] = "Pesanan layanan grooming berhasil dibuat! ID Pesanan: " . $id_pesanan;
-
-            // Reset form and redirect
-            echo "<script>
-                // Reset form data
-                document.getElementById('bookingForm').reset();
-                // Reset select colors
-                document.querySelectorAll('select').forEach(select => {
-                    select.style.color = '#888';
-                });
-                // Hide manual pet form if it was shown
-                document.getElementById('manual-pet-form').style.display = 'none';
-                // Remove selected class from pet options
-                document.querySelectorAll('.pet-option').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                // Reset total price
-                document.getElementById('total_price').value = 'Rp0';
-                
-                // Redirect after reset
-                setTimeout(function() {
-                    window.location.href = 'pesanan.php';
-                }, 100);
-            </script>";
-            exit();
-        } else {
-            throw new Exception("Error inserting order data: " . mysqli_error($conn));
-        }
-
-    } catch (Exception $e) {
-        // Rollback transaction
-        mysqli_rollback($conn);
-        $error_message = $e->getMessage();
     }
 }
 ?>
@@ -129,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Form Booking Grooming - Ling-Ling Pet Shop</title>
+    <title>Ling-Ling Pet Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -387,7 +506,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <br>Mandi Ini Biar Mereka
                     <br>Glow Up Total!
                 </h1>
-                <a href="shop.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <a href="#booking-form" class="btn btn-black text-base mt-2">Mulai Perawatan Hewan</a>
             </div>
         </div>
         <img src="../../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
@@ -527,7 +646,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     telinga, rapihkan bulu paw, dan bagian bokong</p>
                 <a href="#booking-form"
                     class="inline-flex items-center justify-center bg-orange-500 text-sm text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition duration-200">
-                    <i class="fab fa-whatsapp text-2xl mr-2"></i>Saya Mau Booking Sekarang
+                    <i class="fas fa-scissors text-2xl mr-2"></i>Saya Mau Booking Sekarang
                 </a>
             </div>
         </div>
@@ -587,8 +706,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         name="id_anabul_existing" value="<?php echo $pet['id_anabul']; ?>"
                                                         id="pet_<?php echo $pet['id_anabul']; ?>"
                                                         data-name="<?php echo htmlspecialchars($pet['nama_hewan']); ?>"
-                                                        data-category="<?php echo htmlspecialchars($pet['kategori_hewan']); ?>"
-                                                        data-special="<?php echo htmlspecialchars($pet['karakteristik']); ?>">
+                                                        data-category="<?php echo htmlspecialchars($pet['spesies']); ?>"
+                                                        data-special="<?php echo htmlspecialchars($pet['ciri_khusus']); ?>">
                                                     <label class="form-check-label" for="pet_<?php echo $pet['id_anabul']; ?>">
                                                         <div class="d-flex align-items-center">
                                                             <i class="fas fa-paw me-2 text-orange-500"></i>
@@ -596,11 +715,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <span
                                                                     class="font-semibold"><?php echo htmlspecialchars($pet['nama_hewan']); ?></span>
                                                                 <span
-                                                                    class="text-muted ms-2">(<?php echo htmlspecialchars($pet['kategori_hewan']); ?>)</span>
-                                                                <?php if ($pet['karakteristik']): ?>
+                                                                    class="text-muted ms-2">(<?php echo htmlspecialchars($pet['spesies']); ?>)</span>
+                                                                <?php if ($pet['ciri_khusus']): ?>
                                                                     <div class="text-muted small mt-1">
                                                                         <i class="fas fa-info-circle me-1"></i>
-                                                                        <?php echo htmlspecialchars($pet['karakteristik']); ?>
+                                                                        <?php echo htmlspecialchars($pet['ciri_khusus']); ?>
                                                                     </div>
                                                                 <?php endif; ?>
                                                             </div>
@@ -644,7 +763,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </select>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">Ciri-Ciri Khusus (Opsional)</label>
+                                        <label class="form-label">Ciri Khusus (Opsional)</label>
                                         <input type="text" name="pet_special" id="pet_special" class="form-control"
                                             placeholder="Contoh: Warna bulu, ukuran, atau kondisi khusus">
                                     </div>
@@ -662,9 +781,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <label class="form-label">Layanan Perawatan</label>
                                     <select name="service_type" id="service_type" class="form-control" required>
                                         <option value="">Pilih layanan grooming</option>
-                                        <option value="basic">Basic - Rp 150.000</option>
-                                        <option value="mix">Mix - Rp 200.000</option>
-                                        <option value="complete">Complete - Rp 250.000</option>
+                                        <?php foreach ($services_data as $service): ?>
+                                            <option value="<?php echo $service['id_layanan']; ?>"
+                                                data-harga="<?php echo $service['harga']; ?>">
+                                                <?php echo htmlspecialchars($service['nama_layanan']); ?> - Rp
+                                                <?php echo number_format($service['harga'], 0, ',', '.'); ?>
+                                            </option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -681,6 +804,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <option value="sore">13:00 - 15:00</option>
                                         <option value="sore-akhir">15:00 - 17:00</option>
                                     </select>
+                                    <small class="text-muted">Waktu yang sudah dibooking akan dinonaktifkan</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Total Harga</label>
@@ -706,8 +830,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- footer -->
     <?php require '../../includes/footer.php'; ?>
 
+    <!-- Custom Confirmation Modal -->
+    <div id="customConfirmModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-[1000] hidden">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md mx-auto">
+            <div class="text-xl font-bold text-gray-900 mb-4 text-center" id="confirmMessage"></div>
+            <div class="flex justify-end space-x-3">
+                <button id="confirmCancelBtn"
+                    class="px-6 py-2 border border-gray-200 text-gray-700 rounded-full hover:bg-gray-100 transition-colors text-sm">
+                    Batal
+                </button>
+                <button id="confirmOKBtn"
+                    class="px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors text-sm">
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Custom confirmation modal functions
+        function showCustomConfirm(message, callback) {
+            const modal = document.getElementById('customConfirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+            const okBtn = document.getElementById('confirmOKBtn');
+
+            messageEl.textContent = message;
+            modal.classList.remove('hidden');
+
+            const handleConfirm = () => {
+                modal.classList.add('hidden');
+                callback(true);
+                cleanup();
+            };
+
+            const handleCancel = () => {
+                modal.classList.add('hidden');
+                callback(false);
+                cleanup();
+            };
+
+            const cleanup = () => {
+                okBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            okBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
+        }
+
+        // Add this at the beginning of your script
+        window.onload = function () {
+            // Reset form when page loads
+            const form = document.getElementById('bookingForm');
+            if (form) {
+                form.reset();
+                // Reset total price display
+                document.getElementById('total_price').value = 'Rp0';
+                // Hide manual pet form if it was shown
+                document.getElementById('manual-pet-form').style.display = 'none';
+                // Remove selected class from all pet options
+                document.querySelectorAll('.pet-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                // Reset select colors
+                document.querySelectorAll('select').forEach(select => {
+                    select.style.color = '#888';
+                });
+            }
+        };
+
         function validateForm() {
             const form = document.getElementById('bookingForm');
             const errorMessages = [];
@@ -715,7 +909,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Check pet selection
             const selectedPet = form.querySelector('input[name="id_anabul_existing"]:checked');
             if (!selectedPet) {
-                errorMessages.push('Silakan pilih hewan peliharaan atau tambahkan hewan baru');
+                showCustomConfirm('Silakan pilih hewan peliharaan atau tambahkan hewan baru', function (result) {
+                    if (result) {
+                        // User clicked "Ya, Lanjutkan" - they can continue to add a pet
+                        // The form will show the manual pet form
+                        document.querySelector('input[name="id_anabul_existing"][value="new"]').checked = true;
+                        document.getElementById('manual-pet-form').style.display = 'block';
+                        document.getElementById('pet_name').required = true;
+                        document.getElementById('pet_category').required = true;
+                    }
+                });
+                return false;
             } else if (selectedPet.value === 'new') {
                 const petName = form.querySelector('#pet_name').value.trim();
                 const petCategory = form.querySelector('#pet_category').value;
@@ -733,10 +937,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!serviceTime) errorMessages.push('Waktu perawatan harus dipilih');
 
             if (errorMessages.length > 0) {
-                alert('Mohon lengkapi data berikut:\n' + errorMessages.join('\n'));
+                showCustomConfirm('Mohon lengkapi data berikut:\n' + errorMessages.join('\n'), function (result) {
+                    if (result) {
+                        // User clicked "Ya, Lanjutkan" - they can continue filling the form
+                        // Focus on the first error field
+                        if (!serviceType) {
+                            form.querySelector('select[name="service_type"]').focus();
+                        } else if (!serviceDate) {
+                            form.querySelector('input[name="service_date"]').focus();
+                        } else if (!serviceTime) {
+                            form.querySelector('select[name="service_time"]').focus();
+                        }
+                    }
+                });
                 return false;
             }
-
             return true;
         }
 
@@ -750,6 +965,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const petCategorySelect = document.getElementById('pet_category');
             const petSpecialInput = document.getElementById('pet_special');
             const submitBtn = document.getElementById('submitBtn');
+            const serviceDate = document.querySelector('input[name="service_date"]');
+            const serviceTime = document.querySelector('#service_time');
+
+            // Reset form when page loads
+            form.reset();
+            totalPrice.value = 'Rp0';
+            manualPetForm.style.display = 'none';
+            document.querySelectorAll('.pet-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelectorAll('select').forEach(select => {
+                select.style.color = '#888';
+            });
 
             // Add required field indicators
             const requiredFields = form.querySelectorAll('[required]');
@@ -781,17 +1009,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update total price when service type changes
             if (serviceType) {
                 serviceType.addEventListener('change', function () {
-                    const selectedService = this.value;
-                    if (selectedService && hargaPerawatan[selectedService]) {
-                        const total = hargaPerawatan[selectedService];
-                        totalPrice.value = 'Rp ' + total.toLocaleString('id-ID');
+                    const selectedOption = this.options[this.selectedIndex];
+                    if (selectedOption && selectedOption.dataset.harga) {
+                        const price = parseInt(selectedOption.dataset.harga);
+                        totalPrice.value = 'Rp ' + price.toLocaleString('id-ID');
                     } else {
                         totalPrice.value = 'Rp0';
                     }
                 });
             }
 
-            // Handle pet selection
+            // Pet selection handlers
             petRadios.forEach(radio => {
                 radio.addEventListener('change', function () {
                     // Remove selected class from all options
@@ -803,7 +1031,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     this.closest('.pet-option').classList.add('selected');
 
                     if (this.value === 'new') {
-                        // Show manual form
                         manualPetForm.style.display = 'block';
                         // Make fields required
                         petNameInput.required = true;
@@ -813,19 +1040,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         petCategorySelect.value = '';
                         petSpecialInput.value = '';
                     } else {
-                        // Hide manual form and populate with existing data
                         manualPetForm.style.display = 'none';
-                        // Make fields not required
+                        // Remove required attribute
                         petNameInput.required = false;
                         petCategorySelect.required = false;
-
-                        // Fill with selected pet data
-                        petNameInput.value = this.dataset.name || '';
-                        petCategorySelect.value = this.dataset.category || '';
-                        petSpecialInput.value = this.dataset.special || '';
-
-                        // Update select color
-                        handleSelectColor(petCategorySelect);
                     }
                 });
             });
@@ -849,6 +1067,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         this.classList.remove('is-invalid');
                     }
                 });
+            });
+
+            // Event listener untuk perubahan tanggal
+            if (serviceDate) {
+                serviceDate.addEventListener('change', function () {
+                    // Sementara dinonaktifkan
+                    /*
+                    updateTimeAvailability(this.value);
+                    */
+                });
+            }
+
+            // Validasi tambahan sebelum submit
+            form.addEventListener('submit', function (e) {
+                const selectedDate = serviceDate.value;
+                const selectedTime = serviceTime.value;
+
+                if (selectedDate && selectedTime) {
+                    // Sementara dinonaktifkan
+                    /*
+                    // Double-check availability sebelum submit
+                    fetch(`?check_availability=1&date=${selectedDate}`)
+                        .then(response => response.json())
+                        .then(availableSlots => {
+                            if (!availableSlots.hasOwnProperty(selectedTime)) {
+                                e.preventDefault();
+                                alert('Maaf, waktu yang dipilih sudah tidak tersedia. Silakan refresh halaman dan pilih waktu lain.');
+                                return false;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error checking availability:', error);
+                        });
+                    */
+                }
             });
         });
     </script>

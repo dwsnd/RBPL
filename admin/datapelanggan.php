@@ -87,7 +87,7 @@ $result = $conn->query($query);
             margin-bottom: 30px;
             text-align: center;
         }
-        
+
         .main-content {
             margin-left: 250px;
             padding: 20px;
@@ -353,12 +353,23 @@ $result = $conn->query($query);
                             <tr>
                                 <td><?php echo $no++; ?></td>
                                 <td>
-                                    <?php if ($row['foto_profil']): ?>
-                                        <img src="../assets/img/pelanggan/<?php echo $row['foto_profil']; ?>"
-                                            alt="<?php echo $row['nama_lengkap']; ?>" class="img-thumbnail"
+                                    <?php if (!empty($row['foto_profil'])): ?>
+                                        <?php
+                                        $foto = $row['foto_profil'];
+                                        // Jika sudah mengandung '/' (path), gunakan langsung
+                                        if (strpos($foto, '/') !== false) {
+                                            $src = '../' . ltrim($foto, '/');
+                                        } else {
+                                            $src = '../uploads/pelanggan/' . $foto;
+                                        }
+                                        ?>
+                                        <img src="<?= htmlspecialchars($src) ?>"
+                                            alt="<?= htmlspecialchars($row['nama_lengkap']) ?>" class="img-thumbnail"
                                             style="max-width: 50px;">
                                     <?php else: ?>
-                                        <div class="no-image">No Image</div>
+                                        <div class="user-avatar">
+                                            <?= strtoupper(substr($row['nama_lengkap'], 0, 1)) ?>
+                                        </div>
                                     <?php endif; ?>
                                 </td>
                                 <td><?php echo $row['nama_lengkap']; ?></td>
@@ -382,10 +393,6 @@ $result = $conn->query($query);
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="detail.php?type=pelanggan&id=<?php echo $row['id_pelanggan']; ?>"
-                                        class="btn btn-info btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
                                     <a href="ubah.php?type=pelanggan&id=<?php echo $row['id_pelanggan']; ?>"
                                         class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i>

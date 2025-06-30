@@ -516,7 +516,7 @@ $result = $conn->query($query);
                                 <td><?php echo $row['keluhan_utama']; ?></td>
                                 <td>
                                     <span class="badge bg-<?php
-                                    echo match ($row['status_konsultasi']) {
+                                    echo empty($row['status_konsultasi']) ? 'secondary' : match ($row['status_konsultasi']) {
                                         'scheduled' => 'warning',
                                         'ongoing' => 'info',
                                         'completed' => 'success',
@@ -524,7 +524,7 @@ $result = $conn->query($query);
                                         default => 'secondary'
                                     };
                                     ?>">
-                                        <?php echo ucfirst($row['status_konsultasi']); ?>
+                                        <?php echo empty($row['status_konsultasi']) ? '-' : ucfirst($row['status_konsultasi']); ?>
                                     </span>
                                 </td>
                                 <td>
@@ -541,10 +541,6 @@ $result = $conn->query($query);
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="detail.php?type=konsultasi&id=<?php echo $row['id_konsultasi']; ?>"
-                                        class="btn btn-info btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
                                     <a href="ubah.php?type=konsultasi&id=<?php echo $row['id_konsultasi']; ?>"
                                         class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i>

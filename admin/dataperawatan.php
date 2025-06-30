@@ -517,7 +517,9 @@ $result = $conn->query($query);
                                 <td><?php echo ucfirst($row['paket_perawatan']); ?></td>
                                 <td>
                                     <span class="badge bg-<?php
-                                    echo match ($row['status_perawatan']) {
+                                    echo match (
+                                    strtolower($row['status_pesanan'] ?? '')
+                                    ) {
                                         'scheduled' => 'warning',
                                         'in_progress' => 'info',
                                         'completed' => 'success',
@@ -525,7 +527,7 @@ $result = $conn->query($query);
                                         default => 'secondary'
                                     };
                                     ?>">
-                                        <?php echo ucfirst($row['status_perawatan']); ?>
+                                        <?php echo str_replace('_', ' ', ucfirst($row['status_pesanan'] ?? '-')); ?>
                                     </span>
                                 </td>
                                 <td>

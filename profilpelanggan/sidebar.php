@@ -40,19 +40,19 @@ function getMenuItemClasses($baseName)
                 </a>
             </div>
             <div class="<?php echo getMenuItemClasses('keranjang'); ?> px-3 py-2 rounded-lg cursor-pointer text-sm">
-                <a href="../keranjang.php" class="flex items-center gap-2">
+                <a href="../keranjang/keranjang.php" class="flex items-center gap-2">
                     <i class="fas fa-cart-shopping w-5"></i>
                     <span>Keranjang</span>
                 </a>
             </div>
             <div class="<?php echo getMenuItemClasses('pesanan'); ?> px-3 py-2 rounded-lg cursor-pointer text-sm">
-                <a href="../pesanan.php" class="flex items-center gap-2">
+                <a href="../pesanan/index_pesanan.php" class="flex items-center gap-2">
                     <i class="fas fa-clipboard-list w-5"></i>
                     <span>Pesanan</span>
                 </a>
             </div>
-            <div class="<?php echo getMenuItemClasses('hapusakun'); ?> px-3 py-2 rounded-lg cursor-pointer text-sm">
-                <a href="../hapusakun.php" class="flex items-center gap-2">
+            <div class="<?php echo getMenuItemClasses('hapus'); ?> px-3 py-2 rounded-lg cursor-pointer text-sm">
+                <a href="../hapus/hapus.php" class="flex items-center gap-2">
                     <i class="fas fa-user-xmark w-5"></i>
                     <span>Hapus Akun</span>
                 </a>

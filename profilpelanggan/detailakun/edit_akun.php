@@ -25,7 +25,7 @@ try {
     $pelanggan = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$pelanggan) {
-        header("Location:.../../auth/login.php");
+        header("Location:../../auth/login.php");
         exit();
     }
 } catch (PDOException $e) {
@@ -301,6 +301,17 @@ $current_photo_url = getProfilePhotoUrl($pelanggan['foto_profil']);
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Hilangkan spinner pada input number */
+        input[type=number].no-spinner::-webkit-inner-spin-button,
+        input[type=number].no-spinner::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number].no-spinner {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 
@@ -449,17 +460,19 @@ $current_photo_url = getProfilePhotoUrl($pelanggan['foto_profil']);
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">RT</label>
-                                <input type="text" name="rt"
+                                <input type="number" name="rt"
                                     value="<?php echo htmlspecialchars($parsed_address['rt']); ?>"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    placeholder="001">
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 no-spinner"
+                                    placeholder="001" min="1" step="1" inputmode="numeric"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">RW</label>
-                                <input type="text" name="rw"
+                                <input type="number" name="rw"
                                     value="<?php echo htmlspecialchars($parsed_address['rw']); ?>"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    placeholder="002">
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 no-spinner"
+                                    placeholder="002" min="1" step="1" inputmode="numeric"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Desa</label>
@@ -470,10 +483,11 @@ $current_photo_url = getProfilePhotoUrl($pelanggan['foto_profil']);
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Kode Pos</label>
-                                <input type="text" name="kode_pos"
+                                <input type="number" name="kode_pos"
                                     value="<?php echo htmlspecialchars($parsed_address['kode_pos']); ?>"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    placeholder="12345">
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 no-spinner"
+                                    placeholder="12345" min="1" step="1" inputmode="numeric"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </div>
                         </div>
 

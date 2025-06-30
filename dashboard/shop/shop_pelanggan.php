@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-require_once '../includes/db.php';
+require_once '../../includes/db.php';
 
 // Fetch user data if logged in
 $user_data = [];
@@ -100,11 +100,39 @@ if (isset($_SESSION['id_pelanggan'])) {
             border: 1px solid #f97316;
             border-radius: 0.5rem;
             overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            padding-top: 100%;
+            /* Creates a square aspect ratio */
+            background-color: #f8f8f8;
+        }
+
+        .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 0.5rem;
+        }
+
+        .product-info {
+            padding: 0.75rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .button-pagination {
@@ -176,21 +204,43 @@ if (isset($_SESSION['id_pelanggan'])) {
         footer {
             padding: 40px 0;
         }
+
+        /* Popup Notification Styles */
+        .popup-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 
 <body>
     <!-- Navbar -->
-    <?php require_once '../includes/header.php'; ?>
+    <?php require_once '../../includes/header.php'; ?>
 
     <!-- Hero Section -->
     <section class="hero-section position-relative overflow-hidden">
         <!-- SHAPE BESAR KANAN -->
-        <img src="../aset/Shape2.png" class="shape-main" alt="Shape">
+        <img src="../../aset/Shape2.png" class="shape-main" alt="Shape">
         <!-- SHAPE KECIL KIRI ATAS -->
-        <img src="../aset/Shape.png" class="shape-leftup" alt="Shape2">
+        <img src="../../aset/Shape.png" class="shape-leftup" alt="Shape2">
         <!-- SHAPE KECIL KIRI BAWAH -->
-        <img src="../aset/Shape1.png" class="shape-leftdown" alt="Shape1">
+        <img src="../../aset/Shape1.png" class="shape-leftdown" alt="Shape1">
         <div class="container d-flex flex-wrap align-items-center justify-content-between position-relative"
             style="z-index:2;">
             <div class="col-lg-6 mb-4 text-lg-start text-center">
@@ -199,10 +249,10 @@ if (isset($_SESSION['id_pelanggan'])) {
                     <br>Tapi Kamu Bisa Bikin
                     <br>Mereka Bahagia!
                 </h1>
-                <a href="shop.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <a href="shop_pelanggan.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
-        <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
+        <img src="../../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">
     </section>
     <!-- hero rampung -->
 
@@ -214,36 +264,36 @@ if (isset($_SESSION['id_pelanggan'])) {
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-20">
                     <div>
                         <div class="service-card cursor-pointer mb-2" onclick="filterByCategory('kucing')"
-                            style="background-image: url('../aset/vectorfilterhewan.png')">
+                            style="background-image: url('../../aset/vectorfilterhewan.png')">
                             <div class="pet-icon items-center justify-center overflow-hidden">
-                                <img src="../aset/kucingtoko.png" alt="Kucing" class="w-48 h-48 object-contain">
+                                <img src="../../aset/kucingtoko.png" alt="Kucing" class="w-48 h-48 object-contain">
                             </div>
                         </div>
                         <p class="pet-name font-semibold text-base">Kucing</p>
                     </div>
                     <div>
                         <div class="service-card cursor-pointer mb-2 w-48 h-48" onclick="filterByCategory('hamster')"
-                            style="background-image: url('../aset/vectorfilterhewan.png')">
+                            style="background-image: url('../../aset/vectorfilterhewan.png')">
                             <div class="pet-icon item-center justify-center overflow-hidden">
-                                <img src="../aset/hamstertoko.png" alt="Hamster" class="w-38 h-38 object-contain">
+                                <img src="../../aset/hamstertoko.png" alt="Hamster" class="w-38 h-38 object-contain">
                             </div>
                         </div>
                         <p class="pet-name font-semibold text-base">Hamster</p>
                     </div>
                     <div>
                         <div class="service-card cursor-pointer mb-2" onclick="filterByCategory('anjing')"
-                            style="background-image: url('../aset/vectorfilterhewan.png')">
+                            style="background-image: url('../../aset/vectorfilterhewan.png')">
                             <div class="pet-icon items-center justify-center overflow-hidden">
-                                <img src="../aset/anjingtoko.png" alt="Anjing" class="w-48 h-48 object-contain">
+                                <img src="../../aset/anjingtoko.png" alt="Anjing" class="w-48 h-48 object-contain">
                             </div>
                         </div>
                         <p class="pet-name font-semibold text-base">Anjing</p>
                     </div>
                     <div>
                         <div class="service-card cursor-pointer mb-2" onclick="filterByCategory('kelinci')"
-                            style="background-image: url('../aset/vectorfilterhewan.png')">
+                            style="background-image: url('../../aset/vectorfilterhewan.png')">
                             <div class="pet-icon items-center justify-center overflow-hidden">
-                                <img src="../aset/kelincitoko.png" alt="Kelinci" class="w-48 h-48 object-contain">
+                                <img src="../../aset/kelincitoko.png" alt="Kelinci" class="w-48 h-48 object-contain">
                             </div>
                         </div>
                         <p class="pet-name font-semibold text-base">Kelinci</p>
@@ -298,7 +348,10 @@ if (isset($_SESSION['id_pelanggan'])) {
     </div>
 
     <!-- Footer -->
-    <?php require '../includes/footer.php'; ?>
+    <?php require '../../includes/footer.php'; ?>
+
+    <!-- Add popup notification div -->
+    <div id="popupNotification" class="popup-notification"></div>
 
     <script>
         // Variabel DOM utama
@@ -318,13 +371,14 @@ if (isset($_SESSION['id_pelanggan'])) {
         let isLoading = false;
         let searchTimeout;
 
+        // Fungsi debug untuk melihat data
+        const debugLog = (message, data = null) => {
+            console.log(`[DEBUG] ${message}`, data);
+        };
+
         // Fungsi Alert/Error reusable
-        /*
-         * Menampilkan pesan alert/error di container produk
-         * @param {string} message - Pesan yang akan ditampilkan
-         * @param {string} type - Jenis alert ('error' atau 'info')
-         */
         const showAlert = (message, type = 'error') => {
+            debugLog(`Showing alert: ${type}`, message);
             productsContainer.innerHTML = `
             <div class="col-span-full text-center py-12">
                 <i class="fas ${type === 'error' ? 'fa-exclamation-triangle text-red-400' : 'fa-info-circle text-blue-400'} text-3xl mb-3"></i>
@@ -338,6 +392,7 @@ if (isset($_SESSION['id_pelanggan'])) {
 
         // Fungsi menampilkan pesan pilih kategori
         const showSelectCategoryMessage = () => {
+            debugLog('Showing select category message');
             productsContainer.innerHTML = `
             <div class="col-span-full text-center py-16">
                 <i class="fas fa-paw text-orange-400 text-4xl mb-3"></i>
@@ -354,22 +409,38 @@ if (isset($_SESSION['id_pelanggan'])) {
             if (isLoading) return;
             isLoading = true;
             loadingSpinner.style.display = 'flex';
+            debugLog('Loading products...');
 
             try {
-                const response = await fetch('../includes/get_products.php');
+                const response = await fetch('../../includes/get_products.php');
+                debugLog('Response status:', response.status);
+
                 const data = await response.json();
+                debugLog('Response data:', data);
 
                 if (data.success) {
                     allProducts = data.products;
+                    debugLog('All products loaded:', allProducts.length);
+                    if (allProducts.length > 0) {
+                        debugLog('First product:', {
+                            id: allProducts[0].id,
+                            name: allProducts[0].name,
+                            image: allProducts[0].image,
+                            target_hewan: allProducts[0].target_hewan
+                        });
+                    }
+
                     if (!selectedCategory) {
                         showSelectCategoryMessage();
                     } else {
                         applyFilters();
                     }
                 } else {
-                    showAlert('Gagal memuat produk');
+                    debugLog('Failed to load products:', data.message);
+                    showAlert(`Gagal memuat produk: ${data.message}`);
                 }
-            } catch {
+            } catch (error) {
+                debugLog('Network error:', error);
                 showAlert('Terjadi kesalahan jaringan');
             } finally {
                 loadingSpinner.style.display = 'none';
@@ -379,6 +450,12 @@ if (isset($_SESSION['id_pelanggan'])) {
 
         // Fungsi menampilkan produk ke dalam grid sesuai filter & halaman
         const renderProducts = () => {
+            debugLog('Rendering products...', {
+                selectedCategory,
+                filteredProductsCount: filteredProducts.length,
+                currentPage
+            });
+
             if (!selectedCategory) {
                 showSelectCategoryMessage();
                 return;
@@ -388,39 +465,86 @@ if (isset($_SESSION['id_pelanggan'])) {
             const end = start + productsPerPage;
             const productsToShow = filteredProducts.slice(start, end);
 
+            debugLog('Products to show:', productsToShow.length);
+
             if (!productsToShow.length) {
+                debugLog('No products to show');
                 productsContainer.innerHTML = `
-                <div class="col-span-full text-center py-12">
-                    <i class="fas fa-search text-gray-400 text-3xl mb-3"></i>
-                    <p class="text-gray-500">Produk tidak ditemukan</p>
-                </div>
-            `;
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-search text-gray-400 text-3xl mb-3"></i>
+                <p class="text-gray-500">Produk tidak ditemukan untuk kategori "${selectedCategory}"</p>
+                <p class="text-gray-400 text-sm mt-2">Total produk tersedia: ${allProducts.length}</p>
+                <p class="text-gray-400 text-sm">Produk setelah filter: ${filteredProducts.length}</p>
+            </div>
+        `;
                 pagination.innerHTML = '';
                 updateProductCount();
                 return;
             }
 
-            // Render produk dengan map, lebih efisien
-            productsContainer.innerHTML = productsToShow.map(product => `
-            <div class="product-card rounded-lg cursor-pointer" onclick="window.location.href='../auth/login.php'">
-                <div class="aspect-square bg-gray-200 relative p-2">
-                    <img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain">
+            // Render produk dengan improved error handling
+            productsContainer.innerHTML = productsToShow.map((product, index) => {
+                const heartIconClass = product.is_favorited ? 'fas text-red-500' : 'far text-orange-400';
+                return `
+            <div class="product-card rounded-lg cursor-pointer" onclick="window.location.href='detail_produk.php?id=${product.id}'">
+                <div class="product-image-container">
+                    <img src="${product.image}" 
+                         alt="${product.name}" 
+                         class="product-image" 
+                         onerror="handleImageError(this, '${product.image}', '${product.target_hewan}')"
+                         onload="console.log('Image loaded successfully:', '${product.image}')">
                 </div>
-                <div class="p-3">
+                <div class="product-info">
                     <div class="flex items-start justify-between mb-1">
                         <h3 class="font-semibold text-sm text-gray-800 line-clamp-2 leading-tight pr-2" title="${product.name}">
                             ${product.name}
                         </h3>
-                        <button class="w-6 h-6 flex justify-center items-end" onclick="event.stopPropagation(); window.location.href='../auth/login.php'">
-                            <i class="far fa-heart text-orange-400 text-lg"></i>
+                        <button class="w-6 h-6 flex justify-center items-end" onclick="event.stopPropagation(); addToFavorites(${product.id}, this)">
+                            <i class="${heartIconClass} fa-heart text-lg"></i>
                         </button>
                     </div>
                     <p class="text-orange-600 font-medium text-sm">Rp${parseInt(product.price).toLocaleString('id-ID')}</p>
+                    <p class="text-gray-400 text-xs">Kategori: ${product.target_hewan}</p>
                 </div>
             </div>
-        `).join('');
+        `;
+            }).join('');
+
+            // Update pagination and count
             renderPagination();
             updateProductCount();
+        };
+
+        // Fungsi handle error gambar yang diperbaiki
+        window.handleImageError = (img, originalImage, originalCategory) => {
+            console.log('Image error for:', originalImage);
+            console.log('Category:', originalCategory);
+
+            // Array alternatif path untuk akses dari folder public
+            const alternatives = [
+                // Coba path langsung dari uploads
+                originalImage,
+                // Coba dengan struktur folder kategori
+                `../../uploads/produk/${originalCategory.toLowerCase()}/${originalImage.split('/').pop()}`,
+                // Coba tanpa kategori folder
+                `../../uploads/produk/${originalImage.split('/').pop()}`,
+                // Coba di folder aset
+                `../../aset/produk/${originalImage.split('/').pop()}`,
+                // Fallback default
+                '../../aset/default-product.png'
+            ];
+
+            let tried = parseInt(img.getAttribute('data-tried') || '0');
+
+            if (tried < alternatives.length - 1) {
+                img.setAttribute('data-tried', (tried + 1).toString());
+                console.log(`Trying alternative ${tried + 1}:`, alternatives[tried]);
+                img.src = alternatives[tried];
+            } else {
+                console.log('All alternatives failed, using default image');
+                img.src = '../../aset/default-product.png';
+                img.removeAttribute('data-tried');
+            }
         };
 
         // Fungsi tombol pagination
@@ -448,50 +572,63 @@ if (isset($_SESSION['id_pelanggan'])) {
             pagination.innerHTML = html;
         };
 
-        // Fungsi mengganti halaman produk - @param {number} page - Nomor halaman
+        // Fungsi mengganti halaman produk
         window.changePage = (page) => {
             currentPage = page;
             renderProducts();
-            // Scroll ke bagian produk
             const productsSection = document.querySelector('.py-8.bg-white');
             if (productsSection) {
                 productsSection.scrollIntoView({ behavior: 'smooth' });
             }
         };
 
-        // Fungsi filter produk berdasarkan kategori - @param {string} category - Nama kategori
+        // Fungsi filter produk berdasarkan kategori
         window.filterByCategory = (category) => {
-            selectedCategory = category;
+            debugLog('Filtering by category:', category);
+            selectedCategory = category.toLowerCase(); // Pastikan lowercase
+
             // Reset all cards to default background
             document.querySelectorAll('.service-card').forEach(card => {
-                card.style.backgroundImage = "url('../aset/vectorfilterhewan.png')";
+                card.style.backgroundImage = "url('../../aset/vectorfilterhewan.png')";
                 card.classList.remove('active');
             });
+
             // Set active card background
             const activeCard = document.querySelector(`.service-card[onclick="filterByCategory('${category}')"]`);
             if (activeCard) {
-                activeCard.style.backgroundImage = "url('../aset/vectorfilterhewan_pick.png')";
+                activeCard.style.backgroundImage = "url('../../aset/vectorfilterhewan_pick.png')";
                 activeCard.classList.add('active');
             }
+
             applyFilters();
         };
 
         // Fungsi filter pencarian dan kategori
         const applyFilters = () => {
             const searchTerm = searchInput.value.toLowerCase();
-            filteredProducts = allProducts.filter(product =>
-                (!selectedCategory || product.category === selectedCategory) &&
-                (!searchTerm || product.name.toLowerCase().includes(searchTerm))
-            );
+            debugLog('Applying filters:', { selectedCategory, searchTerm });
+            debugLog('All products target_hewan:', allProducts.map(p => p.target_hewan));
+
+            filteredProducts = allProducts.filter(product => {
+                const categoryMatch = !selectedCategory || product.target_hewan === selectedCategory;
+                const searchMatch = !searchTerm || product.name.toLowerCase().includes(searchTerm);
+
+                debugLog(`Product: ${product.name}, Target Hewan: ${product.target_hewan}, Matches: ${categoryMatch && searchMatch}`);
+
+                return categoryMatch && searchMatch;
+            });
+
+            debugLog('Filtered products count:', filteredProducts.length);
             currentPage = 1;
             renderProducts();
         };
 
         // Fungsi update tampilan jumlah produk yang ditampilkan
         const updateProductCount = () => {
-            // Menampilkan jumlah produk yang sedang tampil dan total hasil filter
-            currentCount.textContent = Math.min(currentPage * productsPerPage, filteredProducts.length);
+            const showing = Math.min(currentPage * productsPerPage, filteredProducts.length);
+            currentCount.textContent = showing;
             totalCount.textContent = filteredProducts.length;
+            debugLog('Updated count:', { showing, total: filteredProducts.length });
         };
 
         // Fungsi menambahkan debounce pada input pencarian
@@ -500,6 +637,69 @@ if (isset($_SESSION['id_pelanggan'])) {
             searchTimeout = setTimeout(applyFilters, 300);
         });
 
+        // Fungsi untuk menampilkan notifikasi popup
+        function showPopup(message, type = 'success') {
+            const popup = document.getElementById('popupNotification');
+            popup.textContent = message;
+            popup.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+            popup.classList.add('show');
+
+            // Hide popup after 3 seconds
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
+        // Fungsi untuk menambah ke favorit
+        function addToFavorites(productId, button) {
+            <?php if (isset($_SESSION['id_pelanggan'])): ?>
+                fetch('../../includes/toggle_wishlist.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `product_id=${productId}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const heartIcon = button.querySelector('i');
+
+                            // Update heart icon appearance
+                            if (data.is_favorite) {
+                                heartIcon.classList.remove('far', 'text-orange-400');
+                                heartIcon.classList.add('fas', 'text-red-500');
+                            } else {
+                                heartIcon.classList.remove('fas', 'text-red-500');
+                                heartIcon.classList.add('far', 'text-orange-400');
+                            }
+
+                            // Update the product data in memory
+                            const product = allProducts.find(p => p.id === productId);
+                            if (product) {
+                                product.is_favorited = data.is_favorite;
+                            }
+
+                            // Update favorites count in header if available
+                            const favoritesCountElement = document.querySelector('.fa-regular.fa-heart + span');
+                            if (favoritesCountElement && data.favorites_count !== undefined) {
+                                favoritesCountElement.textContent = data.favorites_count;
+                            }
+
+                            // Show success message
+                            showPopup(data.message, 'success');
+                        } else {
+                            showPopup('Gagal menambahkan ke favorit: ' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showPopup('Terjadi kesalahan saat memproses favorit', 'error');
+                    });
+            <?php else: ?>
+                window.location.href = '../auth/login.php';
+            <?php endif; ?>
+        }
         // Inisialisasi saat halaman dimuat
         document.addEventListener('DOMContentLoaded', loadProducts);
     </script>

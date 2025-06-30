@@ -20,83 +20,93 @@ if (!in_array($currentPage, $publicPages) && session_status() === PHP_SESSION_NO
 function getCorrectPath($page)
 {
     if (isset($_SESSION['id_pelanggan'])) {
-        // Get current path to determine where we are
-        $currentPath = $_SERVER['SCRIPT_NAME'];
-
-        // Check if we're already in dashboard structure
+        $currentPath = $_SERVER['REQUEST_URI'];
         $isInDashboard = strpos($currentPath, '/dashboard/') !== false;
         $isInDashboardSubfolder = strpos($currentPath, '/dashboard/perawatan/') !== false ||
             strpos($currentPath, '/dashboard/penitipan/') !== false ||
             strpos($currentPath, '/dashboard/konsultasi/') !== false ||
             strpos($currentPath, '/dashboard/shop/') !== false;
-
-        // Determine correct path based on current location and target page
+        $isInProfilPelanggan = strpos($currentPath, '/profilpelanggan/') !== false;
+        $profilPelangganDepth = 0;
+        if ($isInProfilPelanggan) {
+            $afterProfil = explode('/profilpelanggan/', $currentPath)[1] ?? '';
+            $profilPelangganDepth = substr_count($afterProfil, '/');
+            // Jika ada file di akhir, tambahkan 1 untuk kedalaman
+            if (!empty($afterProfil) && !str_ends_with($afterProfil, '/')) {
+                $profilPelangganDepth += 1;
+            }
+        }
         switch ($page) {
             case 'index.php':
                 if ($isInDashboardSubfolder) {
                     return '../index_pelanggan.php';
                 } elseif ($isInDashboard) {
                     return 'index_pelanggan.php';
+                } elseif ($isInProfilPelanggan) {
+                    return str_repeat('../', $profilPelangganDepth) . 'dashboard/index_pelanggan.php';
                 } else {
                     return '../dashboard/index_pelanggan.php';
                 }
                 break;
-
             case 'about.php':
                 if ($isInDashboardSubfolder) {
                     return '../about_pelanggan.php';
                 } elseif ($isInDashboard) {
                     return 'about_pelanggan.php';
+                } elseif ($isInProfilPelanggan) {
+                    return str_repeat('../', $profilPelangganDepth) . 'dashboard/about_pelanggan.php';
                 } else {
                     return '../dashboard/about_pelanggan.php';
                 }
                 break;
-
             case 'perawatan.php':
                 if ($isInDashboardSubfolder) {
                     return '../perawatan/perawatan_pelanggan.php';
                 } elseif ($isInDashboard) {
                     return 'perawatan/perawatan_pelanggan.php';
+                } elseif ($isInProfilPelanggan) {
+                    return str_repeat('../', $profilPelangganDepth) . 'dashboard/perawatan/perawatan_pelanggan.php';
                 } else {
                     return '../dashboard/perawatan/perawatan_pelanggan.php';
                 }
                 break;
-
             case 'penitipan.php':
                 if ($isInDashboardSubfolder) {
                     return '../penitipan/penitipan_pelanggan.php';
                 } elseif ($isInDashboard) {
                     return 'penitipan/penitipan_pelanggan.php';
+                } elseif ($isInProfilPelanggan) {
+                    return str_repeat('../', $profilPelangganDepth) . 'dashboard/penitipan/penitipan_pelanggan.php';
                 } else {
                     return '../dashboard/penitipan/penitipan_pelanggan.php';
                 }
                 break;
-
             case 'konsultasi.php':
                 if ($isInDashboardSubfolder) {
                     return '../konsultasi/konsultasi_pelanggan.php';
                 } elseif ($isInDashboard) {
                     return 'konsultasi/konsultasi_pelanggan.php';
+                } elseif ($isInProfilPelanggan) {
+                    return str_repeat('../', $profilPelangganDepth) . 'dashboard/konsultasi/konsultasi_pelanggan.php';
                 } else {
                     return '../dashboard/konsultasi/konsultasi_pelanggan.php';
                 }
                 break;
-
             case 'shop.php':
                 if ($isInDashboardSubfolder) {
                     return '../shop/shop_pelanggan.php';
                 } elseif ($isInDashboard) {
                     return 'shop/shop_pelanggan.php';
+                } elseif ($isInProfilPelanggan) {
+                    return str_repeat('../', $profilPelangganDepth) . 'dashboard/shop/shop_pelanggan.php';
                 } else {
                     return '../dashboard/shop/shop_pelanggan.php';
                 }
                 break;
-
             default:
                 return $page;
         }
     }
-    // If not logged in, use regular pages in current folder
     return $page;
 }
 
@@ -186,6 +196,25 @@ if (isset($_SESSION['id_pelanggan'])) {
     }
 }
 
+// Get favorites count if user is logged in
+$favorites_count = 0;
+if (isset($_SESSION['id_pelanggan'])) {
+    $favorites_query = "SELECT COUNT(*) as count FROM favorit WHERE id_pelanggan = ?";
+    $stmt = $pdo->prepare($favorites_query);
+    $stmt->execute([$_SESSION['id_pelanggan']]);
+    $favorites_count = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+}
+
+// Get cart count if user is logged in
+$cart_count = 0;
+if (isset($_SESSION['id_pelanggan'])) {
+    $cart_query = "SELECT SUM(quantity) as total FROM keranjang WHERE id_pelanggan = ?";
+    $stmt = $pdo->prepare($cart_query);
+    $stmt->execute([$_SESSION['id_pelanggan']]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $cart_count = $result['total'] ? $result['total'] : 0;
+}
+
 // IMPROVED Function to get correct photo path
 function getPhotoPath($photoProfile)
 {
@@ -196,38 +225,48 @@ function getPhotoPath($photoProfile)
     // Remove any leading slashes and backslashes
     $photoProfile = ltrim($photoProfile, '/\\');
 
-    // Get current directory info
-    $currentDir = dirname($_SERVER['SCRIPT_FILENAME']);
-    $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+    // Get current path to determine where we are
+    $currentPath = $_SERVER['REQUEST_URI'];
+    $isInDashboard = strpos($currentPath, '/dashboard/') !== false;
+    $isInDashboardSubfolder = strpos($currentPath, '/dashboard/perawatan/') !== false ||
+        strpos($currentPath, '/dashboard/penitipan/') !== false ||
+        strpos($currentPath, '/dashboard/konsultasi/') !== false ||
+        strpos($currentPath, '/dashboard/shop/') !== false;
+    $isInProfilPelanggan = strpos($currentPath, '/profilpelanggan/') !== false;
 
-    // Define possible paths with priority order
-    $possiblePaths = [
-        // Relative paths (most common)
-        'uploads/pelanggan/' . $photoProfile,
-        '../uploads/pelanggan/' . $photoProfile,
-        '../../uploads/pelanggan/' . $photoProfile,
-        '../../../uploads/pelanggan/' . $photoProfile,
+    // Define possible paths based on current location
+    $possiblePaths = [];
 
-        // Absolute paths
-        $documentRoot . '/uploads/pelanggan/' . $photoProfile,
-        $documentRoot . '/RBPL/REBEL1/uploads/pelanggan/' . $photoProfile,
-
-        // Current directory based
-        $currentDir . '/uploads/pelanggan/' . $photoProfile,
-        $currentDir . '/../uploads/pelanggan/' . $photoProfile,
-        $currentDir . '/../../uploads/pelanggan/' . $photoProfile,
-    ];
+    if ($isInDashboardSubfolder) {
+        // In dashboard subfolder (perawatan, penitipan, etc.)
+        $possiblePaths = [
+            '../../profilpelanggan/uploads/pelanggan/' . $photoProfile,
+            '../profilpelanggan/uploads/pelanggan/' . $photoProfile
+        ];
+    } elseif ($isInDashboard) {
+        // In dashboard root
+        $possiblePaths = [
+            '../profilpelanggan/uploads/pelanggan/' . $photoProfile,
+            '../../profilpelanggan/uploads/pelanggan/' . $photoProfile
+        ];
+    } elseif ($isInProfilPelanggan) {
+        // In profilpelanggan folder
+        $possiblePaths = [
+            'uploads/pelanggan/' . $photoProfile,
+            '../uploads/pelanggan/' . $photoProfile,
+            '../../uploads/pelanggan/' . $photoProfile
+        ];
+    } else {
+        // In public folder or other locations
+        $possiblePaths = [
+            'profilpelanggan/uploads/pelanggan/' . $photoProfile,
+            '../profilpelanggan/uploads/pelanggan/' . $photoProfile
+        ];
+    }
 
     // Check each path
     foreach ($possiblePaths as $path) {
         if (file_exists($path)) {
-            // Convert absolute path to web-accessible relative path
-            if (strpos($path, $documentRoot) === 0) {
-                $webPath = str_replace($documentRoot, '', $path);
-                $webPath = str_replace('\\', '/', $webPath);
-                return $webPath;
-            }
-            // If it's already a relative path, return as is
             return $path;
         }
     }
@@ -239,7 +278,7 @@ function getPhotoPath($photoProfile)
 // Function to get base URL for login/register links
 function getAuthPath($page)
 {
-    $currentPath = $_SERVER['SCRIPT_NAME'];
+    $currentPath = $_SERVER['REQUEST_URI'];
     $isInDashboardSubfolder = strpos($currentPath, '/dashboard/perawatan/') !== false ||
         strpos($currentPath, '/dashboard/penitipan/') !== false ||
         strpos($currentPath, '/dashboard/konsultasi/') !== false ||
@@ -258,16 +297,27 @@ function getAuthPath($page)
 // Function to get correct logout path
 function getLogoutPath()
 {
-    $currentPath = $_SERVER['SCRIPT_NAME'];
+    $currentPath = $_SERVER['REQUEST_URI'];
     $isInDashboardSubfolder = strpos($currentPath, '/dashboard/perawatan/') !== false ||
         strpos($currentPath, '/dashboard/penitipan/') !== false ||
         strpos($currentPath, '/dashboard/konsultasi/') !== false ||
         strpos($currentPath, '/dashboard/shop/') !== false;
     $isInDashboard = strpos($currentPath, '/dashboard/') !== false;
+    $isInProfilPelanggan = strpos($currentPath, '/profilpelanggan/') !== false;
+    $isInProfilPelangganSubfolder = strpos($currentPath, '/profilpelanggan/keranjang/') !== false ||
+        strpos($currentPath, '/profilpelanggan/favorit/') !== false ||
+        strpos($currentPath, '/profilpelanggan/detailakun/') !== false ||
+        strpos($currentPath, '/profilpelanggan/detailanabul/') !== false ||
+        strpos($currentPath, '/profilpelanggan/pesanan/') !== false ||
+        strpos($currentPath, '/profilpelanggan/hapus/') !== false;
 
     if ($isInDashboardSubfolder) {
         return '../../auth/logout.php';
     } elseif ($isInDashboard) {
+        return '../auth/logout.php';
+    } elseif ($isInProfilPelangganSubfolder) {
+        return '../../auth/logout.php';
+    } elseif ($isInProfilPelanggan) {
         return '../auth/logout.php';
     } else {
         return '../auth/logout.php';
@@ -277,19 +327,30 @@ function getLogoutPath()
 // Function to get profile edit path
 function getProfilePath()
 {
-    $currentPath = $_SERVER['SCRIPT_NAME'];
+    $currentPath = $_SERVER['REQUEST_URI'];
     $isInDashboardSubfolder = strpos($currentPath, '/dashboard/perawatan/') !== false ||
         strpos($currentPath, '/dashboard/penitipan/') !== false ||
         strpos($currentPath, '/dashboard/konsultasi/') !== false ||
         strpos($currentPath, '/dashboard/shop/') !== false;
     $isInDashboard = strpos($currentPath, '/dashboard/') !== false;
+    $isInProfilPelanggan = strpos($currentPath, '/profilpelanggan/') !== false;
+    $isInProfilPelangganSubfolder = strpos($currentPath, '/profilpelanggan/keranjang/') !== false ||
+        strpos($currentPath, '/profilpelanggan/favorit/') !== false ||
+        strpos($currentPath, '/profilpelanggan/detailakun/') !== false ||
+        strpos($currentPath, '/profilpelanggan/detailanabul/') !== false ||
+        strpos($currentPath, '/profilpelanggan/pesanan/') !== false ||
+        strpos($currentPath, '/profilpelanggan/hapus/') !== false;
 
     if ($isInDashboardSubfolder) {
-        return '../../profilpelanggan/detailakun/edit_akun.php';
+        return '../../profilpelanggan/detailakun/profil_akun.php';
     } elseif ($isInDashboard) {
-        return '../profilpelanggan/detailakun/edit_akun.php';
+        return '../profilpelanggan/detailakun/profil_akun.php';
+    } elseif ($isInProfilPelangganSubfolder) {
+        return '../detailakun/profil_akun.php';
+    } elseif ($isInProfilPelanggan) {
+        return 'detailakun/profil_akun.php';
     } else {
-        return '../profilpelanggan/detailakun/edit_akun.php';
+        return '../profilpelanggan/detailakun/profil_akun.php';
     }
 }
 
@@ -297,49 +358,71 @@ function getProfilePath()
 function getCartPath()
 {
     if (isset($_SESSION['id_pelanggan'])) {
-        $currentPath = $_SERVER['SCRIPT_NAME'];
+        $currentPath = $_SERVER['REQUEST_URI'];
         $isInDashboardSubfolder = strpos($currentPath, '/dashboard/perawatan/') !== false ||
             strpos($currentPath, '/dashboard/penitipan/') !== false ||
             strpos($currentPath, '/dashboard/konsultasi/') !== false ||
             strpos($currentPath, '/dashboard/shop/') !== false;
         $isInDashboard = strpos($currentPath, '/dashboard/') !== false;
+        $isInProfilPelanggan = strpos($currentPath, '/profilpelanggan/') !== false;
+        $isInProfilPelangganSubfolder = strpos($currentPath, '/profilpelanggan/keranjang/') !== false ||
+            strpos($currentPath, '/profilpelanggan/favorit/') !== false ||
+            strpos($currentPath, '/profilpelanggan/detailakun/') !== false ||
+            strpos($currentPath, '/profilpelanggan/detailanabul/') !== false ||
+            strpos($currentPath, '/profilpelanggan/pesanan/') !== false ||
+            strpos($currentPath, '/profilpelanggan/hapus/') !== false;
 
         if ($isInDashboardSubfolder) {
-            return '../keranjang.php';
+            return '../../profilpelanggan/keranjang/keranjang.php';
         } elseif ($isInDashboard) {
-            return 'keranjang.php';
+            return '../profilpelanggan/keranjang/keranjang.php';
+        } elseif ($isInProfilPelangganSubfolder) {
+            return '../keranjang/keranjang.php';
+        } elseif ($isInProfilPelanggan) {
+            return 'keranjang/keranjang.php';
         } else {
-            return '../dashboard/keranjang.php';
+            return '../profilpelanggan/keranjang/keranjang.php';
         }
     }
-    return 'keranjang.php';
+    return '../profilpelanggan/keranjang/keranjang.php';
 }
 
 function getFavoritePath()
 {
     if (isset($_SESSION['id_pelanggan'])) {
-        $currentPath = $_SERVER['SCRIPT_NAME'];
+        $currentPath = $_SERVER['REQUEST_URI'];
         $isInDashboardSubfolder = strpos($currentPath, '/dashboard/perawatan/') !== false ||
             strpos($currentPath, '/dashboard/penitipan/') !== false ||
             strpos($currentPath, '/dashboard/konsultasi/') !== false ||
             strpos($currentPath, '/dashboard/shop/') !== false;
         $isInDashboard = strpos($currentPath, '/dashboard/') !== false;
+        $isInProfilPelanggan = strpos($currentPath, '/profilpelanggan/') !== false;
+        $isInProfilPelangganSubfolder = strpos($currentPath, '/profilpelanggan/keranjang/') !== false ||
+            strpos($currentPath, '/profilpelanggan/favorit/') !== false ||
+            strpos($currentPath, '/profilpelanggan/detailakun/') !== false ||
+            strpos($currentPath, '/profilpelanggan/detailanabul/') !== false ||
+            strpos($currentPath, '/profilpelanggan/pesanan/') !== false ||
+            strpos($currentPath, '/profilpelanggan/hapus/') !== false;
 
         if ($isInDashboardSubfolder) {
-            return '../favorit.php';
+            return '../../profilpelanggan/favorit/favorit.php';
         } elseif ($isInDashboard) {
-            return 'favorit.php';
+            return '../profilpelanggan/favorit/favorit.php';
+        } elseif ($isInProfilPelangganSubfolder) {
+            return '../favorit/favorit.php';
+        } elseif ($isInProfilPelanggan) {
+            return 'favorit/favorit.php';
         } else {
-            return '../dashboard/favorit.php';
+            return '../profilpelanggan/favorit/favorit.php';
         }
     }
-    return 'favorit.php';
+    return '../profilpelanggan/favorit/favorit.php';
 }
 ?>
 
-<nav class="bg-white sticky top-0 py-4 rounded-b-4xl shadow-xl z-50">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center">
+<nav class="bg-white sticky top-0 py-6 rounded-b-4xl shadow-xl z-50">
+    <div class="container max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-12">
             <a class="flex items-center font-bold text-xl" href="<?php echo getCorrectPath('index.php'); ?>">
                 <i class="fa-solid fa-paw text-orange-500 mr-2 text-2xl hover:text-3xl transition-all duration-300"></i>
                 Ling-Ling Pet Shop
@@ -416,7 +499,7 @@ function getFavoritePath()
                             <i class="fa-regular fa-heart text-2xl"></i>
                             <span
                                 class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
-                                <?php echo isset($_SESSION['fav_count']) ? $_SESSION['fav_count'] : 0; ?>
+                                <?php echo $favorites_count; ?>
                             </span>
                         </a>
                     </div>
@@ -426,7 +509,7 @@ function getFavoritePath()
                             <i class="fa-solid fa-cart-shopping text-2xl"></i>
                             <span
                                 class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
-                                <?php echo isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0; ?>
+                                <?php echo $cart_count; ?>
                             </span>
                         </a>
                     </div>

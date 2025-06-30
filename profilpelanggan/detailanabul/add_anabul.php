@@ -263,10 +263,10 @@ require_once '../../includes/db.php';
 
                             <!-- Kategori Hewan -->
                             <div>
-                                <label for="kategori_hewan" class="block text-sm font-medium text-gray-700 mb-1">
+                                <label for="spesies" class="block text-sm font-medium text-gray-700 mb-1">
                                     Kategori Hewan <span class="text-red-500">*</span>
                                 </label>
-                                <select id="kategori_hewan" name="kategori_hewan"
+                                <select id="spesies" name="spesies"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                     required>
                                     <option value="">Pilih jenis hewan</option>
@@ -279,10 +279,10 @@ require_once '../../includes/db.php';
 
                             <!-- Jenis Ras/Spesies -->
                             <div>
-                                <label for="jenis_ras" class="block text-sm font-medium text-gray-700 mb-1">
+                                <label for="ras" class="block text-sm font-medium text-gray-700 mb-1">
                                     Jenis Ras/Spesies Spesifik
                                 </label>
-                                <input type="text" id="jenis_ras" name="jenis_ras"
+                                <input type="text" id="ras" name="ras"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                     placeholder="Masukkan ras/spesies">
                             </div>
@@ -316,9 +316,9 @@ require_once '../../includes/db.php';
 
                             <!-- Berat -->
                             <div>
-                                <label for="berat" class="block text-sm font-medium text-gray-700 mb-1">Berat</label>
+                                <label for="berat_kg" class="block text-sm font-medium text-gray-700 mb-1">Berat</label>
                                 <div class="flex">
-                                    <input type="number" id="berat" name="berat" step="0.1" min="0"
+                                    <input type="number" id="berat_kg" name="berat_kg" step="0.1" min="0"
                                         class="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                         placeholder="0" pattern="[0-9]*\.?[0-9]*" inputmode="decimal"
                                         onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 46">
@@ -341,18 +341,18 @@ require_once '../../includes/db.php';
 
                             <!-- Riwayat Kesehatan -->
                             <div class="md:col-span-2">
-                                <label for="riwayat_kesehatan"
+                                <label for="riwayat_penyakit"
                                     class="block text-sm font-medium text-gray-700 mb-1">Riwayat Kesehatan</label>
-                                <textarea id="riwayat_kesehatan" name="riwayat_kesehatan" rows="3"
+                                <textarea id="riwayat_penyakit" name="riwayat_penyakit" rows="3"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                     placeholder="Contoh: vaksinasi, alergi, atau penyakit yang pernah dialami"></textarea>
                             </div>
 
                             <!-- Tanda atau Karakteristik -->
                             <div class="md:col-span-2">
-                                <label for="karakteristik" class="block text-sm font-medium text-gray-700 mb-1">Tanda
+                                <label for="ciri_khusus" class="block text-sm font-medium text-gray-700 mb-1">Tanda
                                     atau Karakteristik Unik Hewan Peliharaan</label>
-                                <textarea id="karakteristik" name="karakteristik" rows="3"
+                                <textarea id="ciri_khusus" name="ciri_khusus" rows="3"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                     placeholder="Contoh: bulu berwarna belang, tanda lahir, atau keunikan lainnya"></textarea>
                             </div>

@@ -15,7 +15,7 @@ if (isset($_GET['id'])) {
     $pelanggan_id = $_SESSION['id_pelanggan'];
 
     // Get anabul data with owner verification
-    $query = "SELECT * FROM anabul WHERE id_anabul = ? AND id_pelanggan = ?";
+    $query = "SELECT * FROM anabul WHERE id_anabul = ? AND id_pelanggan = ? AND status = 'aktif'";
     $stmt = $pdo->prepare($query);
     $stmt->execute([$anabul_id, $pelanggan_id]);
     $anabul = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -44,9 +44,9 @@ if (isset($_GET['id'])) {
                 <?php echo htmlspecialchars($anabul['nama_hewan']); ?>
             </h3>
             <p class="text-gray-600">
-                <?php echo htmlspecialchars($anabul['kategori_hewan']); ?>
-                <?php if (!empty($anabul['jenis_ras'])): ?>
-                    - <?php echo htmlspecialchars($anabul['jenis_ras']); ?>
+                <?php echo htmlspecialchars($anabul['spesies']); ?>
+                <?php if (!empty($anabul['ras'])): ?>
+                    - <?php echo htmlspecialchars($anabul['ras']); ?>
                 <?php endif; ?>
             </p>
         </div>
@@ -77,10 +77,10 @@ if (isset($_GET['id'])) {
                         </div>
                     <?php endif; ?>
 
-                    <?php if (!empty($anabul['berat'])): ?>
+                    <?php if (!empty($anabul['berat_kg'])): ?>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Berat:</span>
-                            <span class="font-medium"><?php echo htmlspecialchars($anabul['berat']); ?> kg</span>
+                            <span class="font-medium"><?php echo htmlspecialchars($anabul['berat_kg']); ?> kg</span>
                         </div>
                     <?php endif; ?>
 
@@ -102,26 +102,26 @@ if (isset($_GET['id'])) {
 
             <!-- Health & Characteristics -->
             <div class="space-y-3">
-                <?php if (!empty($anabul['riwayat_kesehatan'])): ?>
+                <?php if (!empty($anabul['riwayat_penyakit'])): ?>
                     <div class="bg-red-50 p-4 rounded-lg">
                         <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
                             <i class="fas fa-heartbeat text-red-500 mr-2"></i>
                             Riwayat Kesehatan
                         </h4>
                         <p class="text-sm text-gray-700 leading-relaxed">
-                            <?php echo nl2br(htmlspecialchars($anabul['riwayat_kesehatan'])); ?>
+                            <?php echo nl2br(htmlspecialchars($anabul['riwayat_penyakit'])); ?>
                         </p>
                     </div>
                 <?php endif; ?>
 
-                <?php if (!empty($anabul['karakteristik'])): ?>
+                <?php if (!empty($anabul['ciri_khusus'])): ?>
                     <div class="bg-yellow-50 p-4 rounded-lg">
                         <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
                             <i class="fas fa-star text-yellow-500 mr-2"></i>
                             Karakteristik Unik
                         </h4>
                         <p class="text-sm text-gray-700 leading-relaxed">
-                            <?php echo nl2br(htmlspecialchars($anabul['karakteristik'])); ?>
+                            <?php echo nl2br(htmlspecialchars($anabul['ciri_khusus'])); ?>
                         </p>
                     </div>
                 <?php endif; ?>

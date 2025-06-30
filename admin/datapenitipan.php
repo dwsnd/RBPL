@@ -126,6 +126,18 @@ if (!$result) {
         }
     }
 }
+
+function labelStatusPenitipan($status)
+{
+    $map = [
+        'pending' => ['label' => 'Pending', 'class' => 'bg-secondary'],
+        'checked_in' => ['label' => 'Check-in', 'class' => 'bg-info'],
+        'checked_out' => ['label' => 'Check-out', 'class' => 'bg-success'],
+        'dibatalkan' => ['label' => 'Dibatalkan', 'class' => 'bg-danger']
+    ];
+    $s = strtolower($status);
+    return $map[$s] ?? ['label' => ucfirst($status), 'class' => 'bg-secondary'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -344,63 +356,67 @@ if (!$result) {
 
         <div class="content-card">
             <div class="table-responsive">
-        <table id="penitipanTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>ID Penitipan</th>
-                    <th>Pelanggan</th>
-                    <th>Anabul</th>
-                    <th>Check-in</th>
-                    <th>Check-out</th>
-                    <th>Jumlah Hari</th>
-                    <th>Kandang</th>
-                    <th>Status Check-in</th>
-                    <th>Total Biaya</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result && $result->num_rows > 0) {
-                    $no = 1;
-                    while ($row = $result->fetch_assoc()):
-                ?>
-                    <tr>
-                        <td><?php echo $no++; ?></td>
-                        <td><?php echo htmlspecialchars($row['id_penitipan']); ?></td>
-                        <td><?php echo htmlspecialchars($row['nama_pelanggan']); ?></td>
-                        <td><?php echo htmlspecialchars($row['nama_hewan']); ?></td>
-                        <td><?php echo $row['tanggal_checkin'] ? date('d/m/Y', strtotime($row['tanggal_checkin'])) : '-'; ?></td>
-                        <td><?php echo $row['tanggal_checkout'] ? date('d/m/Y', strtotime($row['tanggal_checkout'])) : '-'; ?></td>
-                        <td><?php echo ($row['jumlah_hari'] ?? 0) . ' hari'; ?></td>
-                        <td><?php echo htmlspecialchars($row['nomor_kandang'] ?? '-'); ?></td>
-                        <td><?php echo htmlspecialchars($row['status_checkin'] ?? 'pending'); ?></td>
-                        <td>Rp <?php echo number_format($row['total_harga'] ?? 0, 0, ',', '.'); ?></td>
-                        <td>
-                            <span class="status-badge status-<?php echo strtolower($row['status_penitipan']); ?>">
-                                <?php echo ucfirst($row['status_penitipan']); ?>
-                            </span>
-                        </td>
-                        <td>
-                            <a href="ubah.php?type=penitipan&id=<?php echo $row['id_penitipan']; ?>" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a href="hapus.php?type=penitipan&id=<?php echo $row['id_penitipan']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                <?php 
-                    endwhile;
-                } else {
-                    echo "<tr><td colspan='12' class='text-center'>Tidak ada data penitipan</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
+                <table id="penitipanTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID Penitipan</th>
+                            <th>Pelanggan</th>
+                            <th>Anabul</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Jumlah Hari</th>
+                            <th>Kandang</th>
+                            <th>Total Biaya</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if ($result && $result->num_rows > 0) {
+                            $no = 1;
+                            while ($row = $result->fetch_assoc()):
+                                ?>
+                                <tr>
+                                    <td><?php echo $no++; ?></td>
+                                    <td><?php echo htmlspecialchars($row['id_penitipan']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['nama_pelanggan']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['nama_hewan']); ?></td>
+                                    <td><?php echo $row['tanggal_checkin'] ? date('d/m/Y', strtotime($row['tanggal_checkin'])) : '-'; ?>
+                                    </td>
+                                    <td><?php echo $row['tanggal_checkout'] ? date('d/m/Y', strtotime($row['tanggal_checkout'])) : '-'; ?>
+                                    </td>
+                                    <td><?php echo ($row['jumlah_hari'] ?? 0) . ' hari'; ?></td>
+                                    <td><?php echo htmlspecialchars($row['nomor_kandang'] ?? '-'); ?></td>
+                                    <td>Rp <?php echo number_format($row['total_harga'] ?? 0, 0, ',', '.'); ?></td>
+                                    <td>
+                                        <?php $statusInfo = labelStatusPenitipan($row['status_checkin'] ?? 'pending'); ?>
+                                        <span class="badge <?= $statusInfo['class'] ?>">
+                                            <?= $statusInfo['label'] ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="ubah.php?type=penitipan&id=<?php echo $row['id_penitipan']; ?>"
+                                            class="btn btn-warning btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="hapus.php?type=penitipan&id=<?php echo $row['id_penitipan']; ?>"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?php
+                            endwhile;
+                        } else {
+                            echo "<tr><td colspan='12' class='text-center'>Tidak ada data penitipan</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

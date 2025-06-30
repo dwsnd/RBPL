@@ -86,7 +86,7 @@ $result = $conn->query($query);
             margin-bottom: 30px;
             text-align: center;
         }
-        
+
         .main-content {
             margin-left: 250px;
             padding: 20px;
@@ -392,10 +392,6 @@ $result = $conn->query($query);
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="detail.php?type=dokter&id=<?php echo $row['id_dokter']; ?>"
-                                        class="btn btn-info btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
                                     <a href="ubah.php?type=dokter&id=<?php echo $row['id_dokter']; ?>"
                                         class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i>

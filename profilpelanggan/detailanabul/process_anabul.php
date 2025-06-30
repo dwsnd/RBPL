@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pelanggan_id = $_SESSION['id_pelanggan'];
 
         // Validate required fields
-        if (empty($_POST['nama_hewan']) || empty($_POST['kategori_hewan'])) {
-            throw new Exception('Nama hewan dan kategori hewan wajib diisi.');
+        if (empty($_POST['nama_hewan']) || empty($_POST['spesies'])) {
+            throw new Exception('Nama hewan dan spesies hewan wajib diisi.');
         }
 
         // Validate and process multiple file uploads
@@ -126,14 +126,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = [
             'id_pelanggan' => $pelanggan_id,
             'nama_hewan' => trim($_POST['nama_hewan']),
-            'kategori_hewan' => $_POST['kategori_hewan'],
-            'jenis_ras' => !empty($_POST['jenis_ras']) ? trim($_POST['jenis_ras']) : null,
+            'spesies' => $_POST['spesies'],
+            'ras' => !empty($_POST['ras']) ? trim($_POST['ras']) : null,
             'umur_tahun' => !empty($_POST['umur_tahun']) ? (int) $_POST['umur_tahun'] : null,
             'umur_bulan' => !empty($_POST['umur_bulan']) ? (int) $_POST['umur_bulan'] : null,
-            'berat' => !empty($_POST['berat']) ? (float) $_POST['berat'] : null,
+            'berat_kg' => !empty($_POST['berat_kg']) ? (float) $_POST['berat_kg'] : null,
             'jenis_kelamin' => !empty($_POST['jenis_kelamin']) ? $_POST['jenis_kelamin'] : null,
-            'riwayat_kesehatan' => !empty($_POST['riwayat_kesehatan']) ? trim($_POST['riwayat_kesehatan']) : null,
-            'karakteristik' => !empty($_POST['karakteristik']) ? trim($_POST['karakteristik']) : null,
+            'riwayat_penyakit' => !empty($_POST['riwayat_penyakit']) ? trim($_POST['riwayat_penyakit']) : null,
+            'ciri_khusus' => !empty($_POST['ciri_khusus']) ? trim($_POST['ciri_khusus']) : null,
             'foto_utama' => $uploaded_files[0] // Set first image as main photo
         ];
 
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Validate weight
-        if (!empty($data['berat']) && ($data['berat'] < 0 || $data['berat'] > 200)) {
+        if (!empty($data['berat_kg']) && ($data['berat_kg'] < 0 || $data['berat_kg'] > 200)) {
             throw new Exception('Berat hewan tidak valid.');
         }
 
@@ -159,26 +159,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql = "INSERT INTO anabul (
                 id_pelanggan, 
                 nama_hewan, 
-                kategori_hewan, 
-                jenis_ras, 
+                spesies, 
+                ras, 
                 umur_tahun, 
                 umur_bulan, 
-                berat, 
+                berat_kg, 
                 jenis_kelamin, 
-                riwayat_kesehatan, 
-                karakteristik, 
+                riwayat_penyakit, 
+                ciri_khusus, 
                 foto_utama
             ) VALUES (
                 :id_pelanggan, 
                 :nama_hewan, 
-                :kategori_hewan, 
-                :jenis_ras, 
+                :spesies, 
+                :ras, 
                 :umur_tahun, 
                 :umur_bulan, 
-                :berat, 
+                :berat_kg, 
                 :jenis_kelamin, 
-                :riwayat_kesehatan, 
-                :karakteristik, 
+                :riwayat_penyakit, 
+                :ciri_khusus, 
                 :foto_utama
             )";
 
@@ -186,14 +186,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([
                 ':id_pelanggan' => $data['id_pelanggan'],
                 ':nama_hewan' => $data['nama_hewan'],
-                ':kategori_hewan' => $data['kategori_hewan'],
-                ':jenis_ras' => $data['jenis_ras'],
+                ':spesies' => $data['spesies'],
+                ':ras' => $data['ras'],
                 ':umur_tahun' => $data['umur_tahun'],
                 ':umur_bulan' => $data['umur_bulan'],
-                ':berat' => $data['berat'],
+                ':berat_kg' => $data['berat_kg'],
                 ':jenis_kelamin' => $data['jenis_kelamin'],
-                ':riwayat_kesehatan' => $data['riwayat_kesehatan'],
-                ':karakteristik' => $data['karakteristik'],
+                ':riwayat_penyakit' => $data['riwayat_penyakit'],
+                ':ciri_khusus' => $data['ciri_khusus'],
                 ':foto_utama' => $data['foto_utama']
             ]);
 
@@ -216,7 +216,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->commit();
 
             // Set success message
-            $_SESSION['success_message'] = "Data hewan peliharaan '{$data['nama_hewan']}' berhasil ditambahkan dengan " . count($uploaded_files) . " foto.";
+            $_SESSION['notification'] = [
+                'type' => 'success',
+                'message' => "Data hewan peliharaan '{$data['nama_hewan']}' berhasil ditambahkan dengan " . count($uploaded_files) . " foto."
+            ];
 
             // Log success activity (optional)
             error_log("Anabul added successfully: ID {$anabul_id}, User: {$pelanggan_id}, Files: " . implode(', ', $uploaded_files));
@@ -265,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /*
 function compressImage($source, $destination, $quality) {
     $info = getimagesize($source);
-    
+
     if ($info['mime'] == 'image/jpeg') {
         $image = imagecreatefromjpeg($source);
     } elseif ($info['mime'] == 'image/png') {
@@ -273,7 +276,7 @@ function compressImage($source, $destination, $quality) {
     } else {
         return false;
     }
-    
+
     // Save compressed image
     if ($info['mime'] == 'image/jpeg') {
         imagejpeg($image, $destination, $quality);
@@ -286,7 +289,7 @@ function compressImage($source, $destination, $quality) {
         imagejpeg($bg, $destination, $quality);
         imagedestroy($bg);
     }
-    
+
     imagedestroy($image);
     return true;
 }

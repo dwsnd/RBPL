@@ -1,76 +1,58 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 require_once '../../includes/db.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['id_pelanggan'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+    echo json_encode(['success' => false, 'message' => 'User tidak terautentikasi']);
     exit();
 }
 
-// Check if request method is POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-    exit();
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id_konsultasi = $_POST['id_konsultasi'] ?? null;
 
-// Get booking ID
-$id_konsultasi = isset($_POST['id_konsultasi']) ? intval($_POST['id_konsultasi']) : 0;
-
-if ($id_konsultasi <= 0) {
-    echo json_encode(['success' => false, 'message' => 'Invalid booking ID']);
-    exit();
-}
-
-// Start transaction
-mysqli_begin_transaction($conn);
-
-try {
-    // Get booking details
-    $query = "SELECT * FROM konsultasi WHERE id_konsultasi = '$id_konsultasi' AND id_pelanggan = '{$_SESSION['id_pelanggan']}'";
-    $result = mysqli_query($conn, $query);
-
-    if (!$result || mysqli_num_rows($result) === 0) {
-        throw new Exception('Booking not found or unauthorized');
+    if (!$id_konsultasi) {
+        echo json_encode(['success' => false, 'message' => 'ID konsultasi tidak valid']);
+        exit();
     }
 
-    $booking = mysqli_fetch_assoc($result);
+    try {
+        // Get konsultasi data to verify ownership
+        $query = "SELECT k.*, p.id_pelanggan 
+                  FROM konsultasi k 
+                  JOIN pesanan p ON k.id_pesanan = p.id_pesanan 
+                  WHERE k.id_konsultasi = ? AND p.id_pelanggan = ?";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$id_konsultasi, $_SESSION['id_pelanggan']]);
+        $konsultasi = $stmt->fetch();
 
-    // Check if booking can be cancelled
-    if ($booking['status_konsultasi'] !== 'pending') {
-        throw new Exception('Only pending bookings can be cancelled');
+        if (!$konsultasi) {
+            echo json_encode(['success' => false, 'message' => 'Konsultasi tidak ditemukan atau tidak memiliki akses']);
+            exit();
+        }
+
+        // Check if konsultasi can be cancelled
+        if ($konsultasi['status_konsultasi'] !== 'pending') {
+            echo json_encode(['success' => false, 'message' => 'Konsultasi tidak dapat dibatalkan']);
+            exit();
+        }
+
+        // Update konsultasi status
+        $update_query = "UPDATE konsultasi SET status_konsultasi = 'cancelled' WHERE id_konsultasi = ?";
+        $stmt = $pdo->prepare($update_query);
+        $stmt->execute([$id_konsultasi]);
+
+        // Update pesanan status
+        $update_pesanan = "UPDATE pesanan SET status_pesanan = 'cancelled' WHERE id_pesanan = ?";
+        $stmt = $pdo->prepare($update_pesanan);
+        $stmt->execute([$konsultasi['id_pesanan']]);
+
+        echo json_encode(['success' => true, 'message' => 'Konsultasi berhasil dibatalkan']);
+
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
     }
-
-    // Update booking status
-    $update_query = "UPDATE konsultasi SET status_konsultasi = 'cancelled' WHERE id_konsultasi = '$id_konsultasi'";
-    if (!mysqli_query($conn, $update_query)) {
-        throw new Exception('Failed to update booking status');
-    }
-
-    // Update schedule slot
-    $update_slot = "UPDATE jadwal_konsultasi 
-                   SET slot_terpakai = slot_terpakai - 1,
-                       status_jadwal = CASE 
-                           WHEN slot_terpakai - 1 < slot_tersedia THEN 'tersedia'
-                           ELSE status_jadwal
-                       END
-                   WHERE id_dokter = '{$booking['id_dokter']}' 
-                   AND tanggal = '{$booking['tanggal_konsultasi']}' 
-                   AND waktu_mulai = '{$booking['waktu_konsultasi']}'";
-    if (!mysqli_query($conn, $update_slot)) {
-        throw new Exception('Failed to update schedule slot');
-    }
-
-    // Commit transaction
-    mysqli_commit($conn);
-
-    echo json_encode(['success' => true, 'message' => 'Booking cancelled successfully']);
-
-} catch (Exception $e) {
-    // Rollback transaction
-    mysqli_rollback($conn);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Method tidak valid']);
 }
 ?>

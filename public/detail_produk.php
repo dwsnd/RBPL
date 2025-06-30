@@ -1,5 +1,7 @@
 <?php
+session_start();
 require_once '../includes/db.php';
+
 
 // Ngambil product_id dari url parameter
 $product_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;

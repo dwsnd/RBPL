@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         // Validasi ID anabul yang dipilih milik user yang login
-        $check_pet = "SELECT id_anabul FROM anabul WHERE id_anabul = '$id_anabul_existing' AND id_pelanggan = '$id_pelanggan'";
+        $check_pet = "SELECT id_anabul FROM anabul WHERE id_anabul = '$id_anabul_existing' AND id_pelanggan = '$id_pelanggan' AND status = 'aktif'";
         $check_result = mysqli_query($conn, $check_pet);
         if (!$check_result || mysqli_num_rows($check_result) == 0) {
             $errors[] = 'Data hewan peliharaan tidak valid';

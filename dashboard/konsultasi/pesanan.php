@@ -22,12 +22,13 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 // Fetch booking history
 $bookings = [];
-$booking_query = "SELECT k.*, d.nama_dokter, d.spesialisasi, a.nama_hewan, a.kategori_hewan
+$booking_query = "SELECT k.*, d.nama_dokter, d.spesialisasi, a.nama_hewan, a.spesies, p.nomor_pesanan
                   FROM konsultasi k
                   JOIN dokter_hewan d ON k.id_dokter = d.id_dokter
                   JOIN anabul a ON k.id_anabul = a.id_anabul
-                  WHERE k.id_pelanggan = '$id_pelanggan'
-                  ORDER BY k.tanggal_konsultasi DESC, k.waktu_konsultasi DESC";
+                  JOIN pesanan p ON k.id_pesanan = p.id_pesanan
+                  WHERE p.id_pelanggan = '$id_pelanggan'
+                  ORDER BY k.tanggal_kontrol DESC";
 $booking_result = mysqli_query($conn, $booking_query);
 if ($booking_result && mysqli_num_rows($booking_result) > 0) {
     while ($row = mysqli_fetch_assoc($booking_result)) {
@@ -65,7 +66,7 @@ function formatStatus($status)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Riwayat Konsultasi - Ling-Ling Pet Shop</title>
+    <title>Ling-Ling Pet Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -156,8 +157,7 @@ function formatStatus($status)
                                                 Konsultasi #<?php echo $booking['id_konsultasi']; ?>
                                             </h3>
                                             <p class="text-sm text-gray-500">
-                                                <?php echo date('d M Y', strtotime($booking['tanggal_konsultasi'])); ?>
-                                                <?php echo date('H:i', strtotime($booking['waktu_konsultasi'])); ?>
+                                                <?php echo date('d M Y', strtotime($booking['tanggal_kontrol'])); ?>
                                             </p>
                                         </div>
                                         <?php echo formatStatus($booking['status_konsultasi']); ?>
@@ -172,7 +172,7 @@ function formatStatus($status)
                                                     <?php echo htmlspecialchars($booking['nama_hewan']); ?>
                                                 </h4>
                                                 <p class="text-sm text-gray-600">
-                                                    <?php echo htmlspecialchars($booking['kategori_hewan']); ?>
+                                                    <?php echo htmlspecialchars($booking['spesies']); ?>
                                                 </p>
                                             </div>
                                         </div>
@@ -195,18 +195,14 @@ function formatStatus($status)
 
                                     <!-- Symptoms -->
                                     <div class="mb-4">
-                                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Gejala Utama:</h4>
+                                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Keluhan Utama:</h4>
                                         <div class="symptoms text-sm text-gray-600">
-                                            <?php echo nl2br(htmlspecialchars($booking['gejala_utama'])); ?>
+                                            <?php echo nl2br(htmlspecialchars($booking['keluhan_utama'])); ?>
                                         </div>
                                     </div>
 
                                     <!-- Footer -->
                                     <div class="flex justify-between items-center pt-4 border-t">
-                                        <div class="text-sm text-gray-600">
-                                            <i class="fas fa-money-bill-wave me-1"></i>
-                                            Rp <?php echo number_format($booking['biaya_estimasi'], 0, ',', '.'); ?>
-                                        </div>
                                         <?php if ($booking['status_konsultasi'] === 'pending'): ?>
                                             <button class="btn btn-sm btn-danger"
                                                 onclick="cancelBooking(<?php echo $booking['id_konsultasi']; ?>)">

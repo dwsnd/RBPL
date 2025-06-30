@@ -26,9 +26,9 @@
                         <div class="text-sm text-gray-600 space-y-1">
                             <p>
                                 <i class="fas fa-tag text-orange-500 w-4"></i>
-                                <?php echo htmlspecialchars($anabul['kategori_hewan']); ?>
-                                <?php if (!empty($anabul['jenis_ras'])): ?>
-                                    - <?php echo htmlspecialchars($anabul['jenis_ras']); ?>
+                                <?php echo htmlspecialchars($anabul['spesies']); ?>
+                                <?php if (!empty($anabul['ras'])): ?>
+                                    - <?php echo htmlspecialchars($anabul['ras']); ?>
                                 <?php endif; ?>
                             </p>
                             <?php if (!empty($anabul['umur_tahun']) || !empty($anabul['umur_bulan'])): ?>
@@ -46,10 +46,10 @@
                                     ?>
                                 </p>
                             <?php endif; ?>
-                            <?php if (!empty($anabul['berat'])): ?>
+                            <?php if (!empty($anabul['berat_kg'])): ?>
                                 <p>
                                     <i class="fas fa-weight text-orange-500 w-4"></i>
-                                    <?php echo htmlspecialchars($anabul['berat']); ?> kg
+                                    <?php echo htmlspecialchars($anabul['berat_kg']); ?> kg
                                 </p>
                             <?php endif; ?>
                             <?php if (!empty($anabul['jenis_kelamin'])): ?>
@@ -81,29 +81,29 @@
             </div>
 
             <!-- Additional Info (Collapsible) -->
-            <?php if (!empty($anabul['riwayat_kesehatan']) || !empty($anabul['karakteristik'])): ?>
+            <?php if (!empty($anabul['riwayat_penyakit']) || !empty($anabul['ciri_khusus'])): ?>
                 <div class="mt-4 pt-4 border-t border-gray-100">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <?php if (!empty($anabul['riwayat_kesehatan'])): ?>
+                        <?php if (!empty($anabul['riwayat_penyakit'])): ?>
                             <div>
                                 <h5 class="font-medium text-gray-700 mb-2 text-base">
                                     <i class="fas fa-heartbeat text-red-500 mr-2"></i>
                                     Riwayat Kesehatan
                                 </h5>
                                 <p class="text-gray-600 text-sm leading-relaxed">
-                                    <?php echo nl2br(htmlspecialchars($anabul['riwayat_kesehatan'])); ?>
+                                    <?php echo nl2br(htmlspecialchars($anabul['riwayat_penyakit'])); ?>
                                 </p>
                             </div>
                         <?php endif; ?>
 
-                        <?php if (!empty($anabul['karakteristik'])): ?>
+                        <?php if (!empty($anabul['ciri_khusus'])): ?>
                             <div>
                                 <h5 class="font-medium text-gray-700 mb-2 text-base">
                                     <i class="fas fa-star text-yellow-500 mr-2"></i>
                                     Karakteristik Unik
                                 </h5>
                                 <p class="text-gray-600 text-sm leading-relaxed">
-                                    <?php echo nl2br(htmlspecialchars($anabul['karakteristik'])); ?>
+                                    <?php echo nl2br(htmlspecialchars($anabul['ciri_khusus'])); ?>
                                 </p>
                             </div>
                         <?php endif; ?>

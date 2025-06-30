@@ -8,7 +8,7 @@ $customers = query("SELECT * FROM pelanggan WHERE status = 'aktif'");
     <div class="col-sm-3 text-start">Foto</div>
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
-        <input type="file" class="form-control" name="foto" style="background-color: #e0e0e0;" required>
+        <input type="file" class="form-control" name="foto" style="background-color: #e0e0e0;">
     </div>
 </div>
 
@@ -72,7 +72,7 @@ $customers = query("SELECT * FROM pelanggan WHERE status = 'aktif'");
             <option value="">-- Pilih Pemilik --</option>
             <?php foreach ($customers as $customer): ?>
                 <option value="<?= $customer['id_pelanggan'] ?>">
-                    <?= $customer['nama'] ?> - <?= $customer['nomor_telepon'] ?>
+                    <?= $customer['nama_lengkap'] ?> - <?= $customer['nomor_telepon'] ?>
                 </option>
             <?php endforeach; ?>
         </select>

@@ -3,7 +3,56 @@ session_start();
 
 require '../includes/db.php';
 
-// Checking
+// Fungsi untuk generate token yang aman
+function generateRememberToken()
+{
+    return bin2hex(random_bytes(32));
+}
+
+// Fungsi untuk set cookie remember me
+function setRememberMeCookie($email, $token)
+{
+    $expires = time() + (12 * 60 * 60); // 12 jam
+    setcookie('remember_email', $email, $expires, '/', '', true, true); // secure dan httponly
+    setcookie('remember_token', $token, $expires, '/', '', true, true);
+}
+
+// Fungsi untuk clear cookie remember me
+function clearRememberMeCookie()
+{
+    setcookie('remember_email', '', time() - 3600, '/');
+    setcookie('remember_token', '', time() - 3600, '/');
+}
+
+// Auto-login berdasarkan cookie (jika user belum login)
+if (!isset($_SESSION['id_pelanggan']) && isset($_COOKIE['remember_email']) && isset($_COOKIE['remember_token'])) {
+    $remember_email = $_COOKIE['remember_email'];
+    $remember_token = $_COOKIE['remember_token'];
+
+    // Cek apakah token valid di database
+    $query = "SELECT * FROM pelanggan WHERE email = ? AND remember_token = ?";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$remember_email, $remember_token]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        // Auto-login berhasil
+        $_SESSION['logged_in'] = true;
+        $_SESSION['id_pelanggan'] = $result['id_pelanggan'];
+        $_SESSION['nama'] = $result['nama_lengkap'];
+        $_SESSION['email'] = $result['email'];
+        $_SESSION['foto_profil'] = $result['foto_profil'];
+
+        // Redirect ke dashboard
+        header("Location: ../dashboard/index_pelanggan.php");
+        exit();
+    } else {
+        // Token tidak valid, hapus cookie
+        clearRememberMeCookie();
+    }
+}
+
+// Checking login form
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email_or_phone = $_POST['email'];
     $password = $_POST['password'];
@@ -24,9 +73,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['id_pelanggan'] = $result['id_pelanggan'];
                 $_SESSION['nama'] = $result['nama_lengkap'];
                 $_SESSION['email'] = $result['email'];
+                $_SESSION['foto_profil'] = $result['foto_profil'];
 
+                // Handle remember me
                 if ($remember) {
-                    setcookie('email', $result['email'], time() + (86400), "/"); // 1 day
+                    $token = generateRememberToken();
+
+                    // Update token di database
+                    $update_query = "UPDATE pelanggan SET remember_token = ? WHERE id_pelanggan = ?";
+                    $update_stmt = $pdo->prepare($update_query);
+                    $update_stmt->execute([$token, $result['id_pelanggan']]);
+
+                    // Set cookie
+                    setRememberMeCookie($result['email'], $token);
+                } else {
+                    // Hapus token lama jika ada
+                    $update_query = "UPDATE pelanggan SET remember_token = NULL WHERE id_pelanggan = ?";
+                    $update_stmt = $pdo->prepare($update_query);
+                    $update_stmt->execute([$result['id_pelanggan']]);
+
+                    // Clear cookie
+                    clearRememberMeCookie();
                 }
 
                 header("Location: ../dashboard/index_pelanggan.php");
@@ -217,6 +284,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 `;
             }
         }
+
+        // Auto-fill email dan centang checkbox jika ada cookie remember me
+        document.addEventListener('DOMContentLoaded', function () {
+            const emailInput = document.getElementById('email');
+            const rememberCheckbox = document.getElementById('remember');
+
+            // Cek apakah ada cookie remember me
+            const hasRememberCookie = document.cookie.includes('remember_email=');
+
+            if (hasRememberCookie) {
+                // Ambil email dari cookie
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [name, value] = cookie.trim().split('=');
+                    if (name === 'remember_email') {
+                        emailInput.value = decodeURIComponent(value);
+                        rememberCheckbox.checked = true;
+                        break;
+                    }
+                }
+            }
+        });
     </script>
 </body>
 

@@ -1,3 +1,15 @@
+<?php
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if user is logged in - MUST be before any HTML output
+if (!isset($_SESSION['id_pelanggan'])) {
+    header("Location:../../auth/login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,17 +66,6 @@
     <?php require '../../includes/header.php'; ?>
 
     <?php
-    // Start session if not already started
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-
-    // Check if user is logged in
-    if (!isset($_SESSION['id_pelanggan'])) {
-        header("Location:../../auth/login.php");
-        exit();
-    }
-
     // Database connection
     require_once '../../includes/db.php';
 

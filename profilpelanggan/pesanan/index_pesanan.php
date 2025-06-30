@@ -28,7 +28,7 @@ $pelanggan = $stmt->fetch(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ling-Ling Pet Shop - Riwayat Pesanan</title>
+    <title>Ling-Ling Pet Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -272,11 +272,10 @@ $pelanggan = $stmt->fetch(PDO::FETCH_ASSOC);
         <div class="flex-1 px-6 pb-4 max-w-6xl mx-auto">
             <div class="w-full bg-white rounded-lg shadow-md p-6 border border-grey-100">
                 <div class="mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">
-                        <i class="fas fa-history text-orange-500 mr-2"></i>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">
                         Riwayat Pesanan
                     </h2>
-                    <p class="text-gray-600">Lihat semua riwayat pesanan dan layanan Anda</p>
+                    <p class="text-gray-600 text-base">Lihat semua riwayat pesanan dan layanan Anda</p>
                 </div>
 
                 <!-- Tab Navigation -->
@@ -312,6 +311,24 @@ $pelanggan = $stmt->fetch(PDO::FETCH_ASSOC);
 
     <!-- Add popup notification div -->
     <div id="popupNotification" class="popup-notification"></div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="customConfirmModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-[1000] hidden">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md mx-auto">
+            <div class="text-xl font-bold text-gray-900 mb-4 text-center" id="confirmMessage"></div>
+            <div class="flex justify-end space-x-3">
+                <button id="confirmCancelBtn"
+                    class="px-6 py-2 border border-gray-200 text-gray-700 rounded-full hover:bg-gray-100 transition-colors text-sm">
+                    Batal
+                </button>
+                <button id="confirmOKBtn"
+                    class="px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors text-sm">
+                    Ya, Sudah Bayar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Function to show popup notification
@@ -398,346 +415,110 @@ $pelanggan = $stmt->fetch(PDO::FETCH_ASSOC);
                     console.log('No notification to show');
                 });
         });
+
+        // Fungsi untuk salin hanya nomor rekening/ewallet
+        function copyInputValue(inputId) {
+            var input = document.getElementById(inputId);
+            var value = input.value;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(value).then(function () {
+                    if (typeof showPopup === 'function') showPopup('Nomor berhasil disalin!', 'success');
+                }).catch(function (err) {
+                    // Fallback jika gagal
+                    fallbackCopy(value);
+                    if (typeof showPopup === 'function') showPopup('Gagal menyalin dengan clipboard API, mencoba fallback.', 'error');
+                    console.log('Clipboard API error:', err);
+                });
+            } else {
+                fallbackCopy(value);
+            }
+        }
+        function fallbackCopy(value) {
+            try {
+                var tempInput = document.createElement('input');
+                tempInput.value = value;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                tempInput.setSelectionRange(0, 99999);
+                var success = document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                if (success) {
+                    if (typeof showPopup === 'function') showPopup('Nomor berhasil disalin!', 'success');
+                } else {
+                    alert('Gagal menyalin nomor. Silakan salin manual.');
+                }
+            } catch (e) {
+                alert('Gagal menyalin nomor. Silakan salin manual.');
+                console.log('Fallback copy error:', e);
+            }
+        }
+        function sudahBayarNotif() {
+            if (typeof showPopup === 'function') {
+                showPopup('Terima kasih, pembayaran Anda akan segera diverifikasi.', 'success');
+            } else {
+                alert('Terima kasih, pembayaran Anda akan segera diverifikasi.');
+            }
+        }
+        function showCustomConfirm(message, callback) {
+            const modal = document.getElementById('customConfirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const confirmOKBtn = document.getElementById('confirmOKBtn');
+            const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+
+            messageEl.textContent = message;
+            modal.classList.remove('hidden');
+
+            const handleConfirm = () => {
+                callback(true);
+                modal.classList.add('hidden');
+                confirmOKBtn.removeEventListener('click', handleConfirm);
+                confirmCancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            const handleCancel = () => {
+                callback(false);
+                modal.classList.add('hidden');
+                confirmOKBtn.removeEventListener('click', handleConfirm);
+                confirmCancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            confirmOKBtn.addEventListener('click', handleConfirm);
+            confirmCancelBtn.addEventListener('click', handleCancel);
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    handleCancel();
+                }
+            });
+        }
+        function sudahBayarAjax(id_pesanan, btn) {
+            showCustomConfirm('Apakah Anda yakin sudah melakukan pembayaran?', function (result) {
+                if (!result) return;
+                btn.disabled = true;
+                fetch('update_status_pembayaran.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `id_pesanan=${id_pesanan}`
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (typeof showPopup === 'function') showPopup('Status pembayaran berhasil diupdate. Menunggu konfirmasi admin.', 'success');
+                            setTimeout(function () { window.location.reload(); }, 1200);
+                        } else {
+                            btn.disabled = false;
+                            if (typeof showPopup === 'function') showPopup('Gagal update status pembayaran!', 'error');
+                        }
+                    })
+                    .catch((err) => {
+                        btn.disabled = false;
+                        if (typeof showPopup === 'function') showPopup('Gagal update status pembayaran!', 'error');
+                    });
+            });
+        }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
-
-<?php
-// ================================================================
-// File: profilpelanggan/pesanan/pesanan_produk.php
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Check if user is logged in
-if (!isset($_SESSION['id_pelanggan'])) {
-    header("Location:../../auth/login.php");
-    exit();
-}
-
-// Database connection
-require_once '../../includes/db.php';
-
-$pelanggan_id = $_SESSION['id_pelanggan'];
-
-// Query untuk mengambil pesanan produk
-$query = "SELECT p.*, pr.nama_produk, pr.harga, pr.gambar 
-          FROM pemesanan p 
-          LEFT JOIN produk pr ON p.id_produk = pr.id_produk 
-          WHERE p.id_pelanggan = ? AND p.jenis_pesanan = 'produk' 
-          ORDER BY p.tanggal_pesan DESC";
-$stmt = $pdo->prepare($query);
-$stmt->execute([$pelanggan_id]);
-$pesanan_produk = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-<div class="pesanan-content">
-    <?php if (empty($pesanan_produk)): ?>
-        <div class="no-data">
-            <i class="fas fa-shopping-bag"></i>
-            <div class="mb-3">
-                <strong>Belum ada pesanan produk</strong>
-            </div>
-            <p class="mb-4">Pesanan produk Anda akan tampil di sini setelah melakukan pembelian</p>
-            <a href="../../produk/" class="btn btn-primary-custom">
-                <i class="fas fa-shopping-cart mr-2"></i>
-                Belanja Sekarang
-            </a>
-        </div>
-    <?php else: ?>
-        <?php foreach ($pesanan_produk as $pesanan): ?>
-            <div class="pesanan-item">
-                <div class="pesanan-header">
-                    <span class="pesanan-id">
-                        <i class="fas fa-receipt mr-2"></i>
-                        #<?= htmlspecialchars($pesanan['id_pemesanan'] ?? 'PRD' . str_pad($pesanan['id_pemesanan'], 3, '0', STR_PAD_LEFT)) ?>
-                    </span>
-                    <span class="pesanan-status status-<?= strtolower($pesanan['status'] ?? 'pending') ?>">
-                        <?= ucfirst($pesanan['status'] ?? 'Pending') ?>
-                    </span>
-                </div>
-                <div class="pesanan-detail">
-                    <div class="row">
-                        <div class="col-md-2">
-                            <?php if (!empty($pesanan['gambar'])): ?>
-                                <img src="../../assets/images/products/<?= htmlspecialchars($pesanan['gambar']) ?>"
-                                    alt="<?= htmlspecialchars($pesanan['nama_produk']) ?>" class="img-fluid rounded"
-                                    style="max-height: 60px;">
-                            <?php else: ?>
-                                <div class="bg-light rounded d-flex align-items-center justify-content-center"
-                                    style="height: 60px; width: 60px;">
-                                    <i class="fas fa-image text-muted"></i>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="col-md-10">
-                            <strong><?= htmlspecialchars($pesanan['nama_produk'] ?? 'Produk') ?></strong><br>
-                            <small class="text-muted">
-                                <i class="fas fa-calendar mr-1"></i>
-                                <?= date('d/m/Y H:i', strtotime($pesanan['tanggal_pesan'])) ?>
-                            </small><br>
-                            <small class="text-muted">
-                                <i class="fas fa-sort-numeric-up mr-1"></i>
-                                Jumlah: <?= number_format($pesanan['jumlah'] ?? 1) ?> item
-                            </small><br>
-                            <div class="mt-2">
-                                <span class="badge bg-success">
-                                    <i class="fas fa-money-bill-wave mr-1"></i>
-                                    Rp <?= number_format($pesanan['total_harga'] ?? $pesanan['harga'] ?? 0, 0, ',', '.') ?>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
-
-<?php
-// ================================================================
-// File: profilpelanggan/pesanan/pesanan_perawatan.php
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Check if user is logged in
-if (!isset($_SESSION['id_pelanggan'])) {
-    header("Location:../../auth/login.php");
-    exit();
-}
-
-// Database connection
-require_once '../../includes/db.php';
-
-$pelanggan_id = $_SESSION['id_pelanggan'];
-
-// Query untuk mengambil pesanan perawatan/grooming
-$query = "SELECT p.*, l.nama_layanan, l.harga_layanan, a.nama_anabul 
-          FROM pemesanan p 
-          LEFT JOIN layanan l ON p.id_layanan = l.id_layanan 
-          LEFT JOIN anabul a ON p.id_anabul = a.id_anabul
-          WHERE p.id_pelanggan = ? AND p.jenis_pesanan = 'perawatan' 
-          ORDER BY p.tanggal_pesan DESC";
-$stmt = $pdo->prepare($query);
-$stmt->execute([$pelanggan_id]);
-$pesanan_perawatan = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-<div class="pesanan-content">
-    <?php if (empty($pesanan_perawatan)): ?>
-        <div class="no-data">
-            <i class="fas fa-cut"></i>
-            <div class="mb-3">
-                <strong>Belum ada jadwal grooming di riwayat</strong>
-            </div>
-            <p class="mb-4">Yuk, berikan perawatan terbaik agar si imut tampil kece dan sehat—pesan layanan grooming
-                sekarang!</p>
-            <a href="../../perawatan/" class="btn btn-primary-custom">
-                <i class="fas fa-scissors mr-2"></i>
-                Saatnya Perawatan
-            </a>
-        </div>
-    <?php else: ?>
-        <?php foreach ($pesanan_perawatan as $pesanan): ?>
-            <div class="pesanan-item">
-                <div class="pesanan-header">
-                    <span class="pesanan-id">
-                        <i class="fas fa-spa mr-2"></i>
-                        #<?= htmlspecialchars($pesanan['id_pemesanan'] ?? 'PRW' . str_pad($pesanan['id_pemesanan'], 3, '0', STR_PAD_LEFT)) ?>
-                    </span>
-                    <span class="pesanan-status status-<?= strtolower($pesanan['status'] ?? 'pending') ?>">
-                        <?= ucfirst($pesanan['status'] ?? 'Pending') ?>
-                    </span>
-                </div>
-                <div class="pesanan-detail">
-                    <strong><?= htmlspecialchars($pesanan['nama_layanan'] ?? 'Layanan Perawatan') ?></strong><br>
-                    <small class="text-muted">
-                        <i class="fas fa-paw mr-1"></i>
-                        Hewan: <?= htmlspecialchars($pesanan['nama_anabul'] ?? 'Tidak diketahui') ?>
-                    </small><br>
-                    <small class="text-muted">
-                        <i class="fas fa-calendar mr-1"></i>
-                        Tanggal: <?= date('d/m/Y', strtotime($pesanan['tanggal_layanan'] ?? $pesanan['tanggal_pesan'])) ?>
-                    </small><br>
-                    <small class="text-muted">
-                        <i class="fas fa-clock mr-1"></i>
-                        Waktu: <?= date('H:i', strtotime($pesanan['waktu_layanan'] ?? $pesanan['tanggal_pesan'])) ?>
-                    </small><br>
-                    <div class="mt-2">
-                        <span class="badge bg-success">
-                            <i class="fas fa-money-bill-wave mr-1"></i>
-                            Rp <?= number_format($pesanan['total_harga'] ?? $pesanan['harga_layanan'] ?? 0, 0, ',', '.') ?>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
-
-<?php
-// ================================================================
-// File: profilpelanggan/pesanan/pesanan_penitipan.php
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Check if user is logged in
-if (!isset($_SESSION['id_pelanggan'])) {
-    header("Location:../../auth/login.php");
-    exit();
-}
-
-// Database connection
-require_once '../../includes/db.php';
-
-$pelanggan_id = $_SESSION['id_pelanggan'];
-
-// Query untuk mengambil pesanan penitipan
-$query = "SELECT p.*, a.nama_anabul 
-          FROM pemesanan p 
-          LEFT JOIN anabul a ON p.id_anabul = a.id_anabul
-          WHERE p.id_pelanggan = ? AND p.jenis_pesanan = 'penitipan' 
-          ORDER BY p.tanggal_pesan DESC";
-$stmt = $pdo->prepare($query);
-$stmt->execute([$pelanggan_id]);
-$pesanan_penitipan = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-<div class="pesanan-content">
-    <?php if (empty($pesanan_penitipan)): ?>
-        <div class="no-data">
-            <i class="fas fa-home"></i>
-            <div class="mb-3">
-                <strong>Belum ada riwayat penitipan</strong>
-            </div>
-            <p class="mb-4">Riwayat penitipan hewan Anda akan tampil di sini</p>
-            <a href="../../penitipan/" class="btn btn-primary-custom">
-                <i class="fas fa-home mr-2"></i>
-                Pesan Penitipan
-            </a>
-        </div>
-    <?php else: ?>
-        <?php foreach ($pesanan_penitipan as $pesanan): ?>
-            <div class="pesanan-item">
-                <div class="pesanan-header">
-                    <span class="pesanan-id">
-                        <i class="fas fa-bed mr-2"></i>
-                        #<?= htmlspecialchars($pesanan['id_pemesanan'] ?? 'PNT' . str_pad($pesanan['id_pemesanan'], 3, '0', STR_PAD_LEFT)) ?>
-                    </span>
-                    <span class="pesanan-status status-<?= strtolower($pesanan['status'] ?? 'pending') ?>">
-                        <?= ucfirst($pesanan['status'] ?? 'Pending') ?>
-                    </span>
-                </div>
-                <div class="pesanan-detail">
-                    <strong>Penitipan Hewan</strong><br>
-                    <small class="text-muted">
-                        <i class="fas fa-paw mr-1"></i>
-                        Hewan: <?= htmlspecialchars($pesanan['nama_anabul'] ?? 'Tidak diketahui') ?>
-                    </small><br>
-                    <small class="text-muted">
-                        <i class="fas fa-calendar-check mr-1"></i>
-                        Check-in: <?= date('d/m/Y', strtotime($pesanan['tanggal_mulai'] ?? $pesanan['tanggal_pesan'])) ?>
-                    </small><br>
-                    <small class="text-muted">
-                        <i class="fas fa-calendar-times mr-1"></i>
-                        Check-out: <?= date('d/m/Y', strtotime($pesanan['tanggal_selesai'] ?? $pesanan['tanggal_pesan'])) ?>
-                    </small><br>
-                    <small class="text-muted">
-                        <i class="fas fa-clock mr-1"></i>
-                        Durasi: <?= $pesanan['durasi'] ?? '1' ?> hari
-                    </small><br>
-                    <div class="mt-2">
-                        <span class="badge bg-success">
-                            <i class="fas fa-money-bill-wave mr-1"></i>
-                            Rp <?= number_format($pesanan['total_harga'] ?? 0, 0, ',', '.') ?>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
-
-<?php
-// ================================================================
-// File: profilpelanggan/pesanan/pesanan_konsultasi.php
-
-$pelanggan_id = $_SESSION['id_pelanggan'];
-
-// Query untuk mengambil pesanan konsultasi
-$query = "SELECT p.*, d.nama_dokter, a.nama_anabul 
-          FROM pemesanan p 
-          LEFT JOIN dokter d ON p.id_dokter = d.id_dokter 
-          LEFT JOIN anabul a ON p.id_anabul = a.id_anabul
-          WHERE p.id_pelanggan = ? AND p.jenis_pesanan = 'konsultasi' 
-          ORDER BY p.tanggal_pesan DESC";
-$stmt = $pdo->prepare($query);
-$stmt->execute([$pelanggan_id]);
-$pesanan_konsultasi = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-<div class="pesanan-content">
-    <?php if (empty($pesanan_konsultasi)): ?>
-        <div class="no-data">
-            <i class="fas fa-stethoscope"></i>
-            <div class="mb-3">
-                <strong>Belum ada riwayat konsultasi</strong>
-            </div>
-            <p class="mb-4">Riwayat konsultasi dengan dokter hewan akan tampil di sini</p>
-        </div>
-    <?php else: ?>
-        <?php foreach ($pesanan_konsultasi as $pesanan): ?>
-            <div class="pesanan-item">
-                <div class="pesanan-header">
-                    <span class="pesanan-id">
-                        <i class="fas fa-clipboard-list mr-2"></i>
-                        #<?= htmlspecialchars($pesanan['id_pemesanan'] ?? 'KNS' . str_pad($pesanan['id_pemesanan'], 3, '0', STR_PAD_LEFT)) ?>
-                    </span>
-                    <span class="pesanan-status status-<?= strtolower($pesanan['status'] ?? 'pending') ?>">
-                        <?= ucfirst($pesanan['status'] ?? 'Pending') ?>
-                    </span>
-                </div>
-                <div class="pesanan-detail">
-                    <strong>Konsultasi Dokter Hewan</strong><br>
-                    <small class="text-muted">
-                        <i class="fas fa-user-md mr-1"></i>
-                        Dokter: <?= htmlspecialchars($pesanan['nama_dokter'] ?? 'Tidak diketahui') ?>
-                    </small><br>
-                    <small class="text-muted">
-                        <i class="fas fa-paw mr-1"></i>
-                        Hewan: <?= htmlspecialchars($pesanan['nama_anabul'] ?? 'Tidak diketahui') ?>
-                    </small><br>
-                    <small class="text-muted">
-                        <i class="fas fa-calendar mr-1"></i>
-                        Tanggal: <?= date('d/m/Y', strtotime($pesanan['tanggal_konsultasi'] ?? $pesanan['tanggal_pesan'])) ?>
-                    </small><br>
-                    <small class="text-muted">
-                        <i class="fas fa-clock mr-1"></i>
-                        Waktu: <?= date('H:i', strtotime($pesanan['waktu_konsultasi'] ?? $pesanan['tanggal_pesan'])) ?>
-                    </small><br>
-                    <?php if (!empty($pesanan['keluhan'])): ?>
-                        <small class="text-muted">
-                            <i class="fas fa-comment-medical mr-1"></i>
-                            Keluhan:
-                            <?= htmlspecialchars(substr($pesanan['keluhan'], 0, 50)) ?>            <?= strlen($pesanan['keluhan']) > 50 ? '...' : '' ?>
-                        </small><br>
-                    <?php endif; ?>
-                    <div class="mt-2">
-                        <span class="badge bg-success">
-                            <i class="fas fa-money-bill-wave mr-1"></i>
-                            Rp <?= number_format($pesanan['total_harga'] ?? 0, 0, ',', '.') ?>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>

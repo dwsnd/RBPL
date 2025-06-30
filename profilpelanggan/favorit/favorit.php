@@ -13,6 +13,211 @@ if (!isset($_SESSION['id_pelanggan'])) {
 // Database connection
 require_once '../../includes/db.php';
 
+// ================= HELPER FUNCTIONS =================
+function isFavorited($pdo, $pelanggan_id, $product_id)
+{
+    try {
+        $query = "SELECT id_favorit FROM favorit WHERE id_pelanggan = ? AND id_produk = ?";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$pelanggan_id, $product_id]);
+        return $stmt->fetch() !== false;
+    } catch (PDOException $e) {
+        error_log("Error checking favorite status: " . $e->getMessage());
+        return false;
+    }
+}
+
+function getFavoriteProducts($pdo, $pelanggan_id, $limit = null)
+{
+    try {
+        $query = "SELECT p.*, f.created_at as favorit_date 
+                  FROM produk p 
+                  INNER JOIN favorit f ON p.id_produk = f.id_produk 
+                  WHERE f.id_pelanggan = ? 
+                  ORDER BY f.created_at DESC";
+        if ($limit) {
+            $query .= " LIMIT " . (int) $limit;
+        }
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$pelanggan_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error getting favorite products: " . $e->getMessage());
+        return [];
+    }
+}
+// ================= KOMPONEN TAMPILAN =================
+function renderProductCard($produk, $pelanggan_id = null, $show_favorite = true)
+{
+    global $pdo;
+    $is_logged_in = isset($_SESSION['id_pelanggan']) && $pelanggan_id;
+    $is_favorited = false;
+    if ($is_logged_in && $show_favorite) {
+        $is_favorited = isFavorited($pdo, $pelanggan_id, $produk['id_produk']);
+    }
+    $heart_class = $is_favorited ? 'favorited text-red-500' : 'not-favorited text-gray-300';
+
+    // Path gambar berdasarkan data database yang sudah berisi path lengkap
+    $image_path = '';
+    if (!empty($produk['foto_utama'])) {
+        // Clean up the path
+        $image_path = trim($produk['foto_utama']);
+        $image_path = str_replace('\\', '/', $image_path);
+
+        // If the path doesn't start with uploads/, add it
+        if (!str_starts_with($image_path, 'uploads/')) {
+            $image_path = 'uploads/produk/' . $image_path;
+        }
+
+        // Add ../../ to make it relative to profilpelanggan folder
+        $image_path = '../../' . $image_path;
+    }
+
+    ?>
+    <div class="product-card bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col"
+        data-product-id="<?= $produk['id_produk'] ?>">
+        <!-- Product Image Container with Padding -->
+        <div class="p-3 bg-gray-50">
+            <div class="relative flex-shrink-0 rounded-lg overflow-hidden">
+                <?php if (!empty($produk['foto_utama'])): ?>
+                    <img src="<?= htmlspecialchars($image_path) ?>" alt="<?= htmlspecialchars($produk['nama_produk']) ?>"
+                        class="w-full h-56 object-contain bg-white"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        data-original="<?= htmlspecialchars($produk['foto_utama'] ?? '') ?>"
+                        data-target="<?= htmlspecialchars($produk['target_hewan'] ?? '') ?>">
+                    <!-- Fallback Icon Paw -->
+                    <div class="w-full h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center rounded-lg"
+                        style="display: none;">
+                        <div class="text-center">
+                            <i class="fas fa-paw text-6xl text-orange-300 mb-3 animate-pulse"></i>
+                            <p class="text-sm text-gray-500 font-medium">Gambar tidak tersedia</p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <!-- Default Icon Paw -->
+                    <div
+                        class="w-full h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center rounded-lg">
+                        <div class="text-center">
+                            <i class="fas fa-paw text-6xl text-orange-300 mb-3 animate-pulse"></i>
+                            <p class="text-sm text-gray-500 font-medium">Gambar tidak tersedia</p>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Favorite Button -->
+                <?php if ($is_logged_in && $show_favorite): ?>
+                    <button
+                        class="heart-btn <?= $heart_class ?> absolute top-3 right-3 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-all duration-200"
+                        data-product-id="<?= $produk['id_produk'] ?>" onclick="toggleFavorite(<?= $produk['id_produk'] ?>)"
+                        title="<?= $is_favorited ? 'Hapus dari favorit' : 'Tambah ke favorit' ?>">
+                        <i class="fas fa-heart text-lg"></i>
+                    </button>
+                <?php endif; ?>
+
+                <!-- Category Badge -->
+                <?php if (!empty($produk['target_hewan'])): ?>
+                    <span class="absolute top-3 left-3 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                        <?= ucfirst(htmlspecialchars($produk['target_hewan'])) ?>
+                    </span>
+                <?php endif; ?>
+
+                <!-- Stock Badge -->
+                <?php if ($produk['stok'] <= 5 && $produk['stok'] > 0): ?>
+                    <span
+                        class="absolute bottom-3 left-3 px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
+                        Stok Terbatas
+                    </span>
+                <?php elseif ($produk['stok'] <= 0): ?>
+                    <span class="absolute bottom-3 left-3 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                        Habis
+                    </span>
+                <?php endif; ?>
+            </div>
+        </div>
+        <!-- Product Info -->
+        <div class="p-4 flex-1 flex flex-col">
+            <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2 min-h-[2.5rem] text-sm"
+                title="<?= htmlspecialchars($produk['nama_produk']) ?>">
+                <?= htmlspecialchars($produk['nama_produk']) ?>
+            </h3>
+
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-lg font-bold text-orange-600">
+                    Rp<?= number_format($produk['harga'], 0, ',', '.') ?>
+                </span>
+                <span class="text-xs text-gray-500">
+                    Stok: <span
+                        class="font-medium <?= $produk['stok'] <= 5 ? 'text-orange-600' : 'text-green-600' ?>"><?= $produk['stok'] ?></span>
+                </span>
+            </div>
+
+            <?php if (!empty($produk['deskripsi'])): ?>
+                <p class="text-xs text-gray-600 mb-3 line-clamp-2 flex-1">
+                    <?= htmlspecialchars(substr($produk['deskripsi'], 0, 80)) ?>
+                    <?= strlen($produk['deskripsi']) > 80 ? '...' : '' ?>
+                </p>
+            <?php endif; ?>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-2 mt-auto">
+                <?php if ($produk['stok'] > 0): ?>
+                    <button
+                        class="flex-1 bg-orange-500 text-white py-2 px-3 rounded-md hover:bg-orange-600 transition-colors font-medium text-xs"
+                        onclick="addToCart(<?= $produk['id_produk'] ?>)">
+                        <i class="fas fa-shopping-cart mr-1"></i>
+                        Keranjang
+                    </button>
+                <?php else: ?>
+                    <button class="flex-1 bg-gray-400 text-white py-2 px-3 rounded-md cursor-not-allowed font-medium text-xs"
+                        disabled>
+                        <i class="fas fa-times mr-1"></i>
+                        Habis
+                    </button>
+                <?php endif; ?>
+                <button class="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                    onclick="viewProduct(<?= $produk['id_produk'] ?>)" title="Lihat Detail">
+                    <i class="fas fa-eye text-gray-600 text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <?php
+}
+function renderProductGrid($products, $pelanggan_id = null, $show_favorite = true, $grid_classes = 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5')
+{
+    if (empty($products)) {
+        renderEmptyState();
+        return;
+    }
+    ?>
+    <div class="grid <?= $grid_classes ?> gap-4 md:gap-6">
+        <?php foreach ($products as $produk): ?>
+            <?php renderProductCard($produk, $pelanggan_id, $show_favorite); ?>
+        <?php endforeach; ?>
+    </div>
+    <?php
+}
+function renderEmptyState($title = 'Belum ada produk favorit', $message = 'Yuk, tambahkan produk kesukaan Anda ke favorit untuk memudahkan pencarian!', $show_button = true)
+{
+    ?>
+    <div class="text-center py-16">
+        <div class="mb-6">
+            <i class="fas fa-heart text-6xl text-gray-300 mb-4"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-600 mb-3"><?= htmlspecialchars($title) ?></h3>
+        <p class="text-gray-500 mb-6"><?= htmlspecialchars($message) ?></p>
+        <?php if ($show_button): ?>
+            <a href="../produk/"
+                class="inline-flex items-center px-6 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors">
+                <i class="fas fa-shopping-bag mr-2"></i>
+                Jelajahi Produk
+            </a>
+        <?php endif; ?>
+    </div>
+    <?php
+}
+// ================= END HELPER & KOMPONEN =================
+
 // Ambil data pelanggan
 $pelanggan_id = $_SESSION['id_pelanggan'];
 $query = "SELECT * FROM pelanggan WHERE id_pelanggan = ?";
@@ -21,14 +226,7 @@ $stmt->execute([$pelanggan_id]);
 $pelanggan = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Ambil data produk favorit
-$favorit_query = "SELECT p.*, f.created_at as favorit_date 
-                  FROM produk p 
-                  INNER JOIN favorit f ON p.id_produk = f.id_produk 
-                  WHERE f.id_pelanggan = ? 
-                  ORDER BY f.created_at DESC";
-$favorit_stmt = $pdo->prepare($favorit_query);
-$favorit_stmt->execute([$pelanggan_id]);
-$data_favorit = $favorit_stmt->fetchAll(PDO::FETCH_ASSOC);
+$data_favorit = getFavoriteProducts($pdo, $pelanggan_id);
 ?>
 
 <!DOCTYPE html>
@@ -37,7 +235,7 @@ $data_favorit = $favorit_stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ling-Ling Pet Shop - Favorit Saya</title>
+    <title>Ling-Ling Pet Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -103,19 +301,47 @@ $data_favorit = $favorit_stmt->fetchAll(PDO::FETCH_ASSOC);
         .heart-btn.not-favorited {
             color: #d1d5db;
         }
+
+        /* Line clamp utility */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Product card improvements */
+        .product-card {
+            min-height: 400px;
+        }
+
+        .product-card img {
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 640px) {
+            .product-card {
+                min-height: 350px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <!-- Navbar -->
-    <?php require '../../includes/header.php'; ?>
+    <?php require_once '../../includes/header.php'; ?>
 
     <div class="flex min-h-screen p-4">
         <?php require_once '../sidebar.php'; ?>
 
         <!-- Main Content -->
-        <div class="flex-1 px-6 pb-4 max-w-6xl mx-auto">
-            <div class="w-full bg-white rounded-lg shadow-md p-6 border border-grey-100">
+        <div class="flex-1 px-4 md:px-6 pb-4 max-w-7xl mx-auto">
+            <div class="w-full bg-white rounded-lg shadow-md p-4 md:p-6 border border-grey-100">
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold text-gray-800">Favorit Saya</h2>
@@ -123,101 +349,42 @@ $data_favorit = $favorit_stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <!-- Favorit Products Section -->
-                <div class="mt-8">
-                    <?php if (empty($data_favorit)): ?>
-                        <!-- Empty State -->
-                        <div class="text-center py-16">
-                            <div class="mb-6">
-                                <img src="../../assets/images/empty-favorit.png" alt="Empty Favorit"
-                                    class="mx-auto w-48 h-48 object-contain opacity-60">
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-600 mb-3">Belum ada produk favorit</h3>
-                            <p class="text-gray-500 mb-6">Yuk, tambahkan produk kesukaan Anda ke favorit untuk memudahkan
-                                pencarian!</p>
-                            <a href="../produk/"
-                                class="inline-flex items-center px-6 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors">
-                                <i class="fas fa-shopping-bag mr-2"></i>
-                                Jelajahi Produk
-                            </a>
-                        </div>
-                    <?php else: ?>
-                        <!-- Favorit Products Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            <?php foreach ($data_favorit as $produk): ?>
-                                <div
-                                    class="product-card bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                    <!-- Product Image -->
-                                    <div class="relative">
-                                        <img src="../../uploads/produk/<?= htmlspecialchars($produk['image'] ?: 'default.jpg') ?>"
-                                            alt="<?= htmlspecialchars($produk['name']) ?>" class="w-full h-48 object-cover">
-
-                                        <!-- Favorite Button -->
-                                        <button onclick="toggleFavorite(<?= $produk['id'] ?>)"
-                                            class="heart-btn favorited absolute top-3 right-3 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50">
-                                            <i class="fas fa-heart text-lg"></i>
-                                        </button>
-
-                                        <!-- Category Badge -->
-                                        <?php if ($produk['category']): ?>
-                                            <span
-                                                class="absolute top-3 left-3 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                                                <?= ucfirst(htmlspecialchars($produk['category'])) ?>
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <!-- Product Info -->
-                                    <div class="p-4">
-                                        <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2"
-                                            title="<?= htmlspecialchars($produk['name']) ?>">
-                                            <?= htmlspecialchars($produk['name']) ?>
-                                        </h3>
-
-                                        <div class="flex items-center justify-between mb-3">
-                                            <span class="text-lg font-bold text-orange-600">
-                                                Rp<?= number_format($produk['price'], 0, ',', '.') ?>
-                                            </span>
-                                            <span class="text-sm text-gray-500">
-                                                Stok: <?= $produk['stock'] ?>
-                                            </span>
-                                        </div>
-
-                                        <?php if ($produk['description']): ?>
-                                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">
-                                                <?= htmlspecialchars(substr($produk['description'], 0, 100)) ?>...
-                                            </p>
-                                        <?php endif; ?>
-
-                                        <div class="flex gap-2">
-                                            <button
-                                                class="flex-1 bg-orange-500 text-white py-2 px-4 rounded-md hover:bg-orange-600 transition-colors font-medium">
-                                                <i class="fas fa-shopping-cart mr-1"></i>
-                                                Tambah ke Keranjang
-                                            </button>
-                                            <button
-                                                class="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                                                <i class="fas fa-eye text-gray-600"></i>
-                                            </button>
-                                        </div>
-
-                                        <div class="mt-2 text-xs text-gray-400">
-                                            Ditambahkan: <?= date('d M Y', strtotime($produk['favorit_date'])) ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
+                <div class="mt-6">
+                    <?php
+                    if (empty($data_favorit)) {
+                        renderEmptyState();
+                    } else {
+                        renderProductGrid($data_favorit, $pelanggan_id, true);
+                    }
+                    ?>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <?php require '../../includes/footer.php'; ?>
+    <?php require_once '../../includes/footer.php'; ?>
 
     <!-- Add popup notification div -->
     <div id="popupNotification" class="popup-notification"></div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="customConfirmModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-[1000] hidden">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md mx-auto">
+            <div class="text-xl font-bold text-gray-900 mb-4 text-center" id="confirmMessage"></div>
+            <div class="flex justify-end space-x-3">
+                <button id="confirmCancelBtn"
+                    class="px-6 py-2 border border-gray-200 text-gray-700 rounded-full hover:bg-gray-100 transition-colors text-sm">
+                    Batal
+                </button>
+                <button id="confirmOKBtn"
+                    class="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors text-sm">
+                    Ya, Hapus
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Function to show popup notification
@@ -233,55 +400,121 @@ $data_favorit = $favorit_stmt->fetchAll(PDO::FETCH_ASSOC);
             }, 3000);
         }
 
-        // Function to toggle favorite
-        function toggleFavorite(productId) {
-            fetch('toggle_favorit.php', {
+        // Custom confirmation modal function
+        function showCustomConfirm(message, callback) {
+            const modal = document.getElementById('customConfirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+            const okBtn = document.getElementById('confirmOKBtn');
+
+            messageEl.textContent = message;
+            modal.classList.remove('hidden');
+
+            const handleConfirm = () => {
+                modal.classList.add('hidden');
+                callback(true);
+                cleanup();
+            };
+
+            const handleCancel = () => {
+                modal.classList.add('hidden');
+                callback(false);
+                cleanup();
+            };
+
+            const cleanup = () => {
+                okBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            okBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
+        }
+
+        // Function to add to cart
+        function addToCart(productId) {
+            fetch('../dashboard/shop/add_to_cart.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    product_id: productId
+                    product_id: productId,
+                    quantity: 1
                 })
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Find the heart button and update its state
-                        const heartBtn = document.querySelector(`button[onclick="toggleFavorite(${productId})"] i`);
-                        const productCard = heartBtn.closest('.product-card');
-
-                        if (data.action === 'removed') {
-                            // Remove the product card with animation
-                            productCard.style.transition = 'all 0.3s ease';
-                            productCard.style.transform = 'scale(0.8)';
-                            productCard.style.opacity = '0';
-
-                            setTimeout(() => {
-                                productCard.remove();
-
-                                // Update product count
-                                const countElement = document.querySelector('.text-sm.text-gray-500');
-                                const currentCount = parseInt(countElement.textContent.split(' ')[0]);
-                                countElement.textContent = `${currentCount - 1} produk`;
-
-                                // Check if no products left
-                                const remainingProducts = document.querySelectorAll('.product-card');
-                                if (remainingProducts.length === 0) {
-                                    location.reload(); // Reload to show empty state
-                                }
-                            }, 300);
-
-                            showPopup('Produk dihapus dari favorit', 'error');
-                        }
+                        showPopup('Produk berhasil ditambahkan ke keranjang', 'success');
                     } else {
-                        showPopup(data.message || 'Terjadi kesalahan', 'error');
+                        showPopup(data.message || 'Gagal menambahkan ke keranjang', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     showPopup('Terjadi kesalahan sistem', 'error');
                 });
+        }
+
+        // Function to view product detail
+        function viewProduct(productId) {
+            window.location.href = `../dashboard/shop/detail_produk.php?id=${productId}`;
+        }
+
+        // Function to toggle favorite
+        function toggleFavorite(productId) {
+            showCustomConfirm('Apakah Anda yakin ingin menghapus item ini dari favorit?', (result) => {
+                if (result) {
+                    fetch('toggle_favorit.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            product_id: productId
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Find the heart button and update its state
+                                const heartBtn = document.querySelector(`button[onclick="toggleFavorite(${productId})"] i`);
+                                const productCard = heartBtn.closest('.product-card');
+
+                                if (data.action === 'removed') {
+                                    // Remove the product card with animation
+                                    productCard.style.transition = 'all 0.3s ease';
+                                    productCard.style.transform = 'scale(0.8)';
+                                    productCard.style.opacity = '0';
+
+                                    setTimeout(() => {
+                                        productCard.remove();
+
+                                        // Update product count
+                                        const countElement = document.querySelector('.text-sm.text-gray-500');
+                                        const currentCount = parseInt(countElement.textContent.split(' ')[0]);
+                                        countElement.textContent = `${currentCount - 1} produk`;
+
+                                        // Check if no products left
+                                        const remainingProducts = document.querySelectorAll('.product-card');
+                                        if (remainingProducts.length === 0) {
+                                            location.reload(); // Reload to show empty state
+                                        }
+                                    }, 300);
+
+                                    showPopup('Produk dihapus dari favorit', 'error');
+                                }
+                            } else {
+                                showPopup(data.message || 'Terjadi kesalahan', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showPopup('Terjadi kesalahan sistem', 'error');
+                        });
+                }
+            });
         }
 
         // Check for notifications on page load

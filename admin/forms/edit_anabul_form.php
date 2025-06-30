@@ -24,20 +24,21 @@ $customers = query("SELECT * FROM pelanggan WHERE status = 'aktif'");
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
         <input type="text" class="form-control" name="nama_hewan" style="background-color: #e0e0e0;" required
-            value="<?= $data["nama_hewan"] ?>">
+            value="<?= $data["nama_hewan"] ?? '' ?>">
     </div>
 </div>
 
-<!-- Jenis Hewan -->
+<!-- Spesies -->
 <div class="row mb-3 align-items-center">
-    <div class="col-sm-3 text-start">Jenis Hewan</div>
+    <div class="col-sm-3 text-start">Spesies</div>
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
-        <select class="form-control" name="jenis_hewan" style="background-color: #e0e0e0;" required>
-            <option value="Kucing" <?= ($data["jenis_hewan"] == 'Kucing') ? 'selected' : ''; ?>>Kucing</option>
-            <option value="Anjing" <?= ($data["jenis_hewan"] == 'Anjing') ? 'selected' : ''; ?>>Anjing</option>
-            <option value="Hamster" <?= ($data["jenis_hewan"] == 'Hamster') ? 'selected' : ''; ?>>Hamster</option>
-            <option value="Kelinci" <?= ($data["jenis_hewan"] == 'Kelinci') ? 'selected' : ''; ?>>Kelinci</option>
+        <select class="form-control" name="spesies" style="background-color: #e0e0e0;" required>
+            <option value="kucing" <?= (($data["spesies"] ?? '') == 'kucing') ? 'selected' : ''; ?>>Kucing</option>
+            <option value="anjing" <?= (($data["spesies"] ?? '') == 'anjing') ? 'selected' : ''; ?>>Anjing</option>
+            <option value="hamster" <?= (($data["spesies"] ?? '') == 'hamster') ? 'selected' : ''; ?>>Hamster</option>
+            <option value="kelinci" <?= (($data["spesies"] ?? '') == 'kelinci') ? 'selected' : ''; ?>>Kelinci</option>
+            <option value="lainnya" <?= (($data["spesies"] ?? '') == 'lainnya') ? 'selected' : ''; ?>>Lainnya</option>
         </select>
     </div>
 </div>
@@ -47,28 +48,87 @@ $customers = query("SELECT * FROM pelanggan WHERE status = 'aktif'");
     <div class="col-sm-3 text-start">Ras</div>
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
-        <input type="text" class="form-control" name="ras" style="background-color: #e0e0e0;" required
-            value="<?= $data["ras"] ?>">
+        <input type="text" class="form-control" name="ras" style="background-color: #e0e0e0;"
+            value="<?= $data["ras"] ?? '' ?>">
     </div>
 </div>
 
-<!-- Umur -->
+<!-- Umur Tahun & Bulan -->
 <div class="row mb-3 align-items-center">
-    <div class="col-sm-3 text-start">Umur (bulan)</div>
+    <div class="col-sm-3 text-start">Umur</div>
     <div class="col-sm-1 text-end">:</div>
-    <div class="col-sm-8">
-        <input type="number" class="form-control" name="umur" style="background-color: #e0e0e0;" required
-            value="<?= $data["umur"] ?>">
+    <div class="col-sm-4">
+        <input type="number" class="form-control" name="umur_tahun" min="0" placeholder="Tahun"
+            style="background-color: #e0e0e0;" value="<?= $data["umur_tahun"] ?? '' ?>">
+        <small class="text-muted">Tahun</small>
+    </div>
+    <div class="col-sm-4">
+        <input type="number" class="form-control" name="umur_bulan" min="0" max="11" placeholder="Bulan"
+            style="background-color: #e0e0e0;" value="<?= $data["umur_bulan"] ?? '' ?>">
+        <small class="text-muted">Bulan</small>
     </div>
 </div>
 
-<!-- Berat -->
+<!-- Berat (kg) -->
 <div class="row mb-3 align-items-center">
     <div class="col-sm-3 text-start">Berat (kg)</div>
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
-        <input type="number" step="0.1" class="form-control" name="berat" style="background-color: #e0e0e0;" required
-            value="<?= $data["berat"] ?>">
+        <input type="number" step="0.01" class="form-control" name="berat_kg" style="background-color: #e0e0e0;"
+            value="<?= $data["berat_kg"] ?? '' ?>">
+    </div>
+</div>
+
+<!-- Jenis Kelamin -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-3 text-start">Jenis Kelamin</div>
+    <div class="col-sm-1 text-end">:</div>
+    <div class="col-sm-8">
+        <select class="form-control" name="jenis_kelamin" style="background-color: #e0e0e0;">
+            <option value="">- Pilih -</option>
+            <option value="jantan" <?= (($data["jenis_kelamin"] ?? '') == 'jantan') ? 'selected' : ''; ?>>Jantan</option>
+            <option value="betina" <?= (($data["jenis_kelamin"] ?? '') == 'betina') ? 'selected' : ''; ?>>Betina</option>
+        </select>
+    </div>
+</div>
+
+<!-- Warna -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-3 text-start">Warna</div>
+    <div class="col-sm-1 text-end">:</div>
+    <div class="col-sm-8">
+        <input type="text" class="form-control" name="warna" style="background-color: #e0e0e0;"
+            value="<?= $data["warna"] ?? '' ?>">
+    </div>
+</div>
+
+<!-- Ciri Khusus -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-3 text-start">Ciri Khusus</div>
+    <div class="col-sm-1 text-end">:</div>
+    <div class="col-sm-8">
+        <textarea class="form-control" name="ciri_khusus" style="background-color: #e0e0e0;"
+            rows="2"><?= $data["ciri_khusus"] ?? '' ?></textarea>
+    </div>
+</div>
+
+<!-- Riwayat Penyakit -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-3 text-start">Riwayat Penyakit</div>
+    <div class="col-sm-1 text-end">:</div>
+    <div class="col-sm-8">
+        <textarea class="form-control" name="riwayat_penyakit" style="background-color: #e0e0e0;"
+            rows="2"><?= $data["riwayat_penyakit"] ?? '' ?></textarea>
+    </div>
+</div>
+
+<!-- Alergi -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-3 text-start">Alergi</div>
+    <div class="col-sm-1 text-end">:</div>
+    <div class="col-sm-8">
+        <textarea class="form-control" name="alergi" style="background-color: #e0e0e0;"
+            rows="2"><?= $data["alergi"] ?? '' ?></textarea>
     </div>
 </div>
 
@@ -77,12 +137,13 @@ $customers = query("SELECT * FROM pelanggan WHERE status = 'aktif'");
     <div class="col-sm-3 text-start">Pemilik</div>
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
-        <select class="form-control" name="id_pelanggan" style="background-color: #e0e0e0;" required>
-            <?php foreach ($customers as $customer): ?>
-                <option value="<?= $customer['id_pelanggan'] ?>" <?= ($customer['id_pelanggan'] == $data['id_pelanggan']) ? 'selected' : ''; ?>>
-                    <?= $customer['nama'] ?> - <?= $customer['nomor_telepon'] ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+        <input type="text" class="form-control" value="<?php
+        $pemilik = array_filter($customers, function ($c) use ($data) {
+            return $c['id_pelanggan'] == ($data['id_pelanggan'] ?? null);
+        });
+        $pemilik = $pemilik ? array_values($pemilik)[0] : null;
+        echo $pemilik ? $pemilik['nama_lengkap'] . ' - ' . $pemilik['nomor_telepon'] : '-';
+        ?>" readonly style="background-color: #e0e0e0;">
+        <input type="hidden" name="id_pelanggan" value="<?= $data['id_pelanggan'] ?? '' ?>">
     </div>
 </div>

@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_anabul'])) {
         $pdo->beginTransaction();
 
         // First, get the anabul data to verify ownership
-        $query = "SELECT * FROM anabul WHERE id_anabul = ? AND id_pelanggan = ?";
+        $query = "SELECT * FROM anabul WHERE id_anabul = ? AND id_pelanggan = ? AND status = 'aktif'";
         $stmt = $pdo->prepare($query);
         $stmt->execute([$anabul_id, $pelanggan_id]);
         $anabul = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -44,6 +44,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_anabul'])) {
 
         if (!$delete_foto_result) {
             throw new Exception('Gagal menghapus data foto dari database');
+        }
+
+        // Cek apakah anabul sudah pernah dipakai di penitipan, perawatan, atau konsultasi
+        $cek_relasi = $pdo->prepare("SELECT COUNT(*) FROM (
+            SELECT id_anabul FROM penitipan WHERE id_anabul = ?
+            UNION
+            SELECT id_anabul FROM perawatan WHERE id_anabul = ?
+            UNION
+            SELECT id_anabul FROM konsultasi WHERE id_anabul = ?
+        ) AS relasi");
+        $cek_relasi->execute([$anabul_id, $anabul_id, $anabul_id]);
+        $relasi = $cek_relasi->fetchColumn();
+
+        if ($relasi > 0) {
+            // Soft delete: update status
+            $update_status = $pdo->prepare("UPDATE anabul SET status = 'tidak_aktif' WHERE id_anabul = ? AND id_pelanggan = ?");
+            $update_status->execute([$anabul_id, $pelanggan_id]);
+            $pdo->commit();
+            echo json_encode(['success' => true, 'message' => 'Data anabul dinonaktifkan karena sudah pernah digunakan dalam pemesanan.']);
+            exit();
         }
 
         // Delete the main record from anabul table

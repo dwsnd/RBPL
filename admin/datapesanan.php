@@ -20,7 +20,7 @@ $query = "SELECT p.*,
                   JOIN produk pr ON pp.id_produk = pr.id_produk
                   WHERE pp.id_pesanan = p.id_pesanan
               )
-              WHEN p.jenis_pesanan = 'layanan' THEN (
+              WHEN p.jenis_pesanan = 'penitipan' THEN (
                   SELECT GROUP_CONCAT(l.nama_layanan SEPARATOR ', ')
                   FROM pesanan_layanan pl
                   JOIN layanan l ON pl.id_layanan = l.id_layanan

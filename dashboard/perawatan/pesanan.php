@@ -14,23 +14,27 @@ $id_pelanggan = $_SESSION['id_pelanggan'];
 
 // Ambil data pesanan pelanggan
 $query = "SELECT 
-            p.id_pesanan,
-            p.tanggal_booking,
-            p.tanggal_layanan,
-            p.waktu_layanan,
-            p.status_pesanan,
-            p.total_harga,
-            p.catatan_khusus,
-            a.nama_hewan,
-            a.kategori_hewan,
-            a.karakteristik,
-            dl.nama_layanan,
-            dl.deskripsi as deskripsi_layanan
-          FROM pesanan_layanan p
-          JOIN anabul a ON p.id_anabul = a.id_anabul
-          JOIN detail_layanan dl ON p.jenis_layanan = dl.jenis_layanan
-          WHERE p.id_pelanggan = '$id_pelanggan'
-          ORDER BY p.created_at DESC";
+    p.id_pesanan,
+    p.nomor_pesanan,
+    p.tanggal_pesanan,
+    p.total_harga,
+    p.status_pesanan,
+    p.status_pembayaran,
+    pl.id_layanan,
+    l.nama_layanan,
+    l.harga as harga_layanan,
+    a.nama_hewan,
+    pr.tanggal_perawatan,
+    pr.waktu_mulai,
+    pr.waktu_selesai,
+    pr.status_pesanan as status_perawatan
+FROM pesanan p
+JOIN pesanan_layanan pl ON p.id_pesanan = pl.id_pesanan
+JOIN layanan l ON pl.id_layanan = l.id_layanan
+JOIN anabul a ON pl.id_anabul = a.id_anabul
+LEFT JOIN perawatan pr ON pl.id_detail = pr.id_pesanan_layanan
+WHERE p.id_pelanggan = '$id_pelanggan'
+ORDER BY p.created_at DESC";
 
 $result = mysqli_query($conn, $query);
 $pesanan_list = [];
@@ -41,7 +45,8 @@ if ($result && mysqli_num_rows($result) > 0) {
 }
 
 // Function untuk format status
-function formatStatus($status) {
+function formatStatus($status)
+{
     $status_labels = [
         'pending' => ['Menunggu Konfirmasi', 'bg-warning', 'text-dark'],
         'confirmed' => ['Dikonfirmasi', 'bg-info', 'text-white'],
@@ -49,20 +54,21 @@ function formatStatus($status) {
         'completed' => ['Selesai', 'bg-success', 'text-white'],
         'cancelled' => ['Dibatalkan', 'bg-danger', 'text-white']
     ];
-    
+
     $label = isset($status_labels[$status]) ? $status_labels[$status] : ['Unknown', 'bg-secondary', 'text-white'];
     return "<span class='badge {$label[1]} {$label[2]} px-3 py-2'>{$label[0]}</span>";
 }
 
 // Function untuk format waktu
-function formatWaktu($waktu) {
+function formatWaktu($waktu)
+{
     $waktu_labels = [
         'pagi' => '08:00 - 10:00',
         'siang' => '10:00 - 12:00',
         'sore' => '13:00 - 15:00',
         'sore-akhir' => '15:00 - 17:00'
     ];
-    
+
     return isset($waktu_labels[$waktu]) ? $waktu_labels[$waktu] : $waktu;
 }
 ?>
@@ -73,7 +79,7 @@ function formatWaktu($waktu) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pesanan Saya - Ling-Ling Pet Shop</title>
+    <title>Ling-Ling Pet Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -122,11 +128,25 @@ function formatWaktu($waktu) {
             display: none;
         }
 
-        .status-pending { border-left: 4px solid #ffc107; }
-        .status-confirmed { border-left: 4px solid #17a2b8; }
-        .status-in_progress { border-left: 4px solid #007bff; }
-        .status-completed { border-left: 4px solid #28a745; }
-        .status-cancelled { border-left: 4px solid #dc3545; }
+        .status-pending {
+            border-left: 4px solid #ffc107;
+        }
+
+        .status-confirmed {
+            border-left: 4px solid #17a2b8;
+        }
+
+        .status-in_progress {
+            border-left: 4px solid #007bff;
+        }
+
+        .status-completed {
+            border-left: 4px solid #28a745;
+        }
+
+        .status-cancelled {
+            border-left: 4px solid #dc3545;
+        }
     </style>
 </head>
 
@@ -139,8 +159,8 @@ function formatWaktu($waktu) {
         <?php if (isset($_SESSION['success_message'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="fas fa-check-circle me-2"></i>
-                <?php 
-                echo $_SESSION['success_message']; 
+                <?php
+                echo $_SESSION['success_message'];
                 unset($_SESSION['success_message']);
                 ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -150,8 +170,8 @@ function formatWaktu($waktu) {
         <?php if (isset($_SESSION['error_message'])): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                <?php 
-                echo $_SESSION['error_message']; 
+                <?php
+                echo $_SESSION['error_message'];
                 unset($_SESSION['error_message']);
                 ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -183,7 +203,7 @@ function formatWaktu($waktu) {
                 'completed' => 0,
                 'cancelled' => 0
             ];
-            
+
             foreach ($pesanan_list as $pesanan) {
                 if (isset($status_counts[$pesanan['status_pesanan']])) {
                     $status_counts[$pesanan['status_pesanan']]++;
@@ -251,7 +271,8 @@ function formatWaktu($waktu) {
                                 <div class="d-flex align-items-center mb-3">
                                     <i class="fas fa-paw text-orange-500 me-2"></i>
                                     <div>
-                                        <h6 class="mb-0 fw-semibold"><?php echo htmlspecialchars($pesanan['nama_hewan']); ?></h6>
+                                        <h6 class="mb-0 fw-semibold"><?php echo htmlspecialchars($pesanan['nama_hewan']); ?>
+                                        </h6>
                                         <small class="text-muted"><?php echo ucfirst($pesanan['kategori_hewan']); ?></small>
                                     </div>
                                 </div>
@@ -297,14 +318,13 @@ function formatWaktu($waktu) {
                                         Rp <?php echo number_format($pesanan['total_harga'], 0, ',', '.'); ?>
                                     </h5>
                                     <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-sm btn-outline-info" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#detailModal<?php echo $pesanan['id_pesanan']; ?>">
+                                        <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                                            data-bs-target="#detailModal<?php echo $pesanan['id_pesanan']; ?>">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                         <?php if ($pesanan['status_pesanan'] === 'pending'): ?>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                    onclick="confirmCancel(<?php echo $pesanan['id_pesanan']; ?>)">
+                                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                                onclick="confirmCancel(<?php echo $pesanan['id_pesanan']; ?>)">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         <?php endif; ?>
@@ -328,18 +348,22 @@ function formatWaktu($waktu) {
                                     <div class="row">
                                         <div class="col-md-6">
                                             <h6 class="fw-bold mb-3">Informasi Hewan</h6>
-                                            <p><strong>Nama:</strong> <?php echo htmlspecialchars($pesanan['nama_hewan']); ?></p>
+                                            <p><strong>Nama:</strong> <?php echo htmlspecialchars($pesanan['nama_hewan']); ?>
+                                            </p>
                                             <p><strong>Kategori:</strong> <?php echo ucfirst($pesanan['kategori_hewan']); ?></p>
                                             <?php if (!empty($pesanan['karakteristik'])): ?>
-                                                <p><strong>Ciri Khusus:</strong> <?php echo htmlspecialchars($pesanan['karakteristik']); ?></p>
+                                                <p><strong>Ciri Khusus:</strong>
+                                                    <?php echo htmlspecialchars($pesanan['karakteristik']); ?></p>
                                             <?php endif; ?>
                                         </div>
                                         <div class="col-md-6">
                                             <h6 class="fw-bold mb-3">Informasi Layanan</h6>
                                             <p><strong>Layanan:</strong> <?php echo $pesanan['nama_layanan']; ?></p>
-                                            <p><strong>Tanggal:</strong> <?php echo date('d M Y', strtotime($pesanan['tanggal_layanan'])); ?></p>
+                                            <p><strong>Tanggal:</strong>
+                                                <?php echo date('d M Y', strtotime($pesanan['tanggal_layanan'])); ?></p>
                                             <p><strong>Waktu:</strong> <?php echo formatWaktu($pesanan['waktu_layanan']); ?></p>
-                                            <p><strong>Status:</strong> <?php echo formatStatus($pesanan['status_pesanan']); ?></p>
+                                            <p><strong>Status:</strong> <?php echo formatStatus($pesanan['status_pesanan']); ?>
+                                            </p>
                                         </div>
                                     </div>
                                     <hr>
@@ -367,73 +391,73 @@ function formatWaktu($waktu) {
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                     </div>
                                 </div>
-                                </div>
-                                </div>
-                                </div>
-                                <?php endforeach; ?>
-                                </div>
-                                <?php endif; ?>
-                                </div>
-                                
-                                <!-- Modal Konfirmasi Pembatalan -->
-                                <div class="modal fade" id="cancelModal" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Konfirmasi Pembatalan</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="text-center">
-                                                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                                                    <h6>Apakah Anda yakin ingin membatalkan pesanan ini?</h6>
-                                                    <p class="text-muted">Pesanan yang dibatalkan tidak dapat dikembalikan</p>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <form id="cancelForm" method="POST" action="cancel_order.php" style="display: inline;">
-                                                    <input type="hidden" name="id_pesanan" id="cancelOrderId">
-                                                    <button type="submit" class="btn btn-danger">Ya, Batalkan</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Footer -->
-                                <?php require '../../includes/footer.php'; ?>
-                                
-                                <!-- Scripts -->
-                                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-                                <script>
-                                    // Function untuk konfirmasi pembatalan
-                                    function confirmCancel(orderId) {
-                                        document.getElementById('cancelOrderId').value = orderId;
-                                        const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
-                                        modal.show();
-                                    }
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
 
-                                    // Auto hide alerts after 5 seconds
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        const alerts = document.querySelectorAll('.alert');
-                                        alerts.forEach(function (alert) {
-                                            setTimeout(function () {
-                                                const bsAlert = new bootstrap.Alert(alert);
-                                                bsAlert.close();
-                                            }, 5000);
-                                        });
-                                    });
+    <!-- Modal Konfirmasi Pembatalan -->
+    <div class="modal fade" id="cancelModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi Pembatalan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h6>Apakah Anda yakin ingin membatalkan pesanan ini?</h6>
+                        <p class="text-muted">Pesanan yang dibatalkan tidak dapat dikembalikan</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form id="cancelForm" method="POST" action="cancel_order.php" style="display: inline;">
+                        <input type="hidden" name="id_pesanan" id="cancelOrderId">
+                        <button type="submit" class="btn btn-danger">Ya, Batalkan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                    // Refresh page every 30 seconds to check for status updates
-                                    setInterval(function () {
-                                        // Only refresh if no modals are open
-                                        const modals = document.querySelectorAll('.modal.show');
-                                        if (modals.length === 0) {
-                                            location.reload();
-                                        }
-                                    }, 30000);
-                                </script>
-                                </body>
-                                
-                                </html>
+    <!-- Footer -->
+    <?php require '../../includes/footer.php'; ?>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function untuk konfirmasi pembatalan
+        function confirmCancel(orderId) {
+            document.getElementById('cancelOrderId').value = orderId;
+            const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+            modal.show();
+        }
+
+        // Auto hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function (alert) {
+                setTimeout(function () {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+
+        // Refresh page every 30 seconds to check for status updates
+        setInterval(function () {
+            // Only refresh if no modals are open
+            const modals = document.querySelectorAll('.modal.show');
+            if (modals.length === 0) {
+                location.reload();
+            }
+        }, 30000);
+    </script>
+</body>
+
+</html>

@@ -131,7 +131,7 @@ if (isset($_SESSION['id_pelanggan'])) {
                     <br>Keluarga Sendiri,
                     <br>Seriusan!
                 </h1>
-                <a href="shop.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
+                <a href="shop/shop_pelanggan.php" class="btn btn-black text-base mt-2">Mulai Belanja</a>
             </div>
         </div>
         <img src="../aset/cat&dog.png" class="image-catdog" alt="Hewan Peliharaan">

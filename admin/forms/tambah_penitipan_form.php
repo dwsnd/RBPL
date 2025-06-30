@@ -1,7 +1,7 @@
 <?php
 // Get list of active customers and their pets
 $customers = query("SELECT * FROM pelanggan WHERE status = 'aktif'");
-$pets = query("SELECT * FROM anabul");
+$pets = query("SELECT * FROM anabul WHERE status = 'aktif'");
 ?>
 
 <!-- Pelanggan -->
@@ -9,7 +9,7 @@ $pets = query("SELECT * FROM anabul");
     <div class="col-sm-3 text-start">Pelanggan</div>
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
-        <select class="form-control" name="id_pelanggan" style="background-color: #e0e0e0;" required>
+        <select class="form-control" id="id_pelanggan" name="id_pelanggan" style="background-color: #e0e0e0;" required>
             <option value="">-- Pilih Pelanggan --</option>
             <?php foreach ($customers as $customer): ?>
                 <option value="<?= $customer['id_pelanggan'] ?>">
@@ -25,13 +25,8 @@ $pets = query("SELECT * FROM anabul");
     <div class="col-sm-3 text-start">Anabul</div>
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
-        <select class="form-control" name="id_anabul" style="background-color: #e0e0e0;" required>
+        <select class="form-control" id="id_anabul" name="id_anabul" style="background-color: #e0e0e0;" required>
             <option value="">-- Pilih Anabul --</option>
-            <?php foreach ($pets as $pet): ?>
-                <option value="<?= $pet['id_anabul'] ?>">
-                    <?= $pet['nama_hewan'] ?> (<?= $pet['spesies'] ?> - <?= $pet['ras'] ?>)
-                </option>
-            <?php endforeach; ?>
         </select>
     </div>
 </div>
@@ -76,3 +71,32 @@ $pets = query("SELECT * FROM anabul");
         </select>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle customer selection and load their pets
+        const customerSelect = document.getElementById('id_pelanggan');
+        const anabulSelect = document.getElementById('id_anabul');
+
+        // Pre-load all pets data
+        const allPets = <?= json_encode($pets) ?>;
+
+        customerSelect.addEventListener('change', function () {
+            if (this.value) {
+                // Filter pets for selected customer
+                const customerPets = allPets.filter(pet => pet.id_pelanggan == this.value);
+
+                anabulSelect.innerHTML = '<option value="">-- Pilih Anabul --</option>';
+                customerPets.forEach(pet => {
+                    anabulSelect.innerHTML += `
+                        <option value="${pet.id_anabul}">
+                            ${pet.nama_hewan} - ${pet.jenis_hewan} (${pet.ras})
+                        </option>
+                    `;
+                });
+            } else {
+                anabulSelect.innerHTML = '<option value="">-- Pilih Anabul --</option>';
+            }
+        });
+    });
+</script>

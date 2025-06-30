@@ -1,9 +1,10 @@
 <?php
 // Get list of active customers and products
 $customers = query("SELECT * FROM pelanggan WHERE status = 'aktif'");
-$products = query("SELECT * FROM produk");
-$services = query("SELECT * FROM layanan");
+$products = query("SELECT * FROM produk WHERE status = 'aktif'");
+$services = query("SELECT * FROM layanan WHERE status = 'aktif'");
 $doctors = query("SELECT * FROM dokter_hewan");
+$anabul = query("SELECT * FROM anabul WHERE status = 'aktif'");
 ?>
 
 <!-- Tipe Pelanggan -->
@@ -128,9 +129,9 @@ $doctors = query("SELECT * FROM dokter_hewan");
         <select class="form-control" name="jenis_pesanan" style="background-color: #e0e0e0;" required>
             <option value="">-- Pilih Jenis Pesanan --</option>
             <option value="produk">Produk</option>
-            <option value="layanan">Layanan</option>
-            <option value="konsultasi">Konsultasi</option>
+            <option value="penitipan">Penitipan</option>
             <option value="perawatan">Perawatan</option>
+            <option value="konsultasi">Konsultasi</option>
         </select>
     </div>
 </div>
@@ -144,7 +145,7 @@ $doctors = query("SELECT * FROM dokter_hewan");
             <select class="form-control" name="id_produk" style="background-color: #e0e0e0;">
                 <option value="">-- Pilih Produk --</option>
                 <?php foreach ($products as $product): ?>
-                    <option value="<?= $product['id_produk'] ?>">
+                    <option value="<?= $product['id_produk'] ?>" data-harga="<?= $product['harga'] ?>">
                         <?= $product['nama_produk'] ?> - Rp <?= number_format($product['harga'], 0, ',', '.') ?>
                     </option>
                 <?php endforeach; ?>
@@ -155,29 +156,95 @@ $doctors = query("SELECT * FROM dokter_hewan");
         <div class="col-sm-3 text-start">Jumlah</div>
         <div class="col-sm-1 text-end">:</div>
         <div class="col-sm-8">
-            <input type="number" class="form-control" name="quantity" style="background-color: #e0e0e0;" min="1">
+            <input type="number" class="form-control" name="quantity" style="background-color: #e0e0e0;" min="1"
+                value="1">
         </div>
     </div>
 </div>
 
-<div id="detail-layanan" class="detail-section" style="display: none;">
+<div id="detail-penitipan" class="detail-section" style="display: none;">
     <div class="row mb-3 align-items-center">
-        <div class="col-sm-3 text-start">Layanan</div>
+        <div class="col-sm-3 text-start">Layanan Penitipan</div>
         <div class="col-sm-1 text-end">:</div>
         <div class="col-sm-8">
             <select class="form-control" name="id_layanan" style="background-color: #e0e0e0;">
-                <option value="">-- Pilih Layanan --</option>
+                <option value="">-- Pilih Layanan Penitipan --</option>
                 <?php foreach ($services as $service): ?>
-                    <option value="<?= $service['id_layanan'] ?>">
-                        <?= $service['nama_layanan'] ?> - Rp <?= number_format($service['harga'], 0, ',', '.') ?>
-                    </option>
+                    <?php if ($service['jenis_layanan'] == 'penitipan'): ?>
+                        <option value="<?= $service['id_layanan'] ?>" data-harga="<?= $service['harga'] ?>">
+                            <?= $service['nama_layanan'] ?> - Rp <?= number_format($service['harga'], 0, ',', '.') ?>
+                        </option>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </select>
+        </div>
+    </div>
+    <div class="row mb-3 align-items-center">
+        <div class="col-sm-3 text-start">Tanggal Check-in</div>
+        <div class="col-sm-1 text-end">:</div>
+        <div class="col-sm-8">
+            <input type="date" class="form-control" name="tanggal_checkin" style="background-color: #e0e0e0;">
+        </div>
+    </div>
+    <div class="row mb-3 align-items-center">
+        <div class="col-sm-3 text-start">Tanggal Check-out</div>
+        <div class="col-sm-1 text-end">:</div>
+        <div class="col-sm-8">
+            <input type="date" class="form-control" name="tanggal_checkout" style="background-color: #e0e0e0;">
+        </div>
+    </div>
+</div>
+
+<div id="detail-perawatan" class="detail-section" style="display: none;">
+    <div class="row mb-3 align-items-center">
+        <div class="col-sm-3 text-start">Layanan Perawatan</div>
+        <div class="col-sm-1 text-end">:</div>
+        <div class="col-sm-8">
+            <select class="form-control" name="id_layanan" style="background-color: #e0e0e0;">
+                <option value="">-- Pilih Layanan Perawatan --</option>
+                <?php foreach ($services as $service): ?>
+                    <?php if ($service['jenis_layanan'] == 'perawatan'): ?>
+                        <option value="<?= $service['id_layanan'] ?>" data-harga="<?= $service['harga'] ?>">
+                            <?= $service['nama_layanan'] ?> - Rp <?= number_format($service['harga'], 0, ',', '.') ?>
+                        </option>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+    <div class="row mb-3 align-items-center">
+        <div class="col-sm-3 text-start">Tanggal Perawatan</div>
+        <div class="col-sm-1 text-end">:</div>
+        <div class="col-sm-8">
+            <input type="date" class="form-control" name="tanggal_perawatan" style="background-color: #e0e0e0;">
+        </div>
+    </div>
+    <div class="row mb-3 align-items-center">
+        <div class="col-sm-3 text-start">Waktu Perawatan</div>
+        <div class="col-sm-1 text-end">:</div>
+        <div class="col-sm-8">
+            <input type="time" class="form-control" name="waktu_perawatan" style="background-color: #e0e0e0;">
         </div>
     </div>
 </div>
 
 <div id="detail-konsultasi" class="detail-section" style="display: none;">
+    <div class="row mb-3 align-items-center">
+        <div class="col-sm-3 text-start">Layanan Konsultasi</div>
+        <div class="col-sm-1 text-end">:</div>
+        <div class="col-sm-8">
+            <select class="form-control" name="id_layanan" style="background-color: #e0e0e0;">
+                <option value="">-- Pilih Layanan Konsultasi --</option>
+                <?php foreach ($services as $service): ?>
+                    <?php if ($service['jenis_layanan'] == 'konsultasi'): ?>
+                        <option value="<?= $service['id_layanan'] ?>" data-harga="<?= $service['harga'] ?>">
+                            <?= $service['nama_layanan'] ?> - Rp <?= number_format($service['harga'], 0, ',', '.') ?>
+                        </option>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
     <div class="row mb-3 align-items-center">
         <div class="col-sm-3 text-start">Dokter</div>
         <div class="col-sm-1 text-end">:</div>
@@ -196,32 +263,31 @@ $doctors = query("SELECT * FROM dokter_hewan");
         <div class="col-sm-3 text-start">Tanggal Konsultasi</div>
         <div class="col-sm-1 text-end">:</div>
         <div class="col-sm-8">
-            <input type="datetime-local" class="form-control" name="tanggal_konsultasi"
-                style="background-color: #e0e0e0;">
+            <input type="date" class="form-control" name="tanggal_konsultasi" style="background-color: #e0e0e0;">
+        </div>
+    </div>
+    <div class="row mb-3 align-items-center">
+        <div class="col-sm-3 text-start">Waktu Konsultasi</div>
+        <div class="col-sm-1 text-end">:</div>
+        <div class="col-sm-8">
+            <input type="time" class="form-control" name="waktu_konsultasi" style="background-color: #e0e0e0;">
         </div>
     </div>
 </div>
 
-<div id="detail-perawatan" class="detail-section" style="display: none;">
-    <div class="row mb-3 align-items-center">
-        <div class="col-sm-3 text-start">Paket Perawatan</div>
-        <div class="col-sm-1 text-end">:</div>
-        <div class="col-sm-8">
-            <select class="form-control" name="paket_perawatan" style="background-color: #e0e0e0;">
-                <option value="">-- Pilih Paket --</option>
-                <option value="Basic">Basic</option>
-                <option value="Premium">Premium</option>
-                <option value="VIP">VIP</option>
-            </select>
-        </div>
-    </div>
-    <div class="row mb-3 align-items-center">
-        <div class="col-sm-3 text-start">Tanggal Perawatan</div>
-        <div class="col-sm-1 text-end">:</div>
-        <div class="col-sm-8">
-            <input type="datetime-local" class="form-control" name="tanggal_perawatan"
-                style="background-color: #e0e0e0;">
-        </div>
+<!-- Metode Pembayaran -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-3 text-start">Metode Pembayaran</div>
+    <div class="col-sm-1 text-end">:</div>
+    <div class="col-sm-8">
+        <select class="form-control" name="metode_pembayaran" style="background-color: #e0e0e0;" required>
+            <option value="">-- Pilih Metode Pembayaran --</option>
+            <option value="cash">Cash</option>
+            <option value="transfer">Transfer</option>
+            <option value="debit">Debit</option>
+            <option value="credit">Credit</option>
+            <option value="ewallet">E-Wallet</option>
+        </select>
     </div>
 </div>
 
@@ -234,7 +300,7 @@ $doctors = query("SELECT * FROM dokter_hewan");
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
             <option value="processing">Processing</option>
-            <option value="completed">Completed</option>
+            <option value="completed" selected>Completed</option>
             <option value="cancelled">Cancelled</option>
         </select>
     </div>
@@ -259,7 +325,18 @@ $doctors = query("SELECT * FROM dokter_hewan");
     <div class="col-sm-3 text-start">Total Harga</div>
     <div class="col-sm-1 text-end">:</div>
     <div class="col-sm-8">
-        <input type="number" class="form-control" name="total_harga" style="background-color: #e0e0e0;" required>
+        <input type="number" class="form-control" name="total_harga" style="background-color: #e0e0e0;" required
+            readonly>
+    </div>
+</div>
+
+<!-- Catatan Pelanggan -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-3 text-start">Catatan Pelanggan</div>
+    <div class="col-sm-1 text-end">:</div>
+    <div class="col-sm-8">
+        <textarea class="form-control" name="catatan_pelanggan" rows="3" style="background-color: #e0e0e0;"
+            placeholder="Catatan dari pelanggan (opsional)"></textarea>
     </div>
 </div>
 
@@ -269,7 +346,6 @@ $doctors = query("SELECT * FROM dokter_hewan");
         const tipePelangganSelect = document.getElementById('tipe_pelanggan');
         const existingCustomerForm = document.getElementById('existing-customer-form');
         const newCustomerForm = document.getElementById('new-customer-form');
-        const manualAnabulForm = document.getElementById('manual-anabul-form');
 
         tipePelangganSelect.addEventListener('change', function () {
             if (this.value === 'existing') {
@@ -288,22 +364,24 @@ $doctors = query("SELECT * FROM dokter_hewan");
         const customerSelect = document.getElementById('id_pelanggan');
         const anabulSelect = document.getElementById('id_anabul');
 
+        // Pre-load all pets data
+        const allPets = <?= json_encode($anabul) ?>;
+
         customerSelect.addEventListener('change', function () {
             if (this.value) {
-                // Fetch pets for selected customer using AJAX
-                fetch(`get_pets.php?customer_id=${this.value}`)
-                    .then(response => response.json())
-                    .then(pets => {
-                        anabulSelect.innerHTML = '<option value="">-- Pilih Anabul --</option>';
-                        pets.forEach(pet => {
-                            anabulSelect.innerHTML += `
-                            <option value="${pet.id_anabul}">
-                                ${pet.nama_anabul} - ${pet.jenis_anabul} (${pet.ras_anabul})
-                            </option>
-                        `;
-                        });
-                    })
-                    .catch(error => console.error('Error:', error));
+                // Filter pets for selected customer
+                const customerPets = allPets.filter(pet => pet.id_pelanggan == this.value);
+
+                anabulSelect.innerHTML = '<option value="">-- Pilih Anabul --</option>';
+                customerPets.forEach(pet => {
+                    anabulSelect.innerHTML += `
+                        <option value="${pet.id_anabul}">
+                            ${pet.nama_hewan} - ${pet.jenis_hewan} (${pet.ras})
+                        </option>
+                    `;
+                });
+            } else {
+                anabulSelect.innerHTML = '<option value="">-- Pilih Anabul --</option>';
             }
         });
 
@@ -323,23 +401,44 @@ $doctors = query("SELECT * FROM dokter_hewan");
 
         jenisPesananSelect.addEventListener('change', updateDetailSections);
 
-        // Calculate total price when product or quantity changes
+        // Calculate total price when product/quantity or service changes
         const productSelect = document.querySelector('select[name="id_produk"]');
         const quantityInput = document.querySelector('input[name="quantity"]');
+        const serviceSelects = document.querySelectorAll('select[name="id_layanan"]');
         const totalInput = document.querySelector('input[name="total_harga"]');
 
         function calculateTotal() {
-            if (productSelect && quantityInput && totalInput) {
+            let total = 0;
+
+            // Calculate product total
+            if (productSelect && quantityInput) {
                 const selectedOption = productSelect.options[productSelect.selectedIndex];
                 if (selectedOption.value) {
-                    const price = parseInt(selectedOption.text.split('Rp ')[1].replace(/\./g, ''));
+                    const price = parseInt(selectedOption.dataset.harga);
                     const quantity = parseInt(quantityInput.value) || 0;
-                    totalInput.value = price * quantity;
+                    total = price * quantity;
                 }
+            }
+
+            // Calculate service total
+            serviceSelects.forEach(select => {
+                if (select.style.display !== 'none') {
+                    const selectedOption = select.options[select.selectedIndex];
+                    if (selectedOption.value) {
+                        total = parseInt(selectedOption.dataset.harga);
+                    }
+                }
+            });
+
+            if (totalInput) {
+                totalInput.value = total;
             }
         }
 
         if (productSelect) productSelect.addEventListener('change', calculateTotal);
         if (quantityInput) quantityInput.addEventListener('input', calculateTotal);
+        serviceSelects.forEach(select => {
+            select.addEventListener('change', calculateTotal);
+        });
     });
 </script>

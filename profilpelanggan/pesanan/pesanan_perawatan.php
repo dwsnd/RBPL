@@ -12,33 +12,33 @@ if (!isset($_SESSION['id_pelanggan'])) {
 
 $id_pelanggan = $_SESSION['id_pelanggan'];
 
-// Ambil data pesanan pelanggan
+// Ambil data pesanan perawatan milik pelanggan ini
 $query = "SELECT 
-            p.id_pesanan,
-            p.tanggal_booking,
-            p.tanggal_layanan,
-            p.waktu_layanan,
-            p.status_pesanan,
-            p.total_harga,
-            p.catatan_khusus,
-            a.nama_hewan,
-            a.kategori_hewan,
-            a.karakteristik,
-            dl.nama_layanan,
-            dl.deskripsi as deskripsi_layanan
-          FROM pesanan_layanan p
-          JOIN anabul a ON p.id_anabul = a.id_anabul
-          JOIN detail_layanan dl ON p.jenis_layanan = dl.jenis_layanan
-          WHERE p.id_pelanggan = '$id_pelanggan'
-          ORDER BY p.created_at DESC";
+    p.id_pesanan,
+    p.nomor_pesanan,
+    p.tanggal_layanan,
+    p.waktu_layanan,
+    p.status_pesanan,
+    p.total_harga,
+    p.catatan_pelanggan,
+    pl.id_detail,
+    pl.harga_layanan,
+    pl.catatan_khusus,
+    a.nama_hewan,
+    a.spesies,
+    a.ciri_khusus,
+    l.nama_layanan,
+    l.deskripsi as deskripsi_layanan
+FROM pesanan p
+JOIN pesanan_layanan pl ON p.id_pesanan = pl.id_pesanan
+JOIN layanan l ON pl.id_layanan = l.id_layanan
+LEFT JOIN anabul a ON pl.id_anabul = a.id_anabul
+WHERE p.id_pelanggan = ? AND p.jenis_pesanan = 'perawatan'
+ORDER BY p.created_at DESC";
 
-$result = mysqli_query($conn, $query);
-$pesanan_list = [];
-if ($result && mysqli_num_rows($result) > 0) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $pesanan_list[] = $row;
-    }
-}
+$stmt = $pdo->prepare($query);
+$stmt->execute([$id_pelanggan]);
+$pesanan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Function untuk format status
 function formatStatus($status)
@@ -46,7 +46,7 @@ function formatStatus($status)
     $status_labels = [
         'pending' => ['Menunggu Konfirmasi', 'bg-warning', 'text-dark'],
         'confirmed' => ['Dikonfirmasi', 'bg-info', 'text-white'],
-        'in_progress' => ['Sedang Diproses', 'bg-primary', 'text-white'],
+        'processing' => ['Sedang Diproses', 'bg-primary', 'text-white'],
         'completed' => ['Selesai', 'bg-success', 'text-white'],
         'cancelled' => ['Dibatalkan', 'bg-danger', 'text-white']
     ];
@@ -64,194 +64,258 @@ function formatWaktu($waktu)
         'sore' => '13:00 - 15:00',
         'sore-akhir' => '15:00 - 17:00'
     ];
-
     return isset($waktu_labels[$waktu]) ? $waktu_labels[$waktu] : $waktu;
 }
 ?>
 
-<div class="pesanan-content">
-    <?php if (empty($pesanan_list)): ?>
-        <div class="text-center py-5">
-            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-            <h4 class="text-muted">Belum Ada Pesanan</h4>
-            <p class="text-muted mb-4">Anda belum memiliki pesanan layanan grooming</p>
-            <a href="booking_form.php" class="btn btn-warning btn-lg">
-                <i class="fas fa-plus me-2"></i>Buat Pesanan Pertama
-            </a>
+<div class="w-full bg-white rounded-lg shadow-md p-6 border border-grey-100">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1 fw-bold text-dark">Riwayat Perawatan</h4>
+            <p class="text-muted mb-0">Kelola semua layanan grooming hewan Anda</p>
         </div>
-    <?php else: ?>
-        <div class="row">
-            <?php foreach ($pesanan_list as $pesanan): ?>
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm status-<?php echo $pesanan['status_pesanan']; ?>">
-                        <div class="card-header bg-white">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0 fw-bold">
-                                    #<?php echo str_pad($pesanan['id_pesanan'], 6, '0', STR_PAD_LEFT); ?>
-                                </h6>
-                                <?php echo formatStatus($pesanan['status_pesanan']); ?>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <i class="fas fa-paw text-orange-500 me-2"></i>
-                                <div>
-                                    <h6 class="mb-0 fw-semibold"><?php echo htmlspecialchars($pesanan['nama_hewan']); ?></h6>
-                                    <small class="text-muted"><?php echo ucfirst($pesanan['kategori_hewan']); ?></small>
-                                </div>
-                            </div>
+        <?php if (!empty($pesanan_list)): ?>
+            <a href="../../dashboard/perawatan/perawatan_pelanggan.php"
+                class="btn btn-orange-500 text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-plus me-2"></i>Pesan Perawatan
+            </a>
+        <?php endif; ?>
+    </div>
 
-                            <div class="mb-3">
-                                <h6 class="fw-semibold text-dark"><?php echo $pesanan['nama_layanan']; ?></h6>
-                                <small class="text-muted"><?php echo $pesanan['deskripsi_layanan']; ?></small>
-                            </div>
-
-                            <div class="timeline-item mb-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar me-1"></i>
-                                    <?php echo date('d M Y', strtotime($pesanan['tanggal_layanan'])); ?>
-                                </small>
-                            </div>
-
-                            <div class="timeline-item mb-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-clock me-1"></i>
-                                    <?php echo formatWaktu($pesanan['waktu_layanan']); ?>
-                                </small>
-                            </div>
-
-                            <div class="timeline-item mb-3">
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar-plus me-1"></i>
-                                    Dibuat: <?php echo date('d/m/Y H:i', strtotime($pesanan['tanggal_booking'])); ?>
-                                </small>
-                            </div>
-
-                            <?php if (!empty($pesanan['catatan_khusus'])): ?>
-                                <div class="border-top pt-2 mb-3">
-                                    <small class="text-muted">
-                                        <i class="fas fa-sticky-note me-1"></i>
-                                        <?php echo htmlspecialchars($pesanan['catatan_khusus']); ?>
-                                    </small>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="card-footer bg-white">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0 fw-bold text-dark">
-                                    Rp <?php echo number_format($pesanan['total_harga'], 0, ',', '.'); ?>
-                                </h5>
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
-                                        data-bs-target="#detailModal<?php echo $pesanan['id_pesanan']; ?>">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <?php if ($pesanan['status_pesanan'] === 'pending'): ?>
-                                        <button type="button" class="btn btn-sm btn-outline-danger"
-                                            onclick="confirmCancel(<?php echo $pesanan['id_pesanan']; ?>)">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Booking List -->
+    <div class="pesanan-content">
+        <?php if (empty($pesanan_list)): ?>
+            <div class="text-center py-8">
+                <div class="mb-4">
+                    <i class="fas fa-cut text-muted" style="font-size: 4rem;"></i>
                 </div>
-
-                <!-- Modal Detail -->
-                <div class="modal fade" id="detailModal<?php echo $pesanan['id_pesanan']; ?>" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    Detail Pesanan #<?php echo str_pad($pesanan['id_pesanan'], 6, '0', STR_PAD_LEFT); ?>
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h4 class="text-muted mb-2">Belum Ada Riwayat Perawatan</h4>
+                <p class="text-muted mb-4">Anda belum memiliki riwayat layanan grooming</p>
+                <a href="../../dashboard/perawatan/perawatan_pelanggan.php"
+                    class="btn btn-orange-500 text-white px-6 py-3 rounded-lg">
+                    <i class="fas fa-plus me-2"></i>Pesan Perawatan Pertama
+                </a>
+            </div>
+        <?php else: ?>
+            <div class="row g-4">
+                <?php foreach ($pesanan_list as $pesanan): ?>
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm hover-shadow transition-all duration-300">
+                            <!-- Card Header -->
+                            <div class="card-header bg-white border-bottom-0 pb-0">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h6 class="mb-1 fw-bold text-dark">
+                                            #<?php echo str_pad($pesanan['id_pesanan'], 6, '0', STR_PAD_LEFT); ?>
+                                        </h6>
+                                        <small class="text-muted">
+                                            <?php echo date('d M Y', strtotime($pesanan['tanggal_layanan'])); ?>
+                                        </small>
+                                    </div>
+                                    <?php echo formatStatus($pesanan['status_pesanan']); ?>
+                                </div>
                             </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6 class="fw-bold mb-3">Informasi Hewan</h6>
-                                        <p><strong>Nama:</strong> <?php echo htmlspecialchars($pesanan['nama_hewan']); ?></p>
-                                        <p><strong>Kategori:</strong> <?php echo ucfirst($pesanan['kategori_hewan']); ?></p>
-                                        <?php if (!empty($pesanan['karakteristik'])): ?>
-                                            <p><strong>Ciri Khusus:</strong>
-                                                <?php echo htmlspecialchars($pesanan['karakteristik']); ?></p>
-                                        <?php endif; ?>
+
+                            <!-- Card Body -->
+                            <div class="card-body pt-0">
+                                <!-- Layanan Info -->
+                                <div class="mb-4">
+                                    <h6 class="fw-bold text-dark mb-1"><?php echo $pesanan['nama_layanan']; ?></h6>
+                                    <p class="text-muted small mb-0"><?php echo $pesanan['deskripsi_layanan']; ?></p>
+                                </div>
+
+                                <!-- Pet Info -->
+                                <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width: 40px; height: 40px;">
+                                            <i class="fas fa-paw"></i>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <h6 class="fw-bold mb-3">Informasi Layanan</h6>
-                                        <p><strong>Layanan:</strong> <?php echo $pesanan['nama_layanan']; ?></p>
-                                        <p><strong>Tanggal:</strong>
-                                            <?php echo date('d M Y', strtotime($pesanan['tanggal_layanan'])); ?></p>
-                                        <p><strong>Waktu:</strong> <?php echo formatWaktu($pesanan['waktu_layanan']); ?></p>
-                                        <p><strong>Status:</strong> <?php echo formatStatus($pesanan['status_pesanan']); ?></p>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0 fw-semibold"><?php echo htmlspecialchars($pesanan['nama_hewan']); ?>
+                                        </h6>
+                                        <small class="text-muted"><?php echo ucfirst($pesanan['spesies']); ?></small>
                                     </div>
                                 </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h6 class="fw-bold mb-3">Deskripsi Layanan</h6>
-                                        <p><?php echo $pesanan['deskripsi_layanan']; ?></p>
+
+                                <!-- Schedule Info -->
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-calendar text-primary me-2"></i>
+                                            <small class="text-muted">
+                                                <?php echo date('d M Y', strtotime($pesanan['tanggal_layanan'])); ?>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-clock text-primary me-2"></i>
+                                            <small class="text-muted">
+                                                <?php
+                                                if (!empty($pesanan['waktu_layanan'])) {
+                                                    echo formatWaktu($pesanan['waktu_layanan']);
+                                                } else {
+                                                    echo 'Waktu belum ditentukan';
+                                                }
+                                                ?>
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- Notes -->
                                 <?php if (!empty($pesanan['catatan_khusus'])): ?>
-                                    <hr>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <h6 class="fw-bold mb-3">Catatan Khusus</h6>
-                                            <p><?php echo htmlspecialchars($pesanan['catatan_khusus']); ?></p>
+                                    <div class="border-top pt-3 mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <i class="fas fa-sticky-note text-warning me-2 mt-1"></i>
+                                            <div>
+                                                <small class="text-muted fw-semibold">Catatan Khusus:</small>
+                                                <p class="text-muted small mb-0">
+                                                    <?php echo htmlspecialchars($pesanan['catatan_khusus']); ?>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 <?php endif; ?>
                             </div>
-                            <div class="modal-footer">
-                                <div class="w-100 d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0 fw-bold text-dark">
-                                        Total: Rp <?php echo number_format($pesanan['total_harga'], 0, ',', '.'); ?>
+
+                            <!-- Card Footer -->
+                            <div class="card-footer bg-white border-top-0 pt-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="text-muted small">Total Biaya</span>
+                                        <h5 class="mb-0 fw-bold text-dark">
+                                            Rp <?php echo number_format($pesanan['harga_layanan'], 0, ',', '.'); ?>
+                                        </h5>
+                                    </div>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                            data-bs-target="#detailModal<?php echo htmlspecialchars($pesanan['id_pesanan']); ?>">
+                                            <i class="fas fa-eye me-1"></i>Detail
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Detail -->
+                    <div class="modal fade" id="detailModal<?php echo htmlspecialchars($pesanan['id_pesanan']); ?>"
+                        tabindex=" -1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-bold">
+                                        Detail Perawatan #<?php echo str_pad($pesanan['id_pesanan'], 6, '0', STR_PAD_LEFT); ?>
                                     </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body">
+                                                    <h6 class="fw-bold mb-3 text-primary">Informasi Hewan</h6>
+                                                    <p><strong>Nama:</strong>
+                                                        <?php echo htmlspecialchars($pesanan['nama_hewan']); ?></p>
+                                                    <p><strong>Spesies:</strong> <?php echo ucfirst($pesanan['spesies']); ?></p>
+                                                    <?php if (!empty($pesanan['ciri_khusus'])): ?>
+                                                        <p><strong>Ciri Khusus:</strong>
+                                                            <?php echo htmlspecialchars($pesanan['ciri_khusus']); ?></p>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body">
+                                                    <h6 class="fw-bold mb-3 text-primary">Informasi Layanan</h6>
+                                                    <p><strong>Layanan:</strong> <?php echo $pesanan['nama_layanan']; ?></p>
+                                                    <p><strong>Tanggal:</strong>
+                                                        <?php echo date('d M Y', strtotime($pesanan['tanggal_layanan'])); ?></p>
+                                                    <p><strong>Waktu:</strong>
+                                                        <?php
+                                                        if (!empty($pesanan['waktu_layanan'])) {
+                                                            echo formatWaktu($pesanan['waktu_layanan']);
+                                                        } else {
+                                                            echo 'Waktu belum ditentukan';
+                                                        }
+                                                        ?>
+                                                    </p>
+                                                    <p><strong>Status:</strong>
+                                                        <?php echo formatStatus($pesanan['status_pesanan']); ?></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6 class="fw-bold mb-3 text-primary">Deskripsi Layanan</h6>
+                                            <p class="text-muted"><?php echo $pesanan['deskripsi_layanan']; ?></p>
+                                        </div>
+                                    </div>
+                                    <?php if (!empty($pesanan['catatan_khusus'])): ?>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h6 class="fw-bold mb-3 text-primary">Catatan Khusus</h6>
+                                                <p class="text-muted"><?php echo htmlspecialchars($pesanan['catatan_khusus']); ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-</div>
-
-<!-- Modal Konfirmasi Pembatalan -->
-<div class="modal fade" id="cancelModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Konfirmasi Pembatalan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <?php endforeach; ?>
             </div>
-            <div class="modal-body">
-                <div class="text-center">
-                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                    <h6>Apakah Anda yakin ingin membatalkan pesanan ini?</h6>
-                    <p class="text-muted">Pesanan yang dibatalkan tidak dapat dikembalikan</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <form id="cancelForm" method="POST" action="cancel_order.php" style="display: inline;">
-                    <input type="hidden" name="id_pesanan" id="cancelOrderId">
-                    <button type="submit" class="btn btn-danger">Ya, Batalkan</button>
-                </form>
-            </div>
-        </div>
+        <?php endif; ?>
     </div>
 </div>
 
+<style>
+    .btn-orange-500 {
+        background-color: #f97316;
+        border-color: #f97316;
+    }
+
+    .btn-orange-500:hover {
+        background-color: #ea580c;
+        border-color: #ea580c;
+    }
+
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .badge {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+</style>
+
 <script>
-    // Function untuk konfirmasi pembatalan
-    function confirmCancel(orderId) {
-        document.getElementById('cancelOrderId').value = orderId;
-        const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+    // Fungsi untuk membuka modal detail
+    function openDetailModal(id) {
+        const modal = new bootstrap.Modal(document.getElementById('detailModal' + id));
         modal.show();
     }
 </script>
